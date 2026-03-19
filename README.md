@@ -1,0 +1,2 @@
+# Hucky
+Programming tournament system
