@@ -44,7 +44,7 @@
 
 
 
-    <div class = "grid grid-cols-1 lg:grid-cols-4 gap-5">
+    <div class = "grid grid-cols-1 lg:grid-cols-4 gap-6">
         {#each features as feature}
         <div class = "p-8 flex flex-col ring-[1.5px] rounded-xl items-start gap-4 min-w-70">
            <img src = {feature.icon} class = "bg-[#191F00] p-[0.625rem] rounded-[0.625rem] w-9 h-9">
