@@ -14,6 +14,8 @@
     {variant === 'ghost' ? 'font-semibold hover:ring-1 hover:ring-[#191F00]' : ''}
     {variant === 'green' ? 'font-bold text-[#191F00] bg-linear-to-br from-[#BCEB01] to-[#EEFF00] hover:bg-linear-to-tl' : ''}
     {variant === 'outline' ? 'font-bold text-white bg-[#191F00] ring-1 ring-white hover:ring-2' : ''}
+    {variant === 'second' ? 'font-bold text-white bg-[#191F00] hover:ring-1' : ''}
+    {variant === 'white' ? 'font-bold text-[#191F00] bg-white' : ''}
     {className}"
 >
 
