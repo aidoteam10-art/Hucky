@@ -27,7 +27,7 @@
         </div>
   </div>
 
-    <img src="girl_laptop.png" alt="Girl with laptop" class="absolute bottom-0 right-0 max-h-[100%] z-30 object-contain h-auto w-auto transform hidden xl:block">
+    <img src="girl_laptop.png" alt="Girl with laptop" class="absolute bottom-0 right-0 max-h-full z-30 object-contain h-auto w-auto transform hidden xl:block">
 
 </section>
 
@@ -79,3 +79,4 @@
         <Link href = "/registration" variant = "green" size = "lg" >Створити акаунт</Link>
     </div>
 </section>
+
