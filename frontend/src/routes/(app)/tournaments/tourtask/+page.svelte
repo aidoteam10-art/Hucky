@@ -6,15 +6,15 @@
 
   <div class="bg-gradient-to-r from-[#191F00] to-[#191F00] text-white rounded-2xl p-10 pl-14 pr-14 flex justify-between items-center">
     <div>
-      <h2 class="text-lg font-semibold mb-4">Раунд 1: MVP Development</h2>
-      <button class="bg-gradient-to-r from-[#BCEB01] to-[#EEFF00] mt-[16px] text-black px-4 py-2 rounded-lg font-medium hover:bg-lime-300 transition">
+      <h2 class="text-lg font-semibold mb-4 text-[1.5rem]">Раунд 1: MVP Development</h2>
+      <button class="text-[1rem] font-bold bg-gradient-to-r from-[#BCEB01] to-[#EEFF00] mt-[16px] text-[#191F00] px-7.5 py-3 rounded-lg hover:bg-lime-300 transition">
         Здати роботу
       </button>
     </div>
 
     <div class="text-right">
-      <p class="text-sm opacity-80 text-[11px]">Часу залишилося</p>
-      <p class="text-[24px] font-semibold mt-1">{timeLeft}</p>
+      <p class="text-sm opacity-80 text-[1rem]">Часу залишилося</p>
+      <p class="text-[2.5rem] font-semibold mt-1">{timeLeft}</p>
     </div>
   </div>
 
@@ -41,7 +41,7 @@
 
   <div class="border border-gray-300 rounded-2xl p-5 bg-white">
     <h3 class="font-semibold mb-5">Обов’язкові вимоги</h3>
-    <div class="bg-[#ccff33] text-[#1a1a1a] rounded-xl p-4 mb-3">
+    <div class="bg-[#CCFF00] text-[#1a1a1a] rounded-xl p-4 mb-3">
         <div class="flex items-center gap-3">
           <span class="w-8 h-8 flex items-center justify-center border border-current font-bold rounded-lg text-[15px]">
             1
@@ -52,7 +52,7 @@
           </p>
         </div>
     </div>
-    <div class="bg-[#ccff33] text-[#1a1a1a] rounded-xl p-4 mb-3">
+    <div class="bg-[#CCFF00] text-[#1a1a1a] rounded-xl p-4 mb-3">
         <div class="flex items-center gap-3">
           <span class="w-8 h-8 flex items-center justify-center border border-current font-bold rounded-lg text-[15px]">
             2
@@ -63,7 +63,7 @@
           </p>
         </div>
     </div>
-    <div class="bg-[#ccff33] text-[#1a1a1a] rounded-xl p-4 mb-3">
+    <div class="bg-[#CCFF00] text-[#1a1a1a] rounded-xl p-4 mb-3">
         <div class="flex items-center gap-3">
           <span class="w-8 h-8 flex items-center justify-center border border-current font-bold rounded-lg text-[15px]">
             3
@@ -74,7 +74,7 @@
           </p>
         </div>
     </div>
-    <div class="bg-[#ccff33] text-[#1a1a1a] rounded-xl p-4 mb-3">
+    <div class="bg-[#CCFF00] text-[#1a1a1a] rounded-xl p-4 mb-3">
         <div class="flex items-center gap-3">
           <span class="w-8 h-8 flex items-center justify-center border border-current font-bold rounded-lg text-[15px]">
             4
@@ -85,7 +85,7 @@
           </p>
         </div>
     </div>
-    <div class="bg-[#ccff33] text-[#1a1a1a] rounded-xl p-4 mb-3">
+    <div class="bg-[#CCFF00] text-[#1a1a1a] rounded-xl p-4 mb-3">
         <div class="flex items-center gap-3">
           <span class="w-8 h-8 flex items-center justify-center border border-current font-bold rounded-lg text-[15px]">
             5
@@ -96,7 +96,7 @@
           </p>
         </div>
     </div>
-    <div class="bg-[#ccff33] text-[#1a1a1a] rounded-xl p-4 mb-3">
+    <div class="bg-[#CCFF00] text-[#1a1a1a] rounded-xl p-4 mb-3">
         <div class="flex items-center gap-3">
           <span class="w-8 h-8 flex items-center justify-center border border-current font-bold rounded-lg text-[15px]">
             6

@@ -27,7 +27,7 @@
 			</Link>
 		</li>
 		<li>
-			<Link href="/tournaments" variant={isHomePage ? "ghost" : "white"}>
+			<Link href="/tournaments" variant={isHomePage ? "ghost" : "second"}>
 				Турніри
 			</Link>
 		</li>
