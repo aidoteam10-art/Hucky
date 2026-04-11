@@ -1,125 +1,88 @@
 <script>
   let timeLeft = "30:23:50:23";
+  let tournament = {
+    round: "Раунд 1: MVP Development",
+    taskDescription: "Створіть мінімально життєздатний продукт для програми управління завданнями з функціями співпраці в команді.",
+    technologies: "React/Next.js frontend, Node.js/Python backend, PostgreSQL database, deployed to a cloud platform.",
+    mandatoryRequirements: [
+      "Автентифікація користувача (реєстрація/вхід)",
+      "CRUD-операції для завдань",
+      "Функція призначення команди",
+      "REST API з належною обробкою помилок",
+      "База даних щонайменше з 3 таблицями",
+      "Адаптивний дизайн"
+    ],
+    startDate: "21.03.2026, 10:00",
+    endDate: "30.04.2026, 17:00"
+  }
 </script>
 
-<div class="max-w-6xl mx-auto mt-10 space-y-6">
+<div class="max-w-7xl mx-auto mt-10 pb-21 space-y-6">
 
-  <div class="bg-gradient-to-r from-[#191F00] to-[#191F00] text-white rounded-2xl p-10 pl-14 pr-14 flex justify-between items-center">
+  <div class="bg-[#191F00] text-white rounded-3xl p-15 pl-21 pr-14 mb-12.5 flex justify-between items-center">
     <div>
-      <h2 class="text-lg font-semibold mb-4 text-[1.5rem]">Раунд 1: MVP Development</h2>
-      <button class="text-[1rem] font-bold bg-gradient-to-r from-[#BCEB01] to-[#EEFF00] mt-[16px] text-[#191F00] px-7.5 py-3 rounded-lg hover:bg-lime-300 transition">
+      <h2 class="text-lg font-bold mb-4 text-[1.5rem]">{tournament.round}</h2>
+      <button class="text-[1rem] font-bold bg-gradient-to-r from-[#BCEB01] to-[#EEFF00] mt-[16px] text-[#191F00] px-7.5 py-3 rounded-lg hover:brightness-90 transition-all">
         Здати роботу
       </button>
     </div>
 
     <div class="text-right">
-      <p class="text-sm opacity-80 text-[1rem]">Часу залишилося</p>
-      <p class="text-[2.5rem] font-semibold mt-1">{timeLeft}</p>
+      <p class="font-regular text-[1rem]">Часу залишилося</p>
+      <p class="text-[2.5rem] font-semibold mt-5">{timeLeft}</p>
     </div>
   </div>
 
-  <div class="border border-gray-300 rounded-2xl p-5 bg-white ">
+  <div class="border border-[#B4B4B4] rounded-2xl px-7.5 py-9 bg-white ">
     <div class="flex items-center gap-2 mb-3 text-gray-900 font-medium">
-      <span>&lt;&gt;</span>
-      <span class='font-semibold'>Опис завдання</span>
+      <img src="/icons/task_desc.svg" alt="task_description">
+      <span class='font-semibold text-[#191F00]'>Опис завдання</span>
     </div>
-    <p class="text-gray-800 text-[14px]">
-      Створіть мінімально життєздатний продукт для програми управління завданнями 
-      з функціями співпраці в команді.
-    </p>
+    <p class="text-[191F00] font-regular text-[1rem]">{tournament.taskDescription}</p>
   </div>
 
-  <div class="border border-gray-300 rounded-2xl p-5 bg-white">
-    <div class="font-semibold text-gray-900 mb-3">
-      Необхідні технології
+  <div class="border border-[#B4B4B4] rounded-2xl px-7.5 py-9 bg-white ">
+    <div class="flex items-center gap-2 mb-3 text-gray-900 font-medium">
+      <span class='font-semibold text-[#191F00]'>Необхідні технології</span>
     </div>
-    <p class="text-gray-800 text-[14px]">
-      React/Next.js frontend, Node.js/Python backend, PostgreSQL database, 
-      deployed to a cloud platform.
-    </p>
+    <p class="text-[191F00] font-regular text-[1rem]">{tournament.technologies}</p>
   </div>
 
-  <div class="border border-gray-300 rounded-2xl p-5 bg-white">
-    <h3 class="font-semibold mb-5">Обов’язкові вимоги</h3>
-    <div class="bg-[#CCFF00] text-[#1a1a1a] rounded-xl p-4 mb-3">
-        <div class="flex items-center gap-3">
-          <span class="w-8 h-8 flex items-center justify-center border border-current font-bold rounded-lg text-[15px]">
-            1
-          </span>
+  <div class="border border-[#B4B4B4] rounded-2xl px-7.5 py-9 bg-white">
+    <div class="flex items-center gap-2 mb-8 text-gray-900 font-medium">
+      <img src="/icons/required.svg" alt="required">
+      <span class='font-semibold text-[#191F00]'>Обов’язкові вимоги</span>
+    </div>
 
-          <p class="font-medium text-[16px]">
-            Автентифікація користувача (реєстрація/вхід)
+    {#each tournament.mandatoryRequirements as requirement, i}
+      <div class="bg-[#CCFF00] text-[#191F00] rounded-xl p-5 mb-3 text-[1rem] font-regular">
+        <div class="flex items-center gap-4">
+            <span class="w-8 h-8 flex items-center justify-center border border-current font-regular rounded-lg text-[1rem]">
+              {i + 1}
+            </span>
+
+          <p class="font-regular text-[16px]">
+            {requirement}
           </p>
         </div>
-    </div>
-    <div class="bg-[#CCFF00] text-[#1a1a1a] rounded-xl p-4 mb-3">
-        <div class="flex items-center gap-3">
-          <span class="w-8 h-8 flex items-center justify-center border border-current font-bold rounded-lg text-[15px]">
-            2
-          </span>
-
-          <p class="font-medium text-[16px]">
-            CRUD-операції для завдань
-          </p>
-        </div>
-    </div>
-    <div class="bg-[#CCFF00] text-[#1a1a1a] rounded-xl p-4 mb-3">
-        <div class="flex items-center gap-3">
-          <span class="w-8 h-8 flex items-center justify-center border border-current font-bold rounded-lg text-[15px]">
-            3
-          </span>
-
-          <p class="font-medium text-[16px]">
-            Функція призначення команди
-          </p>
-        </div>
-    </div>
-    <div class="bg-[#CCFF00] text-[#1a1a1a] rounded-xl p-4 mb-3">
-        <div class="flex items-center gap-3">
-          <span class="w-8 h-8 flex items-center justify-center border border-current font-bold rounded-lg text-[15px]">
-            4
-          </span>
-
-          <p class="font-medium text-[16px]">
-            REST API з належною обробкою помилок
-          </p>
-        </div>
-    </div>
-    <div class="bg-[#CCFF00] text-[#1a1a1a] rounded-xl p-4 mb-3">
-        <div class="flex items-center gap-3">
-          <span class="w-8 h-8 flex items-center justify-center border border-current font-bold rounded-lg text-[15px]">
-            5
-          </span>
-
-          <p class="font-medium text-[16px]">
-            Database with at least 3 tables
-          </p>
-        </div>
-    </div>
-    <div class="bg-[#CCFF00] text-[#1a1a1a] rounded-xl p-4 mb-3">
-        <div class="flex items-center gap-3">
-          <span class="w-8 h-8 flex items-center justify-center border border-current font-bold rounded-lg text-[15px]">
-            6
-          </span>
-
-          <p class="font-medium text-[16px]">
-            Адаптивний дизайн
-          </p>
-        </div>
-    </div>
-    
+      </div>
+    {/each}
   </div>
-  <div class="border border-gray-300 rounded-2xl p-5 bg-white mb-4">
-    <h3 class="font-semibold mb-5">Розклад</h3>
+
+  <div class="border border-[#B4B4B4] rounded-2xl px-7.5 py-9 bg-white mb-4">
+    <div class="flex items-center gap-3 mb-5 text-gray-900 font-medium">
+      <img src="/icons/schedule.svg" alt="schedule">
+      <span class='font-semibold text-[#191F00]'>Розклад</span>
+    </div>
     <div class="flex w-full">
       <div class="flex-1 text-left">
-        <h3>Початок</h3>
-        <h3 class="font-semibold">21.03.2026, 10:00</h3>
+        <h3 class = "font-semibold text-[1.2rem] text-[#696969] mb-2">Початок</h3>
+        <p class="font-semibold text-[#191F00] text-[1.2rem] tracking-[0.15em]">21.03.2026, 10:00</p>
       </div>
 
       <div class="flex-1 text-left">
-        <h3>Дедлайн</h3>
-        <h3 class="font-semibold">30.04.2026, 17:00</h3>
+        <h3 class = "font-semibold text-[1.2rem] text-[#696969] mb-2">Дедлайн</h3>
+        <p class="font-semibold text-[#191F00] text-[1.2rem] tracking-[0.15em]">30.04.2026, 17:00</p>
       </div>
     </div>
   </div>

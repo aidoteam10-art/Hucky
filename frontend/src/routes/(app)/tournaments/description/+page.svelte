@@ -8,7 +8,7 @@
         description: "Build innovative solutions using modern web technologies. Teams compete across multiple rounds with expert jury evaluation.",
         startRegDate: "01.04.2026",
         endRegDate: "21.04.2026",
-        startDate: "21.03.2024",
+        startDate: "21.03.2026",
         endDate: "30.04.2024",
         teamsMaxNum: 20,
         teamsNum: 12,
