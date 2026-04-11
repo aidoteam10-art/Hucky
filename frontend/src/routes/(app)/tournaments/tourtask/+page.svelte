@@ -21,10 +21,10 @@
 
   <div class="bg-[#191F00] text-white rounded-3xl p-15 pl-21 pr-14 mb-12.5 flex justify-between items-center">
     <div>
-      <h2 class="text-lg font-bold mb-4 text-[1.5rem]">{tournament.round}</h2>
-      <button class="text-[1rem] font-bold bg-gradient-to-r from-[#BCEB01] to-[#EEFF00] mt-[16px] text-[#191F00] px-7.5 py-3 rounded-lg hover:brightness-90 transition-all">
+      <h2 class="text-lg font-bold mb-12 text-[1.5rem]">{tournament.round}</h2>
+      <a href="/task_submission" class="text-[1rem] font-bold bg-gradient-to-r from-[#BCEB01] to-[#EEFF00] mt-[16px] text-[#191F00] px-7.5 py-4 rounded-lg hover:brightness-90 transition-all">
         Здати роботу
-      </button>
+      </a>
     </div>
 
     <div class="text-right">

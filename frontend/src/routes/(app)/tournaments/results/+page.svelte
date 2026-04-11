@@ -66,7 +66,7 @@
     <section class="border border-[#111] rounded-2xl overflow-hidden bg-white shadow-sm">
         <div class="overflow-x-auto">
             <table class="w-full text-left border-collapse text-sm whitespace-nowrap">
-                <thead class="bg-gradient-to-r from-[#BCEB01] to-[#EEFF00] border-b border-[#111]">
+                <thead class="bg-[#CCFF00] border-b border-[#111]">
                     <tr>
                         <th class="py-5 px-6 font-bold w-16">#</th>
                         <th class="py-5 px-6 font-bold">Team</th>

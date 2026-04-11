@@ -1,0 +1,13 @@
+<svg width="140" height="140" viewBox="0 0 140 140" fill="none" xmlns="http://www.w3.org/2000/svg">
+<circle cx="70" cy="70" r="70" fill="#191F00"/>
+<mask id="mask0_166_1251" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="0" y="0" width="140" height="140">
+<circle cx="70" cy="70" r="70" fill="#191F00"/>
+</mask>
+<g mask="url(#mask0_166_1251)">
+<ellipse cx="69.9999" cy="132.046" rx="41.3636" ry="46.1364" fill="#CCFF00"/>
+</g>
+<circle cx="70" cy="66.8183" r="25.4545" fill="#CCFF00"/>
+<circle cx="70" cy="70" r="70" fill="#191F00" fill-opacity="0.73"/>
+<rect x="72.8638" y="58.002" width="7.04836" height="12.922" rx="1" transform="rotate(-45.2065 72.8638 58.002)" fill="white"/>
+<path d="M57.9504 73.3961C57.9604 73.1461 58.0637 72.9089 58.24 72.7314L71.3316 59.5451C71.7207 59.1531 72.3538 59.1509 72.7458 59.54L80.4966 67.2351C80.8885 67.6242 80.8908 68.2574 80.5017 68.6493L67.4101 81.8356C67.2338 82.0131 66.9974 82.1182 66.7475 82.1299L58.6748 82.5101C58.0889 82.5377 57.6051 82.0574 57.6285 81.4713L57.9504 73.3961Z" fill="white"/>
+</svg>

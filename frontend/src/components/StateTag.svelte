@@ -6,14 +6,20 @@
         registration: "bg-[#191F00] text-[#CCFF00]",
         active: "bg-[#191F00] text-[#F97316] ring-[1.5px] ring-[#F97316]", // Оранжевий
         draft: "bg-[#191F00] text-gray-200 ring-[1.5px] ring-gray-400", // Світло-сірий
-        completed: "bg-[#191F00] text-gray-400 ring-[1.5px] ring-gray-500" // Темнішо-сірий
+        completed: "bg-[#191F00] text-gray-400 ring-[1.5px] ring-gray-500", // Темнішо-сірий
+        participant: "bg-[#191F00] text-[#CCFF00]",
+        jury: "bg-[#191F00] text-[#F97316] ring-[1.5px] ring-[#F97316]", // Оранжевий
+        admin: "bg-[#191F00] text-gray-400 ring-[1.5px] ring-gray-500" // Темнішо-сірий
     };
 
     const labels = {
         registration: "Реєстрація",
         active: "Активний",
         draft: "Чернетка",
-        completed: "Завершений"
+        completed: "Завершений",
+        participant: "Учасник",
+        jury: "Журі",
+        admin: "Адмін"
     };
 </script>
 

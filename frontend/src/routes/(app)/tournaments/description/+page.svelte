@@ -1,6 +1,6 @@
 <script>
     import StateTag from "../../../../components/StateTag.svelte";
-    let current_state = "registration";
+    let current_state = "completed";
 
     let tournament = {
         name: "Hackathon Ukraine 2026",
@@ -40,9 +40,9 @@
         </div>
         <div class="flex flex-col items-end">
             {#if tournament.status === "registration"}
-                <button class="bg-[#CCFF00] hover:bg-[#A9D207] text-[#191F00] font-bold py-3.5 px-10 rounded-2xl text-[1.25rem] transition-all shadow-sm">
+                <a href="/team_registration" class="bg-[#CCFF00] hover:bg-[#A9D207] text-[#191F00] font-bold py-3.5 px-10 rounded-2xl text-[1.25rem] transition-all shadow-sm">
                     Зареєструвати команду
-                </button>
+                </a>
 
             {:else if tournament.status === "active"}
                 <div class="bg-[#CCFF00] px-10 py-8 rounded-[1.25rem] flex items-center gap-16 min-w-[450px]">
@@ -113,12 +113,12 @@
             <div>
                 <h3 class="text-[1.6rem] font-bold mb-8">Раунд 1: {tournament.round}</h3>
                 <div class="flex gap-12">
-                    <button class="bg-white text-[#191F00] font-bold py-3.5 px-8 rounded-xl text-[1.1rem] hover:bg-[#CBCBCB] transition-all">
+                    <a href="/tournaments/tourtask" class="bg-white text-[#191F00] font-bold py-3.5 px-8 rounded-xl text-[1.1rem] hover:bg-[#CBCBCB] transition-all">
                         Подивитися завдання
-                    </button>
-                    <button class="bg-[#CCFF00] text-[#191F00] font-bold py-3.5 px-8 rounded-xl text-[1.1rem] hover:bg-[#A9D207] transition-all">
+                    </a>
+                    <a href="/task_submission" class="bg-[#CCFF00] text-[#191F00] font-bold py-3.5 px-8 rounded-xl text-[1.1rem] hover:bg-[#A9D207] transition-all">
                         Здати роботу
-                    </button>
+                    </a>
                 </div>
             </div>
 
