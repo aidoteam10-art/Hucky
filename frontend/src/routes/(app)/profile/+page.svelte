@@ -1,6 +1,7 @@
 <script>
     import StateTag from "../../../components/StateTag.svelte";
     import TournamentCard from "../../../components/TournamentCard.svelte";
+    import CardShell from "../../../components/CardShell.svelte";
     // Ролі: "none" (без ролі), "participant" (учасник), "jury" (журі), "admin" (адмін)
     let role = "admin";
     let timeLeft = "30:23:50:23";
@@ -137,19 +138,22 @@
 
         <div class="grid grid-cols-2 gap-12 max-w-7xl ml-46">
             {#each user.createdTournaments as tournament}
-                <TournamentCard
-                        id={tournament.id}
-                        title={tournament.title}
-                        description={tournament.description}
-                        start_date={tournament.start_date}
-                        current_state={tournament.current_state}
-                        rounds={tournament.rounds}
-                        registered_teams={tournament.registered_teams}
-                        max_teams={tournament.max_teams}
-                />
+                <a href="/tournaments/{tournament.id}" class="block transition-transform duration-200 hover:scale-[1.01] active:scale-[0.99]">
+                    <CardShell>
+                        <TournamentCard
+                                id={tournament.id}
+                                title={tournament.title}
+                                description={tournament.description}
+                                start_date={tournament.start_date}
+                                current_state={tournament.current_state}
+                                rounds={tournament.rounds}
+                                registered_teams={tournament.registered_teams}
+                                max_teams={tournament.max_teams}
+                        />
+                    </CardShell>
+                </a>
             {/each}
         </div>
-
     {/if}
 
 

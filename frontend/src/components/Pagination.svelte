@@ -25,8 +25,12 @@
 
   {#each Array(totalPages) as _, i}
     <button
-      class="flex h-[42px] w-[42px] items-center justify-center rounded-full text-[20px] font-[700] text-[#202020] transition hover:bg-[#dddddd] {currentPage === i + 1 ? 'bg-[#d9f046]' : 'bg-[#e9e9e9]'}"
-      on:click={() => goToPage(i + 1)}
+            class="flex h-[42px] w-[42px] items-center justify-center rounded-full text-[20px] font-[700] text-[#202020] transition {
+      currentPage === i + 1
+        ? 'bg-[#CCFF00]'
+        : 'bg-[#F4F4F5] hover:bg-[#dddddd]'
+    }"
+            on:click={() => goToPage(i + 1)}
     >
       {i + 1}
     </button>
