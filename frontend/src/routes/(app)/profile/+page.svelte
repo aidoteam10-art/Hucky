@@ -3,7 +3,7 @@
     import TournamentCard from "../../../components/TournamentCard.svelte";
     import CardShell from "../../../components/CardShell.svelte";
     // Ролі: "none" (без ролі), "participant" (учасник), "jury" (журі), "admin" (адмін)
-    let role = "admin";
+    let role = "jury";
     let timeLeft = "30:23:50:23";
     let defaultAvatar = "/icons/avatar.svg";
     let hoverAvatar = "/icons/avatar_change.svg";
@@ -162,7 +162,7 @@
 
         <div class="space-y-6 ml-46 max-w-5xl">
             {#each user.assignedTasks as task}
-                <a href="/tournaments/results/{task.id}" class="block rounded-2xl py-6 px-10 border transition-all hover:scale-[1.01]
+                <a href="/tournaments/results/{task.id}?status={task.status}" class="block rounded-2xl py-6 px-10 border transition-all hover:scale-[1.01]
                     {task.status === 'pending' ? 'bg-[#CCFF00] border-transparent' : 'bg-white border-[#B4B4B4]'}">
 
                     <div class="flex justify-between items-start mb-6">
