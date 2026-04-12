@@ -6,8 +6,8 @@
     import Submit from "../../../components/Form/Submit.svelte";
 </script>
 
-<div class="flex flex-col gap-6 max-w-4xl w-full mt-10 p-10">
-    <div class="flex justify-between items-start mb-2 px-2">
+<div class="flex flex-col gap-6 max-w-4xl w-full mt-10 p-6">
+    <div class="flex justify-between items-start mb-2 px-2 gap-3">
         <div class="flex flex-col gap-1">
             <h1 class="text-[1.75rem] font-bold text-[#1F1F1F]">Створіть турнір</h1>
             <h2 class="text-sm font-bold text-[#1F1F1F]">Деталі турніру</h2>
@@ -18,13 +18,13 @@
         </button>
     </div>
 
-    <Card class="flex flex-col gap-5 w-full !w-[100%] shadow-sm">
+    <Card class="flex flex-col gap-5 w-full">
         <h2 class="text-base font-bold text-[#32221B]">Деталі турніру</h2>
         <InputField header="Назва*" placeholder="e.g. Spring Hackathon" class="w-full" />
         <TextArea header="Опис / Правила" placeholder="Правила турніру, формат, цілі..." rows={4} class="w-full" />
     </Card>
 
-    <Card class="flex flex-col gap-5 w-full !w-[100%] shadow-sm">
+    <Card class="flex flex-col gap-5 w-full">
         <h2 class="text-base font-bold text-[#32221B]">Реєстрація і розклад</h2>
         <div class="flex flex-col sm:flex-row gap-8 w-full">
             <DateField header="Початок реєстрації *" class="flex-1" />
@@ -36,7 +36,7 @@
         </div>
     </Card>
 
-    <Card class="flex flex-col gap-5 w-full !w-[100%] shadow-sm">
+    <Card class="flex flex-col gap-5 w-full">
         <h2 class="text-base font-bold text-[#32221B]">Перший раунд</h2>
         <InputField header="Назва раунду*" placeholder="e.g. Round 1: MVP Development" class="w-full" />
         <TextArea header="Опис завдання *" placeholder="Що команди мають зробити..." rows={4} class="w-full" />

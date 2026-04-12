@@ -6,13 +6,13 @@
     let tournament_name = "Hackathon Ukraine 2026";
 </script>
 
-<div class="flex flex-col gap-6 max-w-[700px] mx-auto w-full p-4 md:p-10 mt-10">
+<div class="flex flex-col gap-6 max-w-4xl mx-auto w-full p-6 mt-10">
     <div class="flex flex-col items-start gap-1 text-center mb-2 px-2">
         <h1 class="text-[1.75rem] font-bold text-[#1F1F1F]">Зареєструйте вашу команду</h1>
         <h2 class="text-xs text-[#756157]">Реєстрація команди на <b>{tournament_name}</b></h2>
     </div>
 
-    <Card class="flex flex-col gap-5 w-full !w-[100%]">
+    <Card class="flex flex-col gap-5 w-full">
         <h2 class="text-base font-bold text-[#32221B]">Інформація про команду</h2>
         
         <InputField header="Назва команди *" placeholder="e.g. Code Warriors" class="w-full" />
@@ -23,7 +23,7 @@
         </div>
     </Card>
 
-    <Card class="flex flex-col gap-5 w-full !w-[100%]">
+    <Card class="flex flex-col gap-5 w-full">
         <h2 class="text-base font-bold text-[#32221B]">Капітан команди</h2>
         
         <div class="flex flex-col sm:flex-row gap-8 w-full">
@@ -32,7 +32,7 @@
         </div>
     </Card>
 
-    <Card class="flex flex-col gap-5 w-full !w-[100%]">
+    <Card class="flex flex-col gap-5 w-full">
         <div class="flex justify-between items-center px-1">
             <h2 class="text-base font-bold text-[#32221B]">Учасники команди</h2>
             <button class="text-sm font-bold text-[#32221B] flex items-center gap-1 hover:underline cursor-pointer">

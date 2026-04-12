@@ -5,17 +5,22 @@
     import Submit from "../../../components/Form/Submit.svelte";
 </script>
 
-<Card class = "flex flex-col gap-5 !w-150">
-    <div class = "flex justify-between">
-        <h1 class = "font-bold text-[1.275rem]">Здати роботу</h1>
-        <h3 class = "text-[0.75rem]">Часу залишилося: <b class = "ml-5">30:23:50:23</b></h3>
+
+<div class = "p-6 max-w-3xl w-full">
+    <div class = "flex flex-col items-center gap-1 sm:justify-between sm:flex-row mb-5">
+                <h1 class = "font-bold text-[1.75rem]">Здати роботу</h1>
+                <h3 class = "text-[0.8rem]">Часу залишилося: <b class ="ml-5">30:23:50:23</b></h3>
 
 
-    </div>
+            </div>
+    <Card class = "flex flex-col gap-5 w-full mb-4">
+        
 
-    <InputField src_icon = "icons/github.svg" header = "GitHub Repository *" placeholder= "https://github.com/..."></InputField>
-    <InputField src_icon = "icons/camera.svg" header = "Video Demo *" placeholder = "https://youtube.com/..."></InputField>
-    <InputField src_icon = "icons/globe.svg" header = "Live Demo URL" placeholder = "https://..."></InputField>
-    <TextArea src_icon = "icons/docs.svg" header = "Description" placeholder="What you've built, how to run it..."></TextArea>
-    <Submit title = "Здати роботу"></Submit>
-</Card>
+        <InputField src_icon="icons/github.svg" header="GitHub Repository *" placeholder="https://github.com/..." />
+        <InputField src_icon="icons/camera.svg" header="Video Demo *" placeholder="https://youtube.com/..." />
+        <InputField src_icon="icons/globe.svg" header="Live Demo URL" placeholder="https://..." />
+        <TextArea src_icon="icons/docs.svg" header="Description" placeholder="What you've built, how to run it..." />
+        
+    </Card>
+    <Submit title="Здати роботу" class = "w-full"/>
+</div>
