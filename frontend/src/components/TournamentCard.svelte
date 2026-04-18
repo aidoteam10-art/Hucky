@@ -91,22 +91,32 @@
   on:pointerup={handlePointerUp}
   on:pointerleave={handlePointerLeave}
   style={transformStyle}
-  class="flex flex-col p-8 rounded-[18px] {transformStyle ? '' : 'transition-transform duration-200 hover:scale-[1.02]'} {variant === 'green' ? 'bg-linear-to-r from-[#BCEB01] to-[#EEFF00]' : 'border border-[#c5c5c5] bg-[linear-gradient(180deg,#f4f4f4_0%,#ececec_100%)]'}">
+  class="flex flex-col p-8 rounded-[18px] aspect-video {transformStyle ? '' : 'transition-transform duration-200 hover:scale-[1.02]'} {variant === 'green' ? 'bg-linear-to-r from-[#BCEB01] to-[#EEFF00]' : 'border border-[#c5c5c5] bg-[linear-gradient(180deg,#f4f4f4_0%,#ececec_100%)]'}">
+    
     <div class = "flex justify-between items-center mb-2">
+      
       <span><StateTag variant = "{current_state}"></StateTag></span>
       <span class = "select-none">{formattedRounds}</span>
+    
     </div>
-    <h3 class = "font-black text-[1.75rem] mb-4 select-none">{title}</h3>
-    <p class = "text-[1.25rem] mb-3 select-none">{description}</p>
-    <div class = "flex mb-6 items-center gap-4">
-      <div class = "flex gap-2">
-        <img src="icons/calendar.svg" alt="Calendar icon" class = "w-4 h-auto select-none">
-        <span class = "select-none">{formattedStartDate}</span>
-      </div>
+    
+    <h3 class = "font-black text-[1.75rem] mb-4 select-none line-clamp-1">{title}</h3>
+    <p class = " text-[1.25rem] mb-3 select-none line-clamp-2">{description}</p>
+    
+    <div class = "mt-auto">
+      <div class = "flex mb-6 items-center gap-4">
+        
+        <div class = "flex gap-2">
+          
+          <img src="icons/calendar.svg" alt="Calendar icon" class = "w-4 h-auto select-none">
+          <span class = "select-none">{formattedStartDate}</span>
+        
+        </div>
 
-      <div class = "flex gap-2">
-        <img src="icons/team_tournament.svg" alt="Teams icon" class = "w-3.5 h-auto select-none">
-        <span class = "select-none">{registered_teams}/{max_teams} команд</span>
+        <div class = "flex gap-2">
+          <img src="icons/team_tournament.svg" alt="Teams icon" class = "w-3.5 h-auto select-none">
+          <span class = "select-none">{registered_teams}/{max_teams} команд</span>
+        </div>
       </div>
     </div>
 
