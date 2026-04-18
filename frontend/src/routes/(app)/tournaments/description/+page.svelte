@@ -1,6 +1,6 @@
 <script>
     import StateTag from "../../../../components/StateTag.svelte";
-    let current_state = "completed";
+    let current_state = "registration"; // completed, active, registration
 
     let tournament = {
         name: "Hackathon Ukraine 2026",
@@ -107,11 +107,13 @@
         <div class="bg-[#191F00] rounded-[1.5rem] xl:rounded-[2rem] p-7 lg:p-12 xl:p-16 mt-14 flex flex-col lg:flex-row justify-between items-start lg:items-center text-white gap-8 lg:gap-10">
             <div class="w-full lg:w-auto">
                 <h3 class="text-lg xl:text-[1.6rem] font-bold mb-6 lg:mb-8">Раунд 1: {tournament.round}</h3>
-                <div class="flex flex-col sm:flex-row gap-4 xl:gap-12">
-                    <a href="/tournaments/tourtask" class="text-center bg-white text-[#191F00] font-bold py-3 px-8 rounded-xl text-[1rem] xl:text-[1.1rem] hover:bg-[#CBCBCB] transition-all">
+                <div class="flex flex-col sm:flex-row gap-4 xl:gap-12 w-full lg:w-auto">
+                    <a href="/tournaments/tourtask"
+                       class="w-full sm:w-fit text-center bg-white text-[#191F00] font-bold py-3 px-8 rounded-xl text-[1rem] xl:text-[1.1rem] hover:bg-[#CBCBCB] transition-all whitespace-nowrap">
                         Подивитися завдання
                     </a>
-                    <a href="/task_submission" class="text-center bg-[#CCFF00] text-[#191F00] font-bold py-3 px-8 rounded-xl text-[1rem] xl:text-[1.1rem] hover:bg-[#A9D207] transition-all">
+                    <a href="/task_submission"
+                       class="w-full sm:w-fit text-center bg-[#CCFF00] text-[#191F00] font-bold py-3 px-8 rounded-xl text-[1rem] xl:text-[1.1rem] hover:bg-[#A9D207] transition-all whitespace-nowrap">
                         Здати роботу
                     </a>
                 </div>
