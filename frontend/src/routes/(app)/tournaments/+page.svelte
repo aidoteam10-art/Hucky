@@ -6,6 +6,7 @@
   let currentFilter = 'all';
   let searchQuery = '';
   let currentPage = 1;
+  let itemsPerPage = 6;
 
   const filterOptions = [
     { id: 'all', label: 'Всі' },
@@ -22,6 +23,14 @@
 
     return matchesFilter && matchesSearch;
   });
+
+  $: totalPages = Math.ceil(filteredTournaments.length / itemsPerPage) || 1;
+  $: if (currentPage > totalPages) {
+    currentPage = 1;
+  }
+
+  $: paginaterTournaments = filteredTournaments.slice((currentPage -1)* itemsPerPage, currentPage * itemsPerPage);
+
 </script>
 
 <svelte:head>
@@ -67,7 +76,7 @@
     </div>
 
     <section class="tournaments-grid mx-auto grid grid-cols-1 gap-x-7 gap-y-7 md:grid-cols-2 xl:grid-cols-3">
-      {#each filteredTournaments as t (t.id)}
+      {#each paginaterTournaments as t (t.id)}
             <TournamentCard
                     variant="grey"
                     current_state={t.current_state}
@@ -86,6 +95,6 @@
       {/each}
     </section>
 
-    <Pagination bind:currentPage={currentPage} totalPages={3} />
+    <Pagination bind:currentPage={currentPage} totalPages={totalPages} />
   </div>
 </main>

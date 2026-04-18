@@ -23,6 +23,6 @@
     };
 </script>
 
-<span class="inline-flex items-center justify-center px-4 py-1.5 rounded-4xl font-light text-[0.95rem] tracking-wide {styles[variant] || styles.registration}">
+<span class="inline-flex items-center justify-center px-4 py-1.5 rounded-4xl font-light text-[0.95rem] tracking-wide select-none {styles[variant] || styles.registration}">
     <slot>{labels[variant] || labels.registration}</slot>
 </span>
