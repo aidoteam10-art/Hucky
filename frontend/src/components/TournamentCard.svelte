@@ -38,9 +38,44 @@
   }
   $: formattedRounds = formatRounds(rounds);
   $: formattedStartDate = formatIsoDate(start_date);
+
+  let cardElement;
+  let transformStyle = '';
+  let isPressed = false;
+
+  function handlePointerDown(e) {
+    if (!cardElement) return;
+    isPressed = true;
+    const rect = cardElement.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    
+    const xRel = (x / rect.width) * 2 - 1;
+    const yRel = (y / rect.height) * 2 - 1;
+    
+    const rotateX = -yRel * 5;
+    const rotateY = xRel * 5;
+    
+    transformStyle = `transform: perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(0.98, 0.98, 0.98); transition: transform 0.1s ease-out;`;
+  }
+
+  function handlePointerUpOrLeave() {
+    if (!isPressed) return;
+    isPressed = false;
+    transformStyle = `transform: perspective(800px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1); transition: transform 0.3s ease-out;`;
+    setTimeout(() => {
+        if (!isPressed) transformStyle = '';
+    }, 300);
+  }
 </script>
 
-<article class="flex flex-col p-8 rounded-[18px] transition-transform duration-200 hover:scale-[1.02] active:scale-[0.98] {variant === 'green' ? 'bg-linear-to-r from-[#BCEB01] to-[#EEFF00]' : 'border border-[#c5c5c5] bg-[linear-gradient(180deg,#f4f4f4_0%,#ececec_100%)]'}">
+<article 
+  bind:this={cardElement}
+  on:pointerdown={handlePointerDown}
+  on:pointerup={handlePointerUpOrLeave}
+  on:pointerleave={handlePointerUpOrLeave}
+  style={transformStyle}
+  class="flex flex-col p-8 rounded-[18px] {transformStyle ? '' : 'transition-transform duration-200 hover:scale-[1.02]'} {variant === 'green' ? 'bg-linear-to-r from-[#BCEB01] to-[#EEFF00]' : 'border border-[#c5c5c5] bg-[linear-gradient(180deg,#f4f4f4_0%,#ececec_100%)]'}">
     <div class = "flex justify-between items-center mb-2">
       <span><StateTag variant = "{current_state}"></StateTag></span>
       <span class = "select-none">{formattedRounds}</span>
