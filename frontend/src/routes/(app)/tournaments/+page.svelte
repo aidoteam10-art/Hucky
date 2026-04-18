@@ -1,7 +1,6 @@
 <script>
   import TournamentCard from '../../../components/TournamentCard.svelte';
   import Pagination from '../../../components/Pagination.svelte';
-  import CardShell from '../../../components/CardShell.svelte';
   import { tournaments } from '$lib/data/tournaments.js';
 
   let currentFilter = 'all';
@@ -34,12 +33,7 @@
     <div class="mb-9 flex flex-col gap-6 xl:flex-row xl:items-center xl:justify-between">
       <div class="flex flex-wrap items-center gap-5 md:gap-6">
         <div class="flex h-8 w-8 items-center justify-center">
-          <svg
-                  class="h-6 w-6 fill-none stroke-[1.8] stroke-[#202020]"
-                  viewBox="0 0 24 24"
-          >
-            <path d="M4 5H20L14 12V18L10 20V12L4 5Z" />
-          </svg>
+              <img src = "icons/filter_icon.svg" alt = "Filter Icon">
         </div>
 
         {#each filterOptions as option}
@@ -61,37 +55,30 @@
                 type="text"
                 bind:value={searchQuery}
                 placeholder="Пошук . . ."
-                class="w-full rounded-full border-none bg-[#F4F4F5] px-12.5 py-5 font-semibold text-lg text-[#8e8e8e] outline-none"
+                class="w-full rounded-full border-none bg-[#F4F4F5] px-10 py-4 font-semibold text-lg text-[#8e8e8e] outline-none"
         />
 
-        <svg
-                class="absolute right-5 top-1/2 h-6 w-6 -translate-y-1/2 fill-none stroke-[1.8] stroke-[#9a9a9a]"
-                viewBox="0 0 24 24"
-        >
-          <circle cx="11" cy="11" r="7"></circle>
-          <path d="M20 20L16.5 16.5"></path>
-        </svg>
+        <img 
+                src="/icons/search_icon.svg" 
+                alt="Search Icon" 
+                class="absolute right-5 top-1/2 h-6 w-6 -translate-y-1/2" 
+        />
       </div>
     </div>
 
     <section class="tournaments-grid mx-auto grid grid-cols-1 gap-x-7 gap-y-7 md:grid-cols-2 xl:grid-cols-3">
       {#each filteredTournaments as t (t.id)}
-        <a href="/tournaments/{t.id}" class="block transition-transform duration-200 hover:scale-[1.02] active:scale-[0.98]">
-          <div class="scale-y-[0.97]">
-            <CardShell>
-              <TournamentCard
-                      current_state={t.current_state}
-                      title={t.title}
-                      description={t.description}
-                      start_date={t.start_date}
-                      rounds={t.rounds}
-                      max_teams={t.max_teams}
-                      registered_teams={t.registered_teams}
-                      id={t.id}
-              />
-            </CardShell>
-          </div>
-        </a>
+            <TournamentCard
+                    variant="grey"
+                    current_state={t.current_state}
+                    title={t.title}
+                    description={t.description}
+                    start_date={t.start_date}
+                    rounds={t.rounds}
+                    max_teams={t.max_teams}
+                    registered_teams={t.registered_teams}
+                    id={t.id}
+            />
       {:else}
         <p class="col-span-full py-10 text-center text-lg text-gray-500">
           Не знайдено жодного турніру.

@@ -40,7 +40,7 @@
   $: formattedStartDate = formatIsoDate(start_date);
 </script>
 
-<article class = "flex flex-col bg-linear-to-r from-[#BCEB01] to-[#EEFF00] p-8 rounded-2xl">
+<article class="flex flex-col p-8 rounded-[18px] transition-transform duration-200 hover:scale-[1.02] active:scale-[0.98] {variant === 'green' ? 'bg-linear-to-r from-[#BCEB01] to-[#EEFF00]' : 'border border-[#c5c5c5] bg-[linear-gradient(180deg,#f4f4f4_0%,#ececec_100%)]'}">
     <div class = "flex justify-between items-center mb-2">
       <span><StateTag variant = "{current_state}"></StateTag></span>
       <span>{formattedRounds}</span>
