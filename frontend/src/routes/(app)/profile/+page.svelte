@@ -14,6 +14,8 @@
         emptyRole: "Створіть та зареєструйте команду на турнір, щоб отримати більше можливостей. Зареєструвати команду може лише один учасник, який буде її капітаном.",
         teamName: "Code Warriors",
         tournamentName: "Hackathon Ukraine 2026",
+        tournamentId: 1,
+        currentRoundId: 1,
         schoolName: "PL KPI lyceum",
         round: "Раунд 1: MVP Development",
         teamMembers: [
@@ -122,7 +124,7 @@
             </div>
 
             {#if role === 'admin'}
-                <a href="/tournament_creation" class="flex items-center gap-6 border border-[#191F00] rounded-2xl px-7.5 py-4 hover:ring-1">
+                <a href="/tournaments/new" class="flex items-center gap-6 border border-[#191F00] rounded-2xl px-7.5 py-4 hover:ring-1">
                     <div class="bg-[#CCFF00] w-10 h-10 rounded-full flex items-center justify-center text-[1.65rem] font-semibold leading-none">
                         +
                     </div>
@@ -258,7 +260,7 @@
                 <h3 class="text-[1.5rem] font-bold mb-12">{user.round}</h3>
                 <div class="flex gap-9">
                     <a href="/tournaments/tourtask" class="bg-white text-[#191F00] text-[1.13rem] px-7.5 py-4 rounded-xl font-bold hover:bg-gray-200 transition">Подивитися завдання</a>
-                    <a href="/task_submission" class="bg-gradient-to-r from-[#BCEB01] to-[#EEFF00] text-[#191F00] text-[1.13rem] px-8 py-4 rounded-xl font-bold hover:brightness-90 transition-all">Здати роботу</a>
+                    <a href={`/tournaments/${user.tournamentId}/rounds/${user.currentRoundId}/submission`} class="bg-linear-to-r from-[#BCEB01] to-[#EEFF00] text-[#191F00] text-[1.13rem] px-8 py-4 rounded-xl font-bold hover:brightness-90 transition-all">Здати роботу</a>
                 </div>
             </div>
             <div class="text-right">
