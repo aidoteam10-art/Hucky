@@ -1,18 +1,18 @@
 <script>
-    import Card from "../../../components/Form/Card.svelte";
-    import InputField from "../../../components/Form/InputField.svelte";
-    import TextArea from "../../../components/Form/TextArea.svelte";
-    import DateField from "../../../components/Form/DateField.svelte";
-    import Submit from "../../../components/Form/Submit.svelte";
+    import Card from "/src/components/form/Card.svelte";
+    import InputField from "/src/components/form/InputField.svelte";
+    import TextArea from "/src/components/form/TextArea.svelte";
+    import DateField from "/src/components/form/DateField.svelte";
+    import Submit from "/src/components/form/Submit.svelte";
 </script>
 
-<div class="flex flex-col gap-6 max-w-4xl w-full mt-10 p-6">
+<div class="flex flex-col gap-6 max-w-4xl w-full mt-10 p-6 mx-auto">
     <div class="flex justify-between items-start mb-2 px-2 gap-3">
         <div class="flex flex-col gap-1">
             <h1 class="text-[1.75rem] font-bold text-[#1F1F1F]">Створіть турнір</h1>
             <h2 class="text-sm font-bold text-[#1F1F1F]">Деталі турніру</h2>
         </div>
-        <button class="flex items-center gap-2 border border-[#756157] rounded-lg px-4 py-2 bg-transparent text-sm font-semibold text-[#1F1F1F] hover:bg-black/5 transition-colors cursor-pointer">
+        <button class="flex items-center gap-2 border border-[#756157] rounded-lg px-4 py-2 bg-transparent text-sm font-semibold text-[#1F1F1F] hover:bg-black/5 transition-colors cursor-pointer" type="button">
             <div class="w-5 h-5 rounded-full bg-[#CCFF00] flex items-center justify-center font-bold text-lg leading-none pt-0.5 text-black">+</div>
             Зберегти чернетку
         </button>
@@ -45,7 +45,7 @@
         <div class="flex flex-col gap-3 mt-2 w-full">
             <div class="flex justify-between items-center px-1">
                 <h3 class="text-sm font-bold text-[#32221B]">Обов'язкові вимоги</h3>
-                <button class="text-sm font-bold text-[#32221B] flex items-center gap-1 hover:underline cursor-pointer">
+                <button class="text-sm font-bold text-[#32221B] flex items-center gap-1 hover:underline cursor-pointer" type="button">
                     <span class="text-lg leading-none">+</span> Додати
                 </button>
             </div>

@@ -14,6 +14,8 @@
         emptyRole: "Створіть та зареєструйте команду на турнір, щоб отримати більше можливостей. Зареєструвати команду може лише один учасник, який буде її капітаном.",
         teamName: "Code Warriors",
         tournamentName: "Hackathon Ukraine 2026",
+        tournamentId: 1,
+        currentRoundId: 1,
         schoolName: "PL KPI lyceum",
         round: "Раунд 1: MVP Development",
         teamMembers: [
@@ -66,7 +68,7 @@
             </div>
 
             {#if role === 'admin'}
-                <a href="/tournament_creation" class="flex items-center gap-4 lg:gap-6 border border-[#191F00] rounded-2xl px-5 lg:px-7.5 py-3 lg:py-4 hover:ring-1 w-full md:w-auto justify-center">
+                <a href="/tournaments/new" class="flex items-center gap-4 lg:gap-6 border border-[#191F00] rounded-2xl px-5 lg:px-7.5 py-3 lg:py-4 hover:ring-1 w-full md:w-auto justify-center">
                     <div class="bg-[#CCFF00] w-8 h-8 lg:w-10 lg:h-10 rounded-full flex items-center justify-center text-xl lg:text-[1.65rem] font-semibold leading-none">
                         +
                     </div>
@@ -163,7 +165,7 @@
                 <h3 class="text-xl lg:text-[1.5rem] font-bold mb-6 lg:mb-12">{user.round}</h3>
                 <div class="flex flex-col sm:flex-row gap-4 lg:gap-9 justify-center lg:justify-start">
                     <a href="/tournaments/tourtask" class="bg-white text-[#191F00] text-base lg:text-[1.13rem] px-6 lg:px-7.5 py-3 lg:py-4 rounded-xl font-bold hover:bg-gray-200 transition">Подивитися завдання</a>
-                    <a href="/task_submission" class="bg-gradient-to-r from-[#BCEB01] to-[#EEFF00] text-[#191F00] text-base lg:text-[1.13rem] px-6 lg:px-8 py-3 lg:py-4 rounded-xl font-bold hover:brightness-90 transition-all">Здати роботу</a>
+                    <a href={`/tournaments/${user.tournamentId}/rounds/${user.currentRoundId}/submission`} class="bg-linear-to-r from-[#BCEB01] to-[#EEFF00] text-[#191F00] text-base lg:text-[1.13rem] px-6 lg:px-8 py-3 lg:py-4 rounded-xl font-bold hover:brightness-90 transition-all">Здати роботу</a>
                 </div>
             </div>
             <div class="text-center lg:text-right">
