@@ -1,1 +1,0 @@
-<img src ="icons/tick.svg" alt = "tick">

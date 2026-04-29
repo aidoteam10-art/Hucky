@@ -1,6 +1,8 @@
 <script>
   let timeLeft = "30:23:50:23";
   let tournament = {
+    id: 1,
+    roundId: 1,
     round: "Раунд 1: MVP Development",
     taskDescription: "Створіть мінімально життєздатний продукт для програми управління завданнями з функціями співпраці в команді.",
     technologies: "React/Next.js frontend, Node.js/Python backend, PostgreSQL database, deployed to a cloud platform.",
@@ -22,7 +24,7 @@
   <div class="bg-[#191F00] text-white rounded-3xl p-15 pl-21 pr-14 mb-12.5 flex justify-between items-center">
     <div>
       <h2 class="text-lg font-bold mb-12 text-[1.5rem]">{tournament.round}</h2>
-      <a href="/task_submission" class="text-[1rem] font-bold bg-linear-to-r from-[#BCEB01] to-[#EEFF00] mt-[16px] text-[#191F00] px-7.5 py-4 rounded-lg hover:brightness-90 transition-all">
+      <a href={`/tournaments/${tournament.id}/rounds/${tournament.roundId}/submission`} class="text-[1rem] font-bold bg-linear-to-r from-[#BCEB01] to-[#EEFF00] mt-4 text-[#191F00] px-7.5 py-4 rounded-lg hover:brightness-90 transition-all">
         Здати роботу
       </a>
     </div>

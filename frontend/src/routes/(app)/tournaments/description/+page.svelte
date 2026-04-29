@@ -3,6 +3,8 @@
     let current_state = "completed";
 
     let tournament = {
+        id: 1,
+        activeRoundId: 1,
         name: "Hackathon Ukraine 2026",
         status: current_state, // "registration" | "active" | "completed"
         description: "Build innovative solutions using modern web technologies. Teams compete across multiple rounds with expert jury evaluation.",
@@ -40,7 +42,7 @@
         </div>
         <div class="flex flex-col items-end">
             {#if tournament.status === "registration"}
-                <a href="/team_registration" class="bg-[#CCFF00] hover:bg-[#A9D207] text-[#191F00] font-bold py-3.5 px-10 rounded-2xl text-[1.25rem] transition-all shadow-sm">
+                <a href={`/tournaments/${tournament.id}/team-registration`} class="bg-[#CCFF00] hover:bg-[#A9D207] text-[#191F00] font-bold py-3.5 px-10 rounded-2xl text-[1.25rem] transition-all shadow-sm">
                     Зареєструвати команду
                 </a>
 
@@ -116,7 +118,7 @@
                     <a href="/tournaments/tourtask" class="bg-white text-[#191F00] font-bold py-3.5 px-8 rounded-xl text-[1.1rem] hover:bg-[#CBCBCB] transition-all">
                         Подивитися завдання
                     </a>
-                    <a href="/task_submission" class="bg-[#CCFF00] text-[#191F00] font-bold py-3.5 px-8 rounded-xl text-[1.1rem] hover:bg-[#A9D207] transition-all">
+                    <a href={`/tournaments/${tournament.id}/rounds/${tournament.activeRoundId}/submission`} class="bg-[#CCFF00] text-[#191F00] font-bold py-3.5 px-8 rounded-xl text-[1.1rem] hover:bg-[#A9D207] transition-all">
                         Здати роботу
                     </a>
                 </div>
