@@ -102,7 +102,7 @@
     </div>
     
     <h3 class = "font-black text-[6cqw] xl:text-[5cqw] mb-[3cqw] mt-[2cqw] select-none line-clamp-1">{title}</h3>
-    <p class = "text-[4cqw] xl:text-[3.5cqw] mb-[3cqw] select-none line-clamp-2 md:line-clamp-3 leading-snug">{description}</p>
+    <p class = "text-[4cqw] xl:text-[3.5cqw] mb-[3cqw] select-none line-clamp-2 leading-snug">{description}</p>
     
     <div class = "mt-auto">
       <div class = "flex mb-[4cqw] xl:mb-[3cqw] items-center gap-[4cqw] xl:gap-[3cqw] text-[#191F00]">

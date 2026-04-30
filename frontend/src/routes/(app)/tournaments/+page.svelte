@@ -25,11 +25,11 @@
   });
 
   $: totalPages = Math.ceil(filteredTournaments.length / itemsPerPage) || 1;
-  $: if (currentPage > totalPages) {
-    currentPage = 1;
-  }
+  
+  // Скидаємо на 1-шу сторінку при будь-якій зміні пошуку або фільтру
+  $: searchQuery, currentFilter, (currentPage = 1);
 
-  $: paginaterTournaments = filteredTournaments.slice((currentPage -1)* itemsPerPage, currentPage * itemsPerPage);
+  $: paginatedTournaments = filteredTournaments.slice((currentPage -1)* itemsPerPage, currentPage * itemsPerPage);
 
 </script>
 
@@ -37,7 +37,7 @@
   <title>Hucky - Турніри</title>
 </svelte:head>
 
-<main class="px-4 py-10 md:px-10 md:pt-19 md:pb-14.5 xl:px-17">
+<main class="px-4 pt-10 pb-2 md:px-10 md:pt-18 md:pb-3.6 xl:px-17">
   <div class="mx-auto max-w-[1440px]">
     
     <div class="mb-9 flex flex-col gap-6 xl:flex-row xl:items-center xl:justify-between">
@@ -79,7 +79,7 @@
     </div>
 
     <section class="tournaments-grid mx-auto grid grid-cols-1 gap-x-7 gap-y-7 md:grid-cols-2 xl:grid-cols-3">
-      {#each paginaterTournaments as t (t.id)}
+      {#each paginatedTournaments as t (t.id)}
             <TournamentCard
                     variant="grey"
                     current_state={t.current_state}
@@ -98,6 +98,9 @@
       {/each}
     </section>
 
-    <Pagination bind:currentPage={currentPage} totalPages={totalPages} />
+    <!-- Приклеюємо пагінацію до низу вікна -->
+    <div class="sticky bottom-5 z-10 w-fit mx-auto px-6 py-3 rounded-2xl bg-white/80 backdrop-blur-md shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-[#e5e5e5]">
+      <Pagination bind:currentPage={currentPage} totalPages={totalPages} />
+    </div>
   </div>
 </main>
