@@ -84,6 +84,7 @@
   }
 </script>
 
+<div class="@container w-full h-full">
 <article 
   bind:this={cardElement}
   on:pointermove={handlePointerMove}
@@ -91,38 +92,37 @@
   on:pointerup={handlePointerUp}
   on:pointerleave={handlePointerLeave}
   style={transformStyle}
-  class="flex flex-col p-8 rounded-[18px] aspect-video {transformStyle ? '' : 'transition-transform duration-200 hover:scale-[1.02]'} {variant === 'green' ? 'bg-linear-to-r from-[#BCEB01] to-[#EEFF00]' : 'border border-[#c5c5c5] bg-[linear-gradient(180deg,#f4f4f4_0%,#ececec_100%)]'}">
+  class="flex flex-col p-[6cqw] xl:p-[5cqw] rounded-[4.5cqw] xl:rounded-[4cqw] aspect-video {transformStyle ? '' : 'transition-transform duration-200 hover:scale-[1.02]'} {variant === 'green' ? 'bg-linear-to-r from-[#BCEB01] to-[#EEFF00]' : 'border border-[#c5c5c5] bg-[linear-gradient(180deg,#f4f4f4_0%,#ececec_100%)]'}">
     
-    <div class = "flex justify-between items-center mb-2">
+    <div class = "flex justify-between items-center mb-[2cqw] text-[#191F00]">
       
-      <span><StateTag variant = "{current_state}"></StateTag></span>
-      <span class = "select-none">{formattedRounds}</span>
+      <div class="flex items-center"><StateTag variant="{current_state}" class="text-[3cqw] xl:text-[2.5cqw]"></StateTag></div>
+      <span class = "select-none text-[3.5cqw] xl:text-[3cqw] font-medium">{formattedRounds}</span>
     
     </div>
     
-    <h3 class = "font-black text-[1.75rem] mb-4 select-none line-clamp-1">{title}</h3>
-    <p class = " text-[1.25rem] mb-3 select-none line-clamp-2">{description}</p>
+    <h3 class = "font-black text-[6cqw] xl:text-[5cqw] mb-[3cqw] mt-[2cqw] select-none line-clamp-1">{title}</h3>
+    <p class = "text-[4cqw] xl:text-[3.5cqw] mb-[3cqw] select-none line-clamp-2 leading-snug">{description}</p>
     
     <div class = "mt-auto">
-      <div class = "flex mb-6 items-center gap-4">
+      <div class = "flex mb-[4cqw] xl:mb-[3cqw] items-center gap-[4cqw] xl:gap-[3cqw] text-[#191F00]">
         
-        <div class = "flex gap-2">
-          
-          <img src="icons/calendar.svg" alt="Calendar icon" class = "w-4 h-auto select-none">
-          <span class = "select-none">{formattedStartDate}</span>
-        
+        <div class = "flex gap-[1.5cqw] items-center">
+          <img src="icons/calendar.svg" alt="Calendar icon" class = "w-[4cqw] xl:w-[3.5cqw] h-auto select-none">
+          <span class = "select-none text-[3.5cqw] xl:text-[3cqw] font-medium">{formattedStartDate}</span>
         </div>
 
-        <div class = "flex gap-2">
-          <img src="icons/team_tournament.svg" alt="Teams icon" class = "w-3.5 h-auto select-none">
-          <span class = "select-none">{registered_teams}/{max_teams} команд</span>
+        <div class = "flex gap-[1.5cqw] items-center">
+          <img src="icons/team_tournament.svg" alt="Teams icon" class = "w-[3.5cqw] xl:w-[3cqw] h-auto select-none">
+          <span class = "select-none text-[3.5cqw] xl:text-[3cqw] font-medium">{registered_teams}/{max_teams} команд</span>
         </div>
       </div>
     </div>
 
-    <a href = "/tournaments/{id}" class = "font-bold text-[1.25rem] flex gap-2 items-center w-fit select-none">Детальніше
-      <img src = "arrow_right.svg" class = "w-2" alt="right arrow">
+    <a href = "/tournaments/{id}" class = "font-bold text-[4cqw] xl:text-[3.5cqw] flex gap-[2cqw] items-center w-fit select-none mt-auto text-[#191F00]">Детальніше
+      <img src = "arrow_right.svg" class = "w-[2cqw] xl:w-[1.5cqw]" alt="right arrow">
     </a>
 
 </article>
+</div>
 

@@ -19,7 +19,7 @@
 
     <section class="flex flex-col md:flex-row justify-center items-center md:items-end gap-6 md:gap-0 mb-10 md:mb-16">
 
-        <article class="w-full md:w-60 h-auto md:h-[260px] flex-shrink-0 bg-white border border-[#111] rounded-2xl md:rounded-none md:rounded-l-2xl flex flex-col overflow-hidden relative z-0 md:-mr-px">
+        <article class="order-2 md:order-1 w-full md:w-60 h-auto md:h-[260px] flex-shrink-0 bg-white border border-[#111] rounded-2xl md:rounded-none md:rounded-l-2xl flex flex-col overflow-hidden relative z-0 md:-mr-px">
             <header class="md:h-32 border-b border-[#111] p-6 flex justify-between items-start">
                 <h3 class="text-sm font-bold leading-tight uppercase">Silver<br/>Medalist</h3>
                 <span class="text-5xl font-extrabold leading-none">02</span>
@@ -33,7 +33,7 @@
             </div>
         </article>
 
-        <article class="w-full md:w-[280px] h-auto md:h-80 flex-shrink-0 bg-white border border-[#111] rounded-2xl md:rounded-none md:rounded-t-2xl flex flex-col overflow-hidden relative z-10 shadow-lg">
+        <article class="order-1 md:order-2 w-full md:w-[280px] h-auto md:h-80 flex-shrink-0 bg-white border border-[#111] rounded-2xl md:rounded-none md:rounded-t-2xl flex flex-col overflow-hidden relative z-10 shadow-lg">
             <header class="md:h-[140px] border-b border-[#111] p-6 flex justify-between items-start">
                 <h3 class="text-base font-bold leading-tight uppercase">Grand<br/>Champion</h3>
                 <span class="text-6xl font-extrabold leading-[0.9]">01</span>
@@ -47,7 +47,7 @@
             </div>
         </article>
 
-        <article class="w-full md:w-60 h-auto md:h-[200px] flex-shrink-0 bg-white border border-[#111] rounded-2xl md:rounded-none md:rounded-r-2xl flex flex-col overflow-hidden relative z-0 md:-ml-px">
+        <article class="order-3 md:order-3 w-full md:w-60 h-auto md:h-[200px] flex-shrink-0 bg-white border border-[#111] rounded-2xl md:rounded-none md:rounded-r-2xl flex flex-col overflow-hidden relative z-0 md:-ml-px">
             <header class="md:h-[85px] border-b border-[#111] p-4 px-6 flex justify-between items-start">
                 <h3 class="text-sm font-bold leading-tight uppercase">Bronze<br/>Medalist</h3>
                 <span class="text-5xl font-extrabold leading-none">03</span>
