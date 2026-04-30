@@ -135,7 +135,15 @@
 
     <div class="absolute top-0 right-0 w-1/4 h-full bg-[#CCFF00] z-10 hidden lg:block"></div>
     <div class="relative z-20 flex flex-col items-center lg:items-start justify-center px-6 sm:px-10 lg:pl-26 text-white w-full lg:w-[60%] text-center lg:text-left">
-        <h1 class="text-4xl sm:text-5xl lg:text-[5rem] leading-tight font-black mb-8 lg:mb-15 mt-7">
+        <div class="md:hidden w-64 mb-16 bg-[#191F00]">
+            <video 
+                class="w-full h-full object-contain mix-blend-screen" 
+                autoplay muted playsinline
+            >
+                <source src="logo_anim.mp4" type="video/mp4">
+            </video>
+        </div>
+        <h1 class="text-4xl sm:text-5xl lg:text-[5rem] leading-tight font-black mb-8 lg:mb-15 mt-2">
             Побувайте у <span class="text-[#CCFF00]">змаганнях</span><br> нового рівня
         </h1>
         <p class="mb-12 lg:mb-20 text-white tracking-wide font-light text-lg lg:text-[1.5rem]">
