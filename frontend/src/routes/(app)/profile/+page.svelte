@@ -1,7 +1,6 @@
 <script>
     import StateTag from "../../../components/StateTag.svelte";
     import TournamentCard from "../../../components/TournamentCard.svelte";
-    import CardShell from "../../../components/CardShell.svelte";
     // Ролі: "none" (без ролі), "participant" (учасник), "jury" (журі), "admin" (адмін)
     let role = "jury";
     let timeLeft = "30:23:50:23";
