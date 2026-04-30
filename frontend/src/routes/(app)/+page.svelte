@@ -131,11 +131,11 @@
   });
 </script>
 
-<section class="relative flex min-h-screen lg:min-h-[90%] bg-[#191F00] overflow-hidden py-16 lg:py-0">
+<section class="relative flex min-h-screen xl:min-h-[90%] bg-[#191F00] overflow-hidden py-16 xl:py-0">
 
-    <div class="absolute top-0 right-0 w-1/4 h-full bg-[#CCFF00] z-10 hidden lg:block"></div>
-    <div class="relative z-20 flex flex-col items-center lg:items-start justify-center px-6 sm:px-10 lg:pl-26 text-white w-full lg:w-[60%] text-center lg:text-left">
-        <div class="md:hidden w-64 mb-16 bg-[#191F00]">
+    <div class="absolute top-0 right-0 w-1/4 h-full bg-[#CCFF00] z-10 hidden xl:block"></div>
+    <div class="relative z-20 flex flex-col items-center xl:items-start justify-center px-6 sm:px-10 xl:pl-26 text-white w-full xl:w-[60%] text-center xl:text-left">
+        <div class="xl:hidden w-64 mb-16 bg-[#191F00]">
             <video 
                 class="w-full h-full object-contain mix-blend-screen" 
                 autoplay muted playsinline
@@ -143,13 +143,13 @@
                 <source src="logo_anim.mp4" type="video/mp4">
             </video>
         </div>
-        <h1 class="text-4xl sm:text-5xl lg:text-[5rem] leading-tight font-black mb-8 lg:mb-15 mt-2">
+        <h1 class="text-4xl sm:text-5xl xl:text-[5rem] leading-tight font-black mb-8 xl:mb-15 mt-2">
             Побувайте у <span class="text-[#CCFF00]">змаганнях</span><br> нового рівня
         </h1>
-        <p class="mb-12 lg:mb-20 text-white tracking-wide font-light text-lg lg:text-[1.5rem]">
-            Hucky - платформа для проведення командних програмістських <br class="hidden lg:block"> турнірів    
+        <p class="mb-12 xl:mb-20 text-white tracking-wide font-light text-lg xl:text-[1.5rem]">
+            Hucky - платформа для проведення командних програмістських <br class="hidden xl:block"> турнірів    
         </p>
-        <div class="flex flex-col sm:flex-row gap-4 sm:gap-6 lg:gap-12 w-full sm:w-auto justify-stretch lg:justify-start">
+        <div class="flex flex-col sm:flex-row gap-4 sm:gap-6 xl:gap-12 w-full sm:w-auto justify-stretch xl:justify-start">
             <div class="w-full sm:w-auto flex *:w-full">
                 <Link href="/registration" variant="green" size="lg">Розпочати</Link>
             </div>
@@ -159,7 +159,7 @@
         </div>
   </div>
 
-    <img src="girl_laptop.png" alt="Girl with laptop" class="absolute bottom-0 right-0 max-h-[80%] lg:max-h-full max-w-[40%] z-30 object-contain h-auto w-auto transform hidden lg:block">
+    <img src="girl_laptop.png" alt="Girl with laptop" class="absolute bottom-0 right-0 max-h-[80%] xl:max-h-full max-w-[40%] z-30 object-contain h-auto w-auto transform hidden xl:block">
 
 </section>
 
@@ -184,12 +184,12 @@
 
 
 
-<div class="flex flex-col items-center gap-6 lg:gap-10 mb-16 lg:mb-24 w-full overflow-hidden">
+<div class="flex flex-col items-center gap-6 xl:gap-10 mb-16 xl:mb-24 w-full overflow-hidden">
     
-    <h1 class="font-bold text-3xl sm:text-4xl lg:text-[2.75rem] text-center px-4">Майбутні турніри</h1>
+    <h1 class="font-bold text-3xl sm:text-4xl xl:text-[2.75rem] text-center px-4">Майбутні турніри</h1>
     
     <!-- Горизонтальний скрол-контейнер з вільним прокручуванням (без магнетизму) -->
-    <div bind:this={scrollContainer} class="flex overflow-x-auto w-full gap-4 sm:gap-6 px-4 sm:px-10 lg:px-26 pb-8 pt-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden select-none cursor-pointer">
+    <div bind:this={scrollContainer} class="flex overflow-x-auto w-full gap-4 sm:gap-6 px-4 sm:px-10 xl:px-26 pb-8 pt-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden select-none cursor-pointer">
         {#each tournaments as tournament}
         <!-- Кожна картка має задану ширину, не стискається і вільно скролиться -->
         <div class="w-[85vw] sm:w-[45vw] xl:w-[28vw] shrink-0">
@@ -207,10 +207,10 @@
 
 <hr>
 
-<section class="pb-16 lg:pb-50 px-5 sm:px-10 lg:px-25 pt-16 lg:pt-25">
-    <div class="flex flex-col items-center justify-center bg-[#191F00] py-10 lg:py-15 px-6 gap-6 rounded-3xl text-center w-full">
-        <h2 class="text-white font-bold text-3xl sm:text-4xl lg:text-[2.75rem]">Готові до <span class="bg-clip-text text-transparent bg-linear-to-r from-[#BCEB01] to-[#EEFF00]">змагань</span>?</h2>
-        <p class="text-white text-base sm:text-lg lg:text-[1.25rem] font-light text-center">Зареєструйте свою команду або створіть власний турнір <br class="hidden sm:block"> вже зараз.</p>
+<section class="pb-16 xl:pb-50 px-5 sm:px-10 xl:px-25 pt-16 xl:pt-25">
+    <div class="flex flex-col items-center justify-center bg-[#191F00] py-10 xl:py-15 px-6 gap-6 rounded-3xl text-center w-full">
+        <h2 class="text-white font-bold text-3xl sm:text-4xl xl:text-[2.75rem]">Готові до <span class="bg-clip-text text-transparent bg-linear-to-r from-[#BCEB01] to-[#EEFF00]">змагань</span>?</h2>
+        <p class="text-white text-base sm:text-lg xl:text-[1.25rem] font-light text-center">Зареєструйте свою команду або створіть власний турнір <br class="hidden sm:block"> вже зараз.</p>
         <div class="w-full sm:w-auto flex justify-center *:w-full">
             <Link href="/registration" variant="green" size="lg">Створити акаунт</Link>
         </div>
