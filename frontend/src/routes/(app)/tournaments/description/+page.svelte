@@ -3,6 +3,8 @@
     let current_state = "registration"; // completed, active, registration
 
     let tournament = {
+        id: 1,
+        activeRoundId: 1,
         name: "Hackathon Ukraine 2026",
         status: current_state,
         description: "Build innovative solutions using modern web technologies. Teams compete across multiple rounds with expert jury evaluation.",
@@ -42,7 +44,7 @@
 
         <div class="flex flex-col items-start lg:items-end w-full lg:w-auto">
             {#if tournament.status === "registration"}
-                <a href="/team_registration" class="w-full lg:w-auto text-center bg-[#CCFF00] hover:bg-[#A9D207] text-[#191F00] font-bold py-3 px-10 rounded-2xl text-[1.1rem] xl:text-[1.25rem] transition-all shadow-sm">
+                <a href={`/tournaments/${tournament.id}/team-registration`} class="w-full lg:w-auto text-center bg-[#CCFF00] hover:bg-[#A9D207] text-[#191F00] font-bold py-3 px-10 rounded-2xl text-[1.1rem] xl:text-[1.25rem] transition-all shadow-sm">
                     Зареєструвати команду
                 </a>
 
@@ -112,7 +114,7 @@
                        class="w-full sm:w-fit text-center bg-white text-[#191F00] font-bold py-3 px-8 rounded-xl text-[1rem] xl:text-[1.1rem] hover:bg-[#CBCBCB] transition-all whitespace-nowrap">
                         Подивитися завдання
                     </a>
-                    <a href="/task_submission"
+                    <a href={`/tournaments/${tournament.id}/rounds/${tournament.activeRoundId}/submission`}
                        class="w-full sm:w-fit text-center bg-[#CCFF00] text-[#191F00] font-bold py-3 px-8 rounded-xl text-[1rem] xl:text-[1.1rem] hover:bg-[#A9D207] transition-all whitespace-nowrap">
                         Здати роботу
                     </a>

@@ -1,7 +1,7 @@
 <script>
-	import Card from "../../../components/Form/Card.svelte";
-	import InputField from "../../../components/Form/InputField.svelte";
-	import Submit from "../../../components/Form/Submit.svelte";
+    import Card from "/src/components/form/Card.svelte";
+    import InputField from "/src/components/form/InputField.svelte";
+    import Submit from "/src/components/form/Submit.svelte";
 
 </script>
 <div class = " max-w-lg w-full mx-auto p-6">

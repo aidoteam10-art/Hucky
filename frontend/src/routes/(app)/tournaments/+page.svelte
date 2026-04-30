@@ -1,12 +1,12 @@
 <script>
   import TournamentCard from '../../../components/TournamentCard.svelte';
   import Pagination from '../../../components/Pagination.svelte';
-  import CardShell from '../../../components/CardShell.svelte';
   import { tournaments } from '$lib/data/tournaments.js';
 
   let currentFilter = 'all';
   let searchQuery = '';
   let currentPage = 1;
+  let itemsPerPage = 6;
 
   const filterOptions = [
     { id: 'all', label: 'Всі' },
@@ -23,6 +23,14 @@
 
     return matchesFilter && matchesSearch;
   });
+
+  $: totalPages = Math.ceil(filteredTournaments.length / itemsPerPage) || 1;
+  $: if (currentPage > totalPages) {
+    currentPage = 1;
+  }
+
+  $: paginaterTournaments = filteredTournaments.slice((currentPage -1)* itemsPerPage, currentPage * itemsPerPage);
+
 </script>
 
 <svelte:head>
@@ -36,12 +44,7 @@
       
       <div class="flex flex-wrap items-center gap-3 md:gap-6">
         <div class="hidden sm:flex h-8 w-8 items-center justify-center">
-          <svg
-                  class="h-6 w-6 fill-none stroke-[1.8] stroke-[#202020]"
-                  viewBox="0 0 24 24"
-          >
-            <path d="M4 5H20L14 12V18L10 20V12L4 5Z" />
-          </svg>
+              <img src = "icons/filter_icon.svg" alt = "Filter Icon">
         </div>
 
         <div class="flex flex-wrap gap-2 md:gap-4">
@@ -68,34 +71,27 @@
                 class="w-full rounded-full border-none bg-[#F4F4F5] px-6 py-4 font-semibold text-base text-[#8e8e8e] outline-none md:px-12.5 md:py-5 md:text-lg"
         />
 
-        <svg
-                class="absolute right-5 top-1/2 h-5 w-5 -translate-y-1/2 fill-none stroke-[1.8] stroke-[#9a9a9a] md:h-6 md:w-6"
-                viewBox="0 0 24 24"
-        >
-          <circle cx="11" cy="11" r="7"></circle>
-          <path d="M20 20L16.5 16.5"></path>
-        </svg>
+        <img 
+                src="/icons/search_icon.svg" 
+                alt="Search Icon" 
+                class="absolute right-5 top-1/2 h-6 w-6 -translate-y-1/2" 
+        />
       </div>
     </div>
 
-    <section class="tournaments-grid mx-auto grid grid-cols-1 gap-x-7 gap-y-7 sm:grid-cols-2 lg:grid-cols-3">
-      {#each filteredTournaments as t (t.id)}
-        <a href="/tournaments/{t.id}" class="block transition-transform duration-200 hover:scale-[1.02] active:scale-[0.98]">
-          <div class="h-full scale-y-[0.97]">
-            <CardShell>
-              <TournamentCard
-                      current_state={t.current_state}
-                      title={t.title}
-                      description={t.description}
-                      start_date={t.start_date}
-                      rounds={t.rounds}
-                      max_teams={t.max_teams}
-                      registered_teams={t.registered_teams}
-                      id={t.id}
-              />
-            </CardShell>
-          </div>
-        </a>
+    <section class="tournaments-grid mx-auto grid grid-cols-1 gap-x-7 gap-y-7 md:grid-cols-2 xl:grid-cols-3">
+      {#each paginaterTournaments as t (t.id)}
+            <TournamentCard
+                    variant="grey"
+                    current_state={t.current_state}
+                    title={t.title}
+                    description={t.description}
+                    start_date={t.start_date}
+                    rounds={t.rounds}
+                    max_teams={t.max_teams}
+                    registered_teams={t.registered_teams}
+                    id={t.id}
+            />
       {:else}
         <p class="col-span-full py-10 text-center text-lg text-gray-500">
           Не знайдено жодного турніру.
@@ -104,7 +100,7 @@
     </section>
 
     <div class="mt-10">
-      <Pagination bind:currentPage={currentPage} totalPages={3} />
+      <Pagination bind:currentPage={currentPage} totalPages={totalPages} />
     </div>
   </div>
 </main>
