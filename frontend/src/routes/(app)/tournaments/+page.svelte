@@ -41,8 +41,9 @@
   <div class="mx-auto max-w-[1440px]">
     
     <div class="mb-9 flex flex-col gap-6 xl:flex-row xl:items-center xl:justify-between">
-      <div class="flex flex-wrap items-center gap-5 md:gap-6">
-        <div class="flex h-8 w-8 items-center justify-center">
+      
+      <div class="flex flex-wrap items-center gap-3 md:gap-6">
+        <div class="hidden sm:flex h-8 w-8 items-center justify-center">
               <img src = "icons/filter_icon.svg" alt = "Filter Icon">
         </div>
 
