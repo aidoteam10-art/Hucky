@@ -3,6 +3,9 @@
     export let header = "header";
     export let variant = "big-header"; // small-header | big-header
     export let src_icon = "";
+    export let value = "";
+    export let error = "";
+    export let success = false;
 </script>
 
 <div class="flex flex-col gap-2 {$$props.class ?? ''}">
@@ -11,8 +14,11 @@
             <img src={src_icon} alt="" class="w-4 h-4 object-contain" />
         {/if}
         {#if header}
-            <h3 class="font-medium text-[#32221B] {variant === 'big-header' ? 'text-sm font-semibold' : 'text-[0.625rem]'}">{header}</h3>
+            <h3 class="font-medium {error ? 'text-red-600' : success ? 'text-green-600' : 'text-[#32221B]'} {variant === 'big-header' ? 'text-sm font-semibold' : 'text-[0.625rem]'} transition-colors">{header}</h3>
         {/if}
     </div>
-    <input type="datetime-local" {placeholder} class="w-full rounded-lg border border-[#B4B4B4] bg-[#F9FFE5] p-2 pl-2 text-[0.75rem] text-[#756157]">
+    <input type="datetime-local" {placeholder} bind:value class="w-full rounded-lg border {error ? 'border-red-500 bg-red-50 shake' : success ? 'border-green-500 bg-green-50' : 'border-[#B4B4B4] bg-[#F9FFE5]'} p-2 pl-2 text-[0.75rem] text-[#756157] outline-none transition-all focus:border-[#756157]">
+    {#if error}
+        <span class="text-red-500 text-[0.625rem] mt-[-0.25rem] transition-all">{error}</span>
+    {/if}
 </div>
