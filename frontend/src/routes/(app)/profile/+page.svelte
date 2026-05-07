@@ -1,15 +1,20 @@
 <script>
     import StateTag from "../../../components/StateTag.svelte";
     import TournamentCard from "../../../components/TournamentCard.svelte";
+    
+    export let data;
+
     // Ролі: "none" (без ролі), "participant" (учасник), "jury" (журі), "admin" (адмін)
     let role = "jury";
     let timeLeft = "30:23:50:23";
     let defaultAvatar = "/icons/avatar.svg";
     let hoverAvatar = "/icons/avatar_change.svg";
     let currentAvatar = defaultAvatar;
+    
+    // Тут юзаємо дані з беку 
     let user = {
-        name: "Michael de Santa",
-        email: "michael@example.com",
+        name: data.profile.full_name,
+        email: data.profile.email,
         emptyRole: "Створіть та зареєструйте команду на турнір, щоб отримати більше можливостей. Зареєструвати команду може лише один учасник, який буде її капітаном.",
         teamName: "Code Warriors",
         tournamentName: "Hackathon Ukraine 2026",
