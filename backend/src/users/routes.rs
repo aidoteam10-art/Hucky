@@ -4,6 +4,7 @@ use uuid::Uuid;
 use axum::http::StatusCode;
 
 use crate::state::AppState;
+use super::auth::AuthenticatedUser;
 use super::repository::UserRepository;
 use super::model::{LoginRequest, RegisterUserRequest};
 use super::service::UserService;
@@ -82,11 +83,40 @@ pub async fn register_user_handler(
 
 
 
+#[derive(Serialize)]
+pub struct UserProfileResponse {
+    pub id: Uuid,
+    pub email: String,
+    pub full_name: String,
+}
+
+pub async fn get_me_handler(
+    State(state): State<AppState>,
+    user: AuthenticatedUser,
+) -> Result<Json<UserProfileResponse>, (StatusCode, Json<serde_json::Value>)> {
+    match UserRepository::find_by_id(&state.db, user.user_id).await {
+        Ok(Some(db_user)) => Ok(Json(UserProfileResponse {
+            id: db_user.id,
+            email: db_user.email,
+            full_name: db_user.full_name,
+        })),
+        Ok(None) => {
+            let error_response = serde_json::json!({"error": "Користувач не знайдений в БД"});
+            Err((StatusCode::NOT_FOUND, Json(error_response)))
+        }
+        Err(_) => {
+            let error_response = serde_json::json!({"error": "Помилка бази даних"});
+            Err((StatusCode::INTERNAL_SERVER_ERROR, Json(error_response)))
+        }
+    }
+}
+
 // Функція-збирач роутів для модуля users
 pub fn users_routes() -> Router<AppState> {
     Router::new()
     .route("/count", get(users_count_handler))
     .route("/register", post(register_user_handler))
     .route("/login", post(login_user_handler))
+    .route("/me", get(get_me_handler))
 }
 

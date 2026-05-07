@@ -12,7 +12,7 @@ impl UserRepository{
             .fetch_one(db)
             .await?;
 
-        Ok(count.unwrap_or(0))
+        Ok(count.unwrap_or(0) as i64)
     }
 
     pub async fn create(
@@ -40,6 +40,21 @@ impl UserRepository{
             User,
             "SELECT id, email, full_name, password_hash, created_at, updated_at FROM users WHERE email = $1",
             email
+        )
+        .fetch_optional(db)
+        .await?;
+
+        Ok(user)
+    }
+
+    pub async fn find_by_id(
+        db: &PgPool,
+        id: Uuid,
+    ) -> Result<Option<User>, sqlx::Error> {
+        let user = sqlx::query_as!(
+            User,
+            "SELECT id, email, full_name, password_hash, created_at, updated_at FROM users WHERE id = $1",
+            id
         )
         .fetch_optional(db)
         .await?;
