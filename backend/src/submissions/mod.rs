@@ -2,7 +2,7 @@ use axum::{extract::{Path, State}, routing::{post, put}, Json, Router};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 use crate::state::AppState;
-
+use crate::users::model::Claims;
 
 #[derive(Deserialize)]
 pub struct SubmissionReq {
@@ -22,18 +22,13 @@ pub struct SubmissionRes {
     pub status: String,
 }
 
-
-async fn get_mock_user_id() -> Uuid {
-    Uuid::parse_str("00000000-0000-0000-0000-000000000001").unwrap_or_default()
-}
-
-
 async fn submit_work(
     State(state): State<AppState>,
+    claims: Claims,
     Path(round_id): Path<Uuid>,
     Json(payload): Json<SubmissionReq>,
 ) -> Result<Json<SubmissionRes>, (axum::http::StatusCode, String)> {
-    let user_id = get_mock_user_id().await;
+    let user_id = claims.sub;
 
     if !payload.github_url.starts_with("http") || !payload.video_demo_url.starts_with("http") {
         return Err((axum::http::StatusCode::BAD_REQUEST, "Посилання мають бути валідними URL (починатися з http/https)".into()));
@@ -106,9 +101,10 @@ async fn submit_work(
 
 async fn get_submission(
     State(state): State<AppState>,
+    claims: Claims,
     Path(round_id): Path<Uuid>,
 ) -> Result<Json<SubmissionRes>, (axum::http::StatusCode, String)> {
-    let user_id = get_mock_user_id().await;
+    let user_id = claims.sub;
     
     let sub = sqlx::query_as!(
         SubmissionRes,
@@ -127,9 +123,10 @@ async fn get_submission(
 
 async fn lock_submissions(
     State(state): State<AppState>,
+    claims: Claims,
     Path(round_id): Path<Uuid>,
 ) -> Result<axum::http::StatusCode, (axum::http::StatusCode, String)> {
-    let user_id = get_mock_user_id().await;
+    let user_id = claims.sub;
 
     let is_organizer = sqlx::query_scalar!(
         "SELECT 1 FROM tournament_staff_roles tsr
@@ -168,6 +165,7 @@ mod tests {
     use super::*;
     use axum::http::StatusCode;
     use sqlx::PgPool;
+    use crate::users::model::Claims;
 
     #[sqlx::test]
     async fn test_submit_work_after_deadline_fails(pool: PgPool) {
@@ -181,7 +179,12 @@ mod tests {
             description: Some("Test submission".into()),
         });
 
-        let response = submit_work(state, axum::extract::Path(round_id_mock), payload).await;
+        let mock_claims = Claims {
+            sub: Uuid::new_v4(),
+            exp: 0,
+        };
+
+        let response = submit_work(state, mock_claims, axum::extract::Path(round_id_mock), payload).await;
         assert!(response.is_err());
     }
 }

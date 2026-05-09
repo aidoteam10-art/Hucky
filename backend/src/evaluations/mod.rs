@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 use std::collections::HashSet;
 use uuid::Uuid;
 use crate::state::AppState;
-
+use crate::users::model::Claims;
 
 #[derive(Deserialize)]
 pub struct AddJuryReq { pub email: String }
@@ -76,15 +76,13 @@ pub struct AssignmentDetailRes {
     pub comment: Option<String>,
 }
 
-async fn get_mock_user_id() -> Uuid {
-    Uuid::parse_str("00000000-0000-0000-0000-000000000001").unwrap_or_default()
-}
-
-
 async fn add_jury(
-    State(state): State<AppState>, Path(tournament_id): Path<Uuid>, Json(payload): Json<AddJuryReq>,
+    State(state): State<AppState>, 
+    claims: Claims, 
+    Path(tournament_id): Path<Uuid>, 
+    Json(payload): Json<AddJuryReq>,
 ) -> Result<axum::http::StatusCode, (axum::http::StatusCode, String)> {
-    let current_user_id = get_mock_user_id().await;
+    let current_user_id = claims.sub;
 
     let is_organizer = sqlx::query_scalar!(
         "SELECT 1 FROM tournament_staff_roles WHERE tournament_id = $1 AND user_id = $2 AND role = 'organizer'",
@@ -99,12 +97,10 @@ async fn add_jury(
         .fetch_optional(&state.db).await.map_err(|_| (axum::http::StatusCode::INTERNAL_SERVER_ERROR, "DB Error".into()))?
         .ok_or((axum::http::StatusCode::NOT_FOUND, "Користувача не знайдено".into()))?;
 
-    
     let res = sqlx::query!(
         "INSERT INTO tournament_staff_roles (tournament_id, user_id, role) VALUES ($1, $2, 'jury') ON CONFLICT DO NOTHING",
         tournament_id, target_user_id
     ).execute(&state.db).await.map_err(|_| (axum::http::StatusCode::INTERNAL_SERVER_ERROR, "DB Error".into()))?;
-    
     
     if res.rows_affected() == 0 {
         return Err((axum::http::StatusCode::CONFLICT, "Цей користувач вже є журі в цьому турнірі".into()));
@@ -127,9 +123,11 @@ async fn get_jury_list(
 }
 
 async fn remove_jury(
-    State(state): State<AppState>, Path((tournament_id, user_id_to_remove)): Path<(Uuid, Uuid)>,
+    State(state): State<AppState>, 
+    claims: Claims, 
+    Path((tournament_id, user_id_to_remove)): Path<(Uuid, Uuid)>,
 ) -> Result<axum::http::StatusCode, (axum::http::StatusCode, String)> {
-    let current_user_id = get_mock_user_id().await;
+    let current_user_id = claims.sub;
 
     let is_organizer = sqlx::query_scalar!(
         "SELECT 1 FROM tournament_staff_roles WHERE tournament_id = $1 AND user_id = $2 AND role = 'organizer'",
@@ -148,8 +146,9 @@ async fn remove_jury(
 
 async fn get_jury_assignments(
     State(state): State<AppState>,
+    claims: Claims,
 ) -> Result<Json<Vec<AssignmentListItem>>, (axum::http::StatusCode, String)> {
-    let user_id = get_mock_user_id().await;
+    let user_id = claims.sub;
     
     let records = sqlx::query_as!(
         AssignmentListItem,
@@ -164,9 +163,11 @@ async fn get_jury_assignments(
 }
 
 async fn get_jury_assignment_detail(
-    State(state): State<AppState>, Path(assignment_id): Path<Uuid>,
+    State(state): State<AppState>, 
+    claims: Claims, 
+    Path(assignment_id): Path<Uuid>,
 ) -> Result<Json<AssignmentDetailRes>, (axum::http::StatusCode, String)> {
-    let user_id = get_mock_user_id().await;
+    let user_id = claims.sub;
 
     let detail = sqlx::query!(
         r#"SELECT ja.id, ja.status, t.id as team_id, t.name as team_name, s.github_url, s.video_demo_url, 
@@ -177,7 +178,6 @@ async fn get_jury_assignment_detail(
     ).fetch_optional(&state.db).await.map_err(|_| (axum::http::StatusCode::INTERNAL_SERVER_ERROR, "DB Error".into()))?
     .ok_or((axum::http::StatusCode::NOT_FOUND, "Призначення не знайдено або доступ заборонено".into()))?;
 
-    
     let criteria_records = sqlx::query!(
         r#"SELECT c.id, c.code, c.name, c.description, c.max_score, es.score as "score?"
            FROM evaluation_criteria c
@@ -214,15 +214,16 @@ async fn get_jury_assignment_detail(
 }
 
 async fn generate_assignments(
-    State(state): State<AppState>, Path(round_id): Path<Uuid>, Json(payload): Json<GenerateAssignmentsReq>,
+    State(state): State<AppState>, 
+    claims: Claims, 
+    Path(round_id): Path<Uuid>, 
+    Json(payload): Json<GenerateAssignmentsReq>,
 ) -> Result<axum::http::StatusCode, (axum::http::StatusCode, String)> {
-    
-    
     if payload.reviews_per_submission <= 0 || payload.max_assignments_per_jury <= 0 {
         return Err((axum::http::StatusCode::BAD_REQUEST, "Параметри генерації мають бути більшими за 0".into()));
     }
 
-    let user_id = get_mock_user_id().await;
+    let user_id = claims.sub;
 
     let round = sqlx::query!("SELECT tournament_id, status FROM rounds WHERE id = $1", round_id)
         .fetch_optional(&state.db).await.map_err(|_| (axum::http::StatusCode::INTERNAL_SERVER_ERROR, "DB Error".into()))?
@@ -243,7 +244,6 @@ async fn generate_assignments(
     let submissions = sqlx::query!("SELECT id, team_id FROM submissions WHERE round_id = $1", round_id)
         .fetch_all(&state.db).await.map_err(|_| (axum::http::StatusCode::INTERNAL_SERVER_ERROR, "DB Error".into()))?;
 
-    
     let mut jury_list = sqlx::query!(
         r#"SELECT user_id, 
            COALESCE((SELECT count(*) FROM jury_assignments WHERE jury_user_id = tsr.user_id), 0) as "load!" 
@@ -289,9 +289,12 @@ async fn generate_assignments(
 }
 
 async fn submit_evaluation(
-    State(state): State<AppState>, Path(assignment_id): Path<Uuid>, Json(payload): Json<SubmitEvaluationReq>,
+    State(state): State<AppState>, 
+    claims: Claims, 
+    Path(assignment_id): Path<Uuid>, 
+    Json(payload): Json<SubmitEvaluationReq>,
 ) -> Result<axum::http::StatusCode, (axum::http::StatusCode, String)> {
-    let user_id = get_mock_user_id().await;
+    let user_id = claims.sub;
     
     let assignment = sqlx::query!(
         "SELECT ja.status, ja.jury_user_id, r.id as round_id, r.tournament_id FROM jury_assignments ja JOIN rounds r ON ja.round_id = r.id WHERE ja.id = $1", 
