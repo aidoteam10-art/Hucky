@@ -1,5 +1,5 @@
-pub mod routes;
-pub mod repository;
-pub mod model;
-pub mod service;
 pub mod auth;
+pub mod model;
+pub mod repository;
+pub mod routes;
+pub mod service;
