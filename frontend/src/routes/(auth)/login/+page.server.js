@@ -1,41 +1,37 @@
 import { fail, redirect } from '@sveltejs/kit';
+import { ApiError, apiRequest } from '$lib/server/api';
 
 export const actions = {
-    default: async ({ request, cookies }) => {
-        const formData = await request.formData();
-        const email = formData.get("email");
-        const password = formData.get("password");
+	default: async ({ request, cookies, fetch }) => {
+		const formData = await request.formData();
+		const email = String(formData.get('email') || '').trim();
+		const password = String(formData.get('password') || '');
 
-        if (!email || !password) {
-            return fail(400, { email, message: "Заповніть всі поля" });
-        }
+		if (!email || !password) {
+			return fail(400, { email, message: 'Заповніть email і пароль' });
+		}
 
-        try {
-            const response = await fetch("http://127.0.0.1:8080/api/users/login", {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email, password })
-            });
+		try {
+			const data = await apiRequest(fetch, '/api/users/login', {
+				method: 'POST',
+				body: { email, password }
+			});
 
-            if (!response.ok) {
-                const errorText = await response.text();
-                return fail(401, { email, message: errorText });
-            }
+			cookies.set('jwt', data.token, {
+				path: '/',
+				httpOnly: true,
+				sameSite: 'strict',
+				secure: false,
+				maxAge: 60 * 60 * 24
+			});
+		} catch (error) {
+			if (error instanceof ApiError) {
+				return fail(error.status, { email, message: error.message });
+			}
 
-            const data = await response.json();
-            const token = data.token;
+			return fail(500, { email, message: 'Backend недоступний' });
+		}
 
-            cookies.set('jwt', token, {
-                path: '/',
-                httpOnly: true, 
-                sameSite: 'strict',
-                secure: import.meta.env.PROD, 
-                maxAge: 60 * 60 * 24
-            });
-        } catch (error) { 
-            return fail(500, { email, message: "Сервер недоступний" });
-        }
-        
-        throw redirect(303, '/');
-    }
-}
+		throw redirect(303, '/tournaments');
+	}
+};

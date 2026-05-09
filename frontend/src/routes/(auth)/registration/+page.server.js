@@ -1,36 +1,35 @@
 import { fail, redirect } from '@sveltejs/kit';
+import { ApiError, apiRequest } from '$lib/server/api';
 
 export const actions = {
-    default: async ({ request }) => {
-        const formData = await request.formData();
-        const full_name = formData.get("name");
-        const email = formData.get("email");
-        const password = formData.get("password");
-        const repeatPassword = formData.get("repeatPassword");
+	default: async ({ request, fetch }) => {
+		const formData = await request.formData();
+		const full_name = String(formData.get('name') || '').trim();
+		const email = String(formData.get('email') || '').trim();
+		const password = String(formData.get('password') || '');
+		const repeatPassword = String(formData.get('repeatPassword') || '');
 
-        if (!full_name || !email || !password) {
-            return fail(400, { email, full_name, message: "Заповніть всі обов'язкові поля" });
-        }
+		if (!full_name || !email || !password) {
+			return fail(400, { email, full_name, message: "Заповніть обов'язкові поля" });
+		}
 
-        if (password !== repeatPassword) {
-            return fail(400, { email, full_name, message: "Паролі не співпадають" });
-        }
+		if (password !== repeatPassword) {
+			return fail(400, { email, full_name, message: 'Паролі не співпадають' });
+		}
 
-        try {
-            const response = await fetch("http://127.0.0.1:8080/api/users/register", {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email, password, full_name })
-            });
+		try {
+			await apiRequest(fetch, '/api/users/register', {
+				method: 'POST',
+				body: { email, password, full_name }
+			});
+		} catch (error) {
+			if (error instanceof ApiError) {
+				return fail(error.status, { email, full_name, message: error.message });
+			}
 
-            if (!response.ok) {
-                const errorText = await response.text();
-                return fail(401, { email, full_name, message: errorText });
-            }
-        } catch (error) {
-            return fail(500, { email, full_name, message: "Сервер недоступний" });
-        }
-        
-        throw redirect(303, '/login');
-    }
-}
+			return fail(500, { email, full_name, message: 'Backend недоступний' });
+		}
+
+		throw redirect(303, '/login');
+	}
+};
