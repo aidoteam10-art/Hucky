@@ -11,7 +11,9 @@ use sqlx::PgPool;
 // Підключаємо наші нові модулі
 mod state;
 mod users;
-
+mod submissions;
+mod evaluations;
+mod leaderboard;
 use crate::state::AppState;
 
 #[derive(Serialize)]
@@ -44,6 +46,9 @@ async fn main() {
         .route("/api/ping", get(ping_handler))
         // Підключаємо роути користувачів (вони будуть за адресою /api/users/...)
         .nest("/api/users", users::routes::users_routes())
+        .nest("/api", submissions::routes())
+        .nest("/api", evaluations::routes())
+        .nest("/api", leaderboard::routes())
         .layer(cors)
         .with_state(app_state);
 
