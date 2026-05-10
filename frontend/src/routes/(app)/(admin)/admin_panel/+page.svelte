@@ -80,10 +80,7 @@
 		<div class="mb-8">
 			<div class="mb-4 flex items-center gap-4">
 				<div class="flex h-10 w-10 shrink-0 items-center justify-center text-[#FF4545]" aria-hidden="true">
-					<svg viewBox="0 0 24 24" class="h-8 w-8" fill="none" stroke="currentColor" stroke-width="2">
-						<path d="m4 8 4 3 4-7 4 7 4-3-2 10H6L4 8Z" />
-						<path d="M6 21h12" />
-					</svg>
+					<img src="/icons/top-admin.svg" alt="" class="h-10 w-10 shrink-0" />
 				</div>
 				<h1 class="text-3xl font-bold leading-tight sm:text-4xl">Найвищий адміністратор</h1>
 			</div>
@@ -94,16 +91,14 @@
 
 		<section class="mb-6 rounded-xl border border-[#B4B4B4] bg-white p-5 sm:p-6">
 			<div class="flex flex-col gap-4 sm:flex-row sm:items-center">
-				<div class="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-[#FFECEC] text-[#FF4545]">
-					<img src="/icons/shield.svg" alt="" class="h-8 w-8" />
-				</div>
+				<img src="/icons/admin_logo.svg" alt="admin" class="h-18 w-18" />
 				<div class="min-w-0">
 					<h2 class="break-words text-xl font-bold">{topAdmin.name}</h2>
 					<div class="mt-2 flex min-w-0 items-center gap-2 text-sm text-[#696969]">
-						<img src="/icons/mail_dark.svg" alt="" class="h-4 w-4 shrink-0 opacity-70" />
+						<img src="/icons/mail.svg" alt="" class="h-4 w-4 shrink-0 opacity-70" />
 						<span class="break-all">{topAdmin.email}</span>
 					</div>
-					<span class="mt-3 inline-flex rounded-full border border-[#FF4545] px-3 py-1 text-xs font-medium text-[#FF4545]">
+					<span class="mt-3 inline-flex rounded-full border border-[#FF4545] bg-[#FDECEC] px-3 py-1 text-xs font-medium text-[#FF4545]">
 						{topAdmin.status}
 					</span>
 				</div>
@@ -161,7 +156,7 @@
 									<h3 class="break-words text-sm font-bold">{user.name}</h3>
 									<div class="mt-2 flex flex-col gap-2 text-xs text-[#696969] sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-4">
 										<span class="flex min-w-0 items-center gap-2">
-											<img src="/icons/mail_dark.svg" alt="" class="h-3.5 w-3.5 shrink-0 opacity-70" />
+											<img src="/icons/mail.svg" alt="" class="h-3.5 w-3.5 shrink-0 opacity-70" />
 											<span class="break-all">{user.email}</span>
 										</span>
 										<span class="flex min-w-0 items-center gap-2">
