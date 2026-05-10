@@ -1,15 +1,13 @@
-use axum::{
-    routing::get,
-    Router,
-    Json,
-};
+use axum::{Json, Router, routing::get};
 use serde::Serialize;
-use tower_http::cors::{Any, CorsLayer};
-use tokio::net::TcpListener;
 use sqlx::PgPool;
+use tokio::net::TcpListener;
+use tower_http::cors::{Any, CorsLayer};
 
-// Підключаємо наші нові модулі
+mod error;
+mod rounds;
 mod state;
+mod tournaments;
 mod users;
 
 use crate::state::AppState;
@@ -23,8 +21,8 @@ struct HealthResponse {
 #[tokio::main]
 async fn main() {
     dotenvy::dotenv().ok();
-    let database_url = std::env::var("DATABASE_URL")
-        .expect("DATABASE_URL must be set in .env file");
+    let database_url =
+        std::env::var("DATABASE_URL").expect("DATABASE_URL must be set in .env file");
 
     println!("Connecting to db...");
     let pool = PgPool::connect(&database_url)
@@ -39,11 +37,11 @@ async fn main() {
         .allow_methods(Any)
         .allow_headers(Any);
 
-    // Збираємо наш головний роутер з різних частин
     let app = Router::new()
         .route("/api/ping", get(ping_handler))
-        // Підключаємо роути користувачів (вони будуть за адресою /api/users/...)
         .nest("/api/users", users::routes::users_routes())
+        .merge(tournaments::routes::routes())
+        .merge(rounds::routes::routes())
         .layer(cors)
         .with_state(app_state);
 
@@ -54,9 +52,8 @@ async fn main() {
 }
 
 async fn ping_handler() -> Json<HealthResponse> {
-    let response = HealthResponse {
+    Json(HealthResponse {
         status: "success".to_string(),
         message: "Api works!!!".to_string(),
-    };
-    Json(response)
+    })
 }
