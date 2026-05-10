@@ -1,6 +1,7 @@
 <script>
     import StateTag from "../../../components/StateTag.svelte";
     import TournamentCard from "../../../components/TournamentCard.svelte";
+    import { downloadCertificatePdf } from '$lib/certificatePdf';
     
     export let data;
 
@@ -38,6 +39,23 @@
             { team: "Binary Bandits", tournament: "Hackathon Ukraine 2026", status: "pending", id: "task-2", links: { github: "#", video: "#" } },
             { team: "Hard Coders", tournament: "Hackathon Ukraine 2026", status: "graded", id: "task-3", links: { github: "#", video: "#", live: "#" } }
         ],
+        certificate: {
+            available: true,
+            userName: data.profile.full_name,
+            teamName: "Code Warriors",
+            tournamentName: "Hackathon Ukraine 2026",
+            overallPlace: 2,
+            issuedAt: "10.05.2026",
+            rounds: [
+                { title: "Раунд 1: MVP Development", place: 1 },
+                { title: "Раунд 2: Product Demo", place: 3 },
+                { title: "Раунд 3: Final Pitch", place: 2 }
+            ]
+        }
+    }
+
+    function downloadCertificate() {
+        downloadCertificatePdf(user.certificate);
     }
 </script>
 
@@ -81,6 +99,18 @@
             {/if}
         </div>
     </section>
+
+    {#if user.certificate?.available}
+        <section class="mb-12 lg:mb-20 md:ml-32 lg:ml-46 max-w-5xl">
+            <button
+                type="button"
+                on:click={downloadCertificate}
+                class="rounded-2xl bg-[#CCFF00] px-6 py-4 text-lg lg:text-[1.25rem] font-bold text-[#191F00] transition-colors hover:bg-[#B9EA00]"
+            >
+                Завантажити сертифікат
+            </button>
+        </section>
+    {/if}
 
     {#if role === 'admin'}
         <h2 class="text-xl lg:text-[1.5rem] font-semibold mb-8 lg:mb-13 md:ml-32 lg:ml-46 text-center md:text-left">Створені вами турніри:</h2>
