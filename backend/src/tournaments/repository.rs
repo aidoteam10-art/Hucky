@@ -89,7 +89,7 @@ impl TournamentRepository {
                 t.starts_at,
                 COALESCE((SELECT COUNT(*) FROM rounds r WHERE r.tournament_id = t.id), 0)::bigint AS rounds_count,
                 t.max_teams,
-                0::bigint AS registered_teams
+                COALESCE((SELECT COUNT(*) FROM teams tm WHERE tm.tournament_id = t.id), 0)::bigint AS registered_teams
             FROM tournaments t",
         );
 
@@ -220,6 +220,26 @@ impl TournamentRepository {
         .fetch_optional(db)
         .await
     }
+
+    pub async fn registered_teams(
+        db: &PgPool,
+        tournament_id: Uuid,
+    ) -> Result<Vec<crate::tournaments::dto::RegisteredTeamPreview>, sqlx::Error> {
+        sqlx::query_as::<_, crate::tournaments::dto::RegisteredTeamPreview>(
+            "SELECT
+                tm.id,
+                tm.name,
+                COUNT(ms.user_id) FILTER (WHERE ms.status = 'accepted')::bigint AS members_count
+            FROM teams tm
+            LEFT JOIN team_memberships ms ON ms.team_id = tm.id
+            WHERE tm.tournament_id = $1
+            GROUP BY tm.id
+            ORDER BY tm.created_at DESC",
+        )
+        .bind(tournament_id)
+        .fetch_all(db)
+        .await
+    }
 }
 
 fn push_filters(
@@ -235,11 +255,18 @@ fn push_filters(
     }
 
     if let Some(search) = search.map(str::trim).filter(|value| !value.is_empty()) {
-        let pattern = format!("%{}%", search.to_lowercase());
+        let pattern = format!("%{}%", escape_like_pattern(&search.to_lowercase()));
         builder.push(" AND (LOWER(t.title) LIKE ");
         builder.push_bind(pattern.clone());
-        builder.push(" OR LOWER(t.description) LIKE ");
+        builder.push(" ESCAPE '\\' OR LOWER(t.description) LIKE ");
         builder.push_bind(pattern);
-        builder.push(")");
+        builder.push(" ESCAPE '\\')");
     }
+}
+
+fn escape_like_pattern(input: &str) -> String {
+    input
+        .replace('\\', r"\\")
+        .replace('%', r"\%")
+        .replace('_', r"\_")
 }

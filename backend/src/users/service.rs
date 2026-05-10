@@ -1,8 +1,8 @@
 use super::{
-    auth::JWT_SECRET,
     model::{Claims, LoginRequest, RegisterUserRequest},
     repository::UserRepository,
 };
+use crate::config::Config;
 use argon2::{
     Argon2,
     password_hash::{PasswordHash, PasswordHasher, PasswordVerifier, SaltString, rand_core::OsRng},
@@ -65,7 +65,7 @@ impl UserService {
         let token = encode(
             &Header::default(),
             &claims,
-            &EncodingKey::from_secret(JWT_SECRET.as_ref()),
+            &EncodingKey::from_secret(Config::get().jwt_secret_bytes()),
         )
         .map_err(|e| format!("Помилка генерації токену: {}", e))?;
 

@@ -68,7 +68,7 @@ pub struct TournamentDetailResponse {
     pub active_round: Option<ActiveRoundPreview>,
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, sqlx::FromRow)]
 pub struct RegisteredTeamPreview {
     pub id: Uuid,
     pub name: String,
