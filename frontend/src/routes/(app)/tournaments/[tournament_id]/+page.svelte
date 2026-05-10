@@ -12,6 +12,8 @@
 
 	$: tournament = data.tournament;
 	$: rounds = data.rounds || [];
+	$: registeredTeams = tournament.registered_teams || [];
+	$: userTeam = data.userTeam;
 
 	function formatDate(value) {
 		if (!value) return 'Не вказано';
@@ -71,7 +73,14 @@
 		</div>
 
 		<div class="flex w-full flex-col gap-3 lg:w-auto lg:items-end">
-			{#if tournament.status === 'registration'}
+			{#if userTeam}
+				<a
+					href={`/teams/${userTeam.team_id}`}
+					class="w-full rounded-2xl bg-[#191F00] px-10 py-3 text-center text-[1.1rem] font-bold text-[#CCFF00] shadow-sm transition-all hover:bg-[#2b3500] lg:w-auto"
+				>
+					Моя команда
+				</a>
+			{:else if tournament.status === 'registration' && data.isAuthenticated}
 				<a
 					href={resolve('/tournaments/[tournament_id]/team-registration', {
 						tournament_id: String(tournament.id)
@@ -79,6 +88,13 @@
 					class="w-full rounded-2xl bg-[#CCFF00] px-10 py-3 text-center text-[1.1rem] font-bold text-[#191F00] shadow-sm transition-all hover:bg-[#A9D207] lg:w-auto"
 				>
 					Зареєструвати команду
+				</a>
+			{:else if tournament.status === 'registration'}
+				<a
+					href="/login"
+					class="w-full rounded-2xl bg-[#CCFF00] px-10 py-3 text-center text-[1.1rem] font-bold text-[#191F00] shadow-sm transition-all hover:bg-[#A9D207] lg:w-auto"
+				>
+					Увійти для реєстрації
 				</a>
 			{/if}
 			<a
@@ -175,6 +191,32 @@
 						</p>
 					{/each}
 				</div>
+			</div>
+
+			<div class="rounded-2xl border border-[#E5E7EB] bg-white p-6 shadow-sm lg:p-8">
+				<div class="mb-6 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+					<h2 class="text-2xl font-bold">Зареєстровані команди</h2>
+					<span class="text-sm font-semibold text-gray-500">{registeredTeams.length} у списку</span>
+				</div>
+
+				{#if registeredTeams.length > 0}
+					<div class="grid gap-4">
+						{#each registeredTeams as team (team.id)}
+							<div class="rounded-xl border border-[#E5E7EB] bg-[#FAFAFA] p-5">
+								<div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+									<h3 class="text-lg font-bold">{team.name}</h3>
+									<span class="rounded-full bg-[#191F00] px-4 py-1.5 text-xs font-semibold text-[#CCFF00]">
+										{team.members_count} учасників
+									</span>
+								</div>
+							</div>
+						{/each}
+					</div>
+				{:else}
+					<p class="rounded-xl bg-[#F4F4F5] px-5 py-6 text-center font-semibold text-gray-600">
+						Команди ще не зареєстровані.
+					</p>
+				{/if}
 			</div>
 		</div>
 

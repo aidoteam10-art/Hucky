@@ -5,14 +5,20 @@ export const load = async ({ params, cookies, fetch }) => {
 	const token = getAuthToken(cookies);
 
 	try {
-		const [tournament, rounds] = await Promise.all([
+		const [tournament, rounds, myTeams] = await Promise.all([
 			apiRequest(fetch, `/api/tournaments/${params.tournament_id}`, { token }),
-			apiRequest(fetch, `/api/tournaments/${params.tournament_id}/rounds`, { token })
+			apiRequest(fetch, `/api/tournaments/${params.tournament_id}/rounds`, { token }),
+			token
+				? apiRequest(fetch, '/api/me/teams', { token })
+				: Promise.resolve({ items: [] })
 		]);
+		const userTeam =
+			myTeams.items?.find((item) => item.tournament.id === params.tournament_id) || null;
 
 		return {
 			tournament,
 			rounds: rounds.items,
+			userTeam,
 			isAuthenticated: Boolean(token)
 		};
 	} catch (error) {
