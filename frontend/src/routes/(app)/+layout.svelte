@@ -32,13 +32,32 @@
 		</ol>
 
 		<ol class="flex items-center gap-2 lg:gap-6 list-none shrink-0">
-			<li>
-				<Link {isHomePage} href="/login" variant={isHomePage ? "ghost" : "second"}>Увійти</Link>
-			</li>
-			<li>
-				<Link {isHomePage} href="/registration" variant={isHomePage ? "primary" : "green"}>Реєстрація</Link>
-			</li>
-		</ol>
+            {#if $page.data.user}
+                <!-- залогінений -->
+                <li>
+                    <a href="/profile" class="flex items-center gap-2 {isHomePage ? 'text-[#191F00] hover:text-[#89AB00]' : 'text-white hover:text-gray-300'} transition-colors">
+                        
+                        <img src="/icons/avatar.svg" alt="Профіль" class="w-8 h-8 rounded-full border border-gray-300 bg-white" />
+                        <span class="font-medium hidden lg:block">Профіль</span>
+                    </a>
+                </li>
+                <li>
+                    <form action="/logout" method="POST" class="m-0">
+                        <button type="submit" class="font-medium text-red-500 hover:text-red-700 transition-colors">
+                            Вийти
+                        </button>
+                    </form>
+                </li>
+            {:else}
+                <!-- незалогінений -->
+                <li>
+                    <Link {isHomePage} href="/login" variant={isHomePage ? "ghost" : "second"}>Увійти</Link>
+                </li>
+                <li>
+                    <Link {isHomePage} href="/registration" variant={isHomePage ? "primary" : "green"}>Реєстрація</Link>
+                </li>
+            {/if}
+        </ol>
 	</div>
 
 	<button
@@ -72,13 +91,24 @@
 			<li class="w-full">
 				<Link on:click={toggleMenu} href="/tournaments" variant={isHomePage ? "ghost" : "second"} size="sm" className="w-full">Турніри</Link>
 			</li>
+		{#if $page.data.user}
 			<hr class="w-full opacity-5 my-1" />
+			<li class="w-full">
+				<form action="/logout" method="POST">
+					<button type="submit" class="w-full text-center text-red-500 hover:text-red-700 py-2">Вийти</button>
+				</form>
+			</li>
+		{:else}
+			
+			
 			<li class="w-full">
 				<Link on:click={toggleMenu} href="/login" variant={isHomePage ? "ghost" : "second"} size="sm" className="w-full">Увійти</Link>
 			</li>
 			<li class="w-full">
 				<Link on:click={toggleMenu} href="/registration" variant={isHomePage ? "primary" : "green"} size="sm" className="w-full">Реєстрація</Link>
 			</li>
+		{/if}
+			
 		</ol>
 	</div>
 {/if}

@@ -1,4 +1,6 @@
 <script>
+    export let name = undefined;
+    export let required = false;
     export let type = "text";
     export let placeholder = "Example text";
     export let header = "header";
@@ -16,7 +18,7 @@
         {/if}
         <h3 class="font-medium {error ? 'text-red-600' : success ? 'text-green-600' : 'text-[#32221B]'} {variant === 'big-header' ? 'text-sm font-semibold' : 'text-[0.625rem]'} transition-colors">{header}</h3>
     </div>
-    <input {type} {placeholder} bind:value class="w-full rounded-lg border {error ? 'border-red-500 bg-red-50 shake' : success ? 'border-green-500 bg-green-50' : 'border-[#B4B4B4] bg-[#F9FFE5]'} p-2 pl-2 text-[0.75rem] text-[#756157] outline-none transition-all focus:border-[#756157]">
+    <input {name} {required} {type} {placeholder} bind:value class="w-full rounded-lg border {error ? 'border-red-500 bg-red-50 shake' : success ? 'border-green-500 bg-green-50' : 'border-[#B4B4B4] bg-[#F9FFE5]'} p-2 pl-2 text-[0.75rem] text-[#756157] outline-none transition-all focus:border-[#756157]">
     {#if error}
         <span class="text-red-500 text-[0.625rem] mt-[-0.25rem] transition-all">{error}</span>
     {/if}
