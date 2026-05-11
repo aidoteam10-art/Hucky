@@ -10,8 +10,8 @@ use crate::{error::ApiResult, state::AppState, users::auth::AuthenticatedUser};
 use super::{
     dto::{
         ChangeTournamentStatusRequest, CreateTournamentRequest, CreateTournamentResponse,
-        MyTournamentsResponse, TournamentDetailResponse, TournamentListQuery, TournamentListResponse,
-        UpdateTournamentRequest,
+        MyTournamentsResponse, TournamentDetailResponse, TournamentListQuery,
+        TournamentListResponse, UpdateTournamentRequest,
     },
     service::TournamentService,
 };

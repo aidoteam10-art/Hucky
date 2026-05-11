@@ -140,14 +140,12 @@ pub struct AdminUserListResponse {
 }
 
 pub fn admin_routes() -> Router<AppState> {
-    Router::new().route(
-        "/api/admin/users",
-        get(list_admin_users_handler),
-    )
-    .route(
-        "/api/admin/users/:id/role",
-        patch(update_admin_user_role_handler),
-    )
+    Router::new()
+        .route("/api/admin/users", get(list_admin_users_handler))
+        .route(
+            "/api/admin/users/:id/role",
+            patch(update_admin_user_role_handler),
+        )
 }
 
 async fn list_admin_users_handler(
@@ -165,15 +163,14 @@ async fn list_admin_users_handler(
         .map_err(|_| ApiError::Validation("Invalid role filter".to_string()))?;
     let page = query.page.unwrap_or(1).max(1);
     let per_page = query.per_page.unwrap_or(20).clamp(1, 100);
-    let (items, total) = UserRepository::list_admin_users(
-        &state.db,
-        role,
-        query.search.as_deref(),
-        page,
-        per_page,
-    )
-    .await?;
-    let total_pages = if total == 0 { 0 } else { (total + per_page - 1) / per_page };
+    let (items, total) =
+        UserRepository::list_admin_users(&state.db, role, query.search.as_deref(), page, per_page)
+            .await?;
+    let total_pages = if total == 0 {
+        0
+    } else {
+        (total + per_page - 1) / per_page
+    };
 
     Ok(Json(AdminUserListResponse {
         items: items.into_iter().map(admin_user_response).collect(),
@@ -207,7 +204,9 @@ async fn update_admin_user_role_handler(
 async fn require_admin(state: &AppState, user: AuthenticatedUser) -> ApiResult<()> {
     match UserRepository::account_role(&state.db, user.user_id).await? {
         Some(AccountRole::Admin) => Ok(()),
-        _ => Err(ApiError::Forbidden("Only admin can perform this action".to_string())),
+        _ => Err(ApiError::Forbidden(
+            "Only admin can perform this action".to_string(),
+        )),
     }
 }
 

@@ -32,3 +32,6 @@ argon2 = "0.5.3"
 password-hash = "0.6.1"
 jsonwebtoken = { version = "10.3.0", features = ["rust_crypto"] }
 
+[dev-dependencies]
+tower = { version = "0.5", features = ["util"] }
+

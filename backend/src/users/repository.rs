@@ -119,10 +119,7 @@ impl UserRepository {
         .await
     }
 
-    pub async fn bootstrap_superadmin(
-        db: &PgPool,
-        email: &str,
-    ) -> Result<(), sqlx::Error> {
+    pub async fn bootstrap_superadmin(db: &PgPool, email: &str) -> Result<(), sqlx::Error> {
         sqlx::query(
             "UPDATE users
             SET account_role = 'admin', updated_at = NOW()
