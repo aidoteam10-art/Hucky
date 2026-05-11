@@ -70,6 +70,14 @@
             <InputField name="repeatPassword" bind:value={repeatPassword} success={repeatPassword.length > 0 && password === repeatPassword} class="mb-3" type="password" placeholder="••••••••" header="Повторіть пароль *" required />
 
             <Submit class="mb-3" title="Зареєструватися" />
+
+            <p class="text-center text-[0.625rem] leading-4 text-[#756157]">
+                Реєструючись, ви погоджуєтеся з
+                <a href="/terms" class="font-semibold text-[#191F00] hover:underline">Умовами використання</a>
+                та підтверджуєте, що ознайомилися з
+                <a href="/privacy-policy" class="font-semibold text-[#191F00] hover:underline">Політикою конфіденційності</a>
+                Hucky.
+            </p>
         </form>
         
         <span class="flex justify-center">
