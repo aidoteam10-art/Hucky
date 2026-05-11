@@ -25,10 +25,15 @@ impl UserService {
             .to_string();
 
         let account_role = registration_role(&payload.email);
-        let new_user_id =
-            UserRepository::create(db, &payload.email, &payload.full_name, &password_hash, account_role)
-                .await
-                .map_err(|e| format!("Помилка бази даних: {}", e))?;
+        let new_user_id = UserRepository::create(
+            db,
+            &payload.email,
+            &payload.full_name,
+            &password_hash,
+            account_role,
+        )
+        .await
+        .map_err(|e| format!("Помилка бази даних: {}", e))?;
 
         Ok(new_user_id)
     }

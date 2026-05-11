@@ -12,8 +12,8 @@ use crate::{
 use super::{
     dto::{
         ChangeTournamentStatusRequest, CreateTournamentRequest, CreateTournamentResponse,
-        MyTournamentsResponse, TournamentDetailResponse, TournamentListQuery, TournamentListResponse,
-        UpdateTournamentRequest,
+        MyTournamentsResponse, TournamentDetailResponse, TournamentListQuery,
+        TournamentListResponse, UpdateTournamentRequest,
     },
     model::{NewTournament, Tournament, TournamentListFilter, TournamentStatus, UpdateTournament},
     repository::TournamentRepository,
@@ -237,10 +237,7 @@ impl TournamentService {
         }
     }
 
-    async fn require_can_create_tournament(
-        db: &PgPool,
-        user: AuthenticatedUser,
-    ) -> ApiResult<()> {
+    async fn require_can_create_tournament(db: &PgPool, user: AuthenticatedUser) -> ApiResult<()> {
         let role = UserRepository::account_role(db, user.user_id)
             .await?
             .ok_or_else(|| ApiError::NotFound("Current user not found".to_string()))?;
