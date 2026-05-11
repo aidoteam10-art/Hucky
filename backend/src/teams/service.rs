@@ -5,7 +5,7 @@ use uuid::Uuid;
 use crate::{
     error::{ApiError, ApiResult},
     tournaments::model::{Tournament, TournamentStatus},
-    users::auth::AuthenticatedUser,
+    users::{auth::AuthenticatedUser, model::AccountRole, repository::UserRepository},
 };
 
 use super::{
@@ -33,6 +33,7 @@ impl TeamService {
         tournament_id: Uuid,
         payload: CreateTeamRequest,
     ) -> ApiResult<TeamSummaryResponse> {
+        ensure_user_can_participate(db, user.user_id).await?;
         let current_user = TeamRepository::find_user_by_id(db, user.user_id)
             .await?
             .ok_or_else(|| ApiError::NotFound("Current user not found".to_string()))?;
@@ -87,6 +88,8 @@ impl TeamService {
         }
 
         for invited_user in invited_users.iter().flatten() {
+            ensure_user_can_participate(db, invited_user.id).await?;
+
             if TeamRepository::accepted_membership_in_tournament(db, invited_user.id, tournament_id)
                 .await?
                 .is_some()
@@ -250,6 +253,10 @@ impl TeamService {
             .await?
             .len() as i64;
 
+        if let Some(invited_user) = &invited_user {
+            ensure_user_can_participate(db, invited_user.id).await?;
+        }
+
         if accepted_members_count + pending_invitations_count >= MAX_TOTAL_TEAM_MEMBERS {
             return Err(ApiError::Validation(
                 "Team already has the maximum number of members and pending invitations"
@@ -331,6 +338,7 @@ impl TeamService {
         user: AuthenticatedUser,
         invitation_id: Uuid,
     ) -> ApiResult<TeamSummaryResponse> {
+        ensure_user_can_participate(db, user.user_id).await?;
         let current_user = TeamRepository::find_user_by_id(db, user.user_id)
             .await?
             .ok_or_else(|| ApiError::NotFound("Current user not found".to_string()))?;
@@ -532,6 +540,20 @@ async fn ensure_can_manage_team(db: &PgPool, user_id: Uuid, team: &Team) -> ApiR
             "Only team captain or tournament organizer can perform this action".to_string(),
         ))
     }
+}
+
+async fn ensure_user_can_participate(db: &PgPool, user_id: Uuid) -> ApiResult<()> {
+    let role = UserRepository::account_role(db, user_id)
+        .await?
+        .ok_or_else(|| ApiError::NotFound("User not found".to_string()))?;
+
+    if role == AccountRole::Organiser {
+        return Err(ApiError::Forbidden(
+            "Organisers cannot register or join tournament teams".to_string(),
+        ));
+    }
+
+    Ok(())
 }
 
 fn ensure_team_registration_is_open(tournament: &Tournament) -> ApiResult<()> {

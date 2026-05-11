@@ -6,7 +6,7 @@ use uuid::Uuid;
 use crate::{
     error::{ApiError, ApiResult},
     tournaments::service::TournamentService,
-    users::auth::AuthenticatedUser,
+    users::{auth::AuthenticatedUser, repository::UserRepository},
 };
 
 use super::{
@@ -44,6 +44,7 @@ impl JuryService {
                 "This user is already jury for the tournament".to_string(),
             ));
         }
+        UserRepository::promote_to_jury_if_participant(db, target_user_id).await?;
 
         Self::list_jury(db, user, tournament_id).await
     }

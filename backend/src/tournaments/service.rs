@@ -6,13 +6,13 @@ use uuid::Uuid;
 use crate::{
     error::{ApiError, ApiResult},
     rounds::{model::NewRound, repository::RoundRepository, service::RoundService},
-    users::auth::AuthenticatedUser,
+    users::{auth::AuthenticatedUser, model::AccountRole, repository::UserRepository},
 };
 
 use super::{
     dto::{
         ChangeTournamentStatusRequest, CreateTournamentRequest, CreateTournamentResponse,
-        TournamentDetailResponse, TournamentListQuery, TournamentListResponse,
+        MyTournamentsResponse, TournamentDetailResponse, TournamentListQuery, TournamentListResponse,
         UpdateTournamentRequest,
     },
     model::{NewTournament, Tournament, TournamentListFilter, TournamentStatus, UpdateTournament},
@@ -27,6 +27,7 @@ impl TournamentService {
         user: AuthenticatedUser,
         payload: CreateTournamentRequest,
     ) -> ApiResult<CreateTournamentResponse> {
+        Self::require_can_create_tournament(db, user).await?;
         validate_tournament_fields(
             &payload.title,
             &payload.description,
@@ -109,6 +110,25 @@ impl TournamentService {
             total,
             total_pages,
         })
+    }
+
+    pub async fn my_tournaments(
+        db: &PgPool,
+        user: AuthenticatedUser,
+    ) -> ApiResult<MyTournamentsResponse> {
+        let role = UserRepository::account_role(db, user.user_id)
+            .await?
+            .ok_or_else(|| ApiError::NotFound("Current user not found".to_string()))?;
+
+        if role != AccountRole::Organiser {
+            return Err(ApiError::Forbidden(
+                "Only organiser can view managed tournaments".to_string(),
+            ));
+        }
+
+        let items = TournamentRepository::list_for_organizer(db, user.user_id).await?;
+
+        Ok(MyTournamentsResponse { items })
     }
 
     pub async fn get_tournament(
@@ -213,6 +233,23 @@ impl TournamentService {
         } else {
             Err(ApiError::Forbidden(
                 "Only tournament organizer can perform this action".to_string(),
+            ))
+        }
+    }
+
+    async fn require_can_create_tournament(
+        db: &PgPool,
+        user: AuthenticatedUser,
+    ) -> ApiResult<()> {
+        let role = UserRepository::account_role(db, user.user_id)
+            .await?
+            .ok_or_else(|| ApiError::NotFound("Current user not found".to_string()))?;
+
+        if role.can_create_tournaments() {
+            Ok(())
+        } else {
+            Err(ApiError::Forbidden(
+                "Only organiser can create tournaments".to_string(),
             ))
         }
     }

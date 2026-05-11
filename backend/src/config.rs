@@ -7,6 +7,7 @@ pub struct Config {
     pub server_host: String,
     pub server_port: u16,
     pub frontend_origin: String,
+    pub superadmin_email: Option<String>,
 }
 
 static CONFIG: OnceLock<Config> = OnceLock::new();
@@ -44,6 +45,11 @@ impl Config {
             .unwrap_or(8080);
         let frontend_origin = std::env::var("FRONTEND_ORIGIN")
             .unwrap_or_else(|_| "http://localhost:5173".to_string());
+        let superadmin_email = std::env::var("SUPERADMIN_EMAIL")
+            .or_else(|_| std::env::var("ADMIN_EMAIL"))
+            .ok()
+            .map(|value| value.trim().to_lowercase())
+            .filter(|value| !value.is_empty());
 
         Self {
             database_url,
@@ -51,6 +57,7 @@ impl Config {
             server_host,
             server_port,
             frontend_origin,
+            superadmin_email,
         }
     }
 }

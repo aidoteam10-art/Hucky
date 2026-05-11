@@ -1,5 +1,5 @@
 use super::{
-    model::{Claims, LoginRequest, RegisterUserRequest},
+    model::{AccountRole, Claims, LoginRequest, RegisterUserRequest},
     repository::UserRepository,
 };
 use crate::config::Config;
@@ -24,8 +24,9 @@ impl UserService {
             .map_err(|e| format!("Помилка хешвання паролю: {}", e))?
             .to_string();
 
+        let account_role = registration_role(&payload.email);
         let new_user_id =
-            UserRepository::create(db, &payload.email, &payload.full_name, &password_hash)
+            UserRepository::create(db, &payload.email, &payload.full_name, &password_hash, account_role)
                 .await
                 .map_err(|e| format!("Помилка бази даних: {}", e))?;
 
@@ -70,5 +71,28 @@ impl UserService {
         .map_err(|e| format!("Помилка генерації токену: {}", e))?;
 
         Ok(token)
+    }
+
+    pub async fn bootstrap_superadmin(db: &PgPool) -> Result<(), String> {
+        let Some(email) = Config::get().superadmin_email.as_deref() else {
+            return Ok(());
+        };
+
+        UserRepository::bootstrap_superadmin(db, email)
+            .await
+            .map_err(|e| format!("Помилка призначення superadmin: {}", e))
+    }
+}
+
+fn registration_role(email: &str) -> AccountRole {
+    let normalized = email.trim().to_lowercase();
+    if Config::get()
+        .superadmin_email
+        .as_deref()
+        .is_some_and(|admin_email| admin_email.eq_ignore_ascii_case(&normalized))
+    {
+        AccountRole::Admin
+    } else {
+        AccountRole::Participant
     }
 }

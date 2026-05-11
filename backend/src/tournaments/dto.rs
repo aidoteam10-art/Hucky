@@ -52,6 +52,11 @@ pub struct TournamentListResponse {
 }
 
 #[derive(Debug, Serialize)]
+pub struct MyTournamentsResponse {
+    pub items: Vec<TournamentListItem>,
+}
+
+#[derive(Debug, Serialize)]
 pub struct TournamentDetailResponse {
     pub id: Uuid,
     pub title: String,
