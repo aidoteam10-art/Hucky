@@ -216,3 +216,76 @@
         </div>
     </div>
 </section>
+<footer class="bg-[#191F00] text-white pt-[4.3125rem] pb-[3.8125rem] px-6 sm:px-10 xl:px-26 font-light">
+    <div class="max-w-[1600px] mx-auto">
+
+        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-[1fr_auto_auto_auto_auto] xl:gap-0 mb-[3.8125rem]">
+
+
+            <div class="xl:pr-[13.1875rem] mb-12 xl:mb-0">
+                <div class="flex items-center gap-3 mb-6">
+                    <img src="/icons/logo_white.png" alt="Hucky Logo" class="w-16 h-16 object-contain">
+                    <h2 class="text-3xl font-bold tracking-tighter">H<span class="text-[#89AB00]">u</span>cky</h2>
+                </div>
+                <p class="text-[0.8rem] leading-relaxed opacity-80 mb-2">
+                    Платформа для проведення командних IT-турнірів.
+                </p>
+                <p class="text-[0.8rem] opacity-80">Київ, Україна 2026</p>
+            </div>
+
+            <!-- Турніри (Відстань справа 194px) -->
+            <div class="xl:pr-[12.125rem] mb-10 xl:mb-0">
+                <h4 class="font-bold text-[1rem] mb-[1.4375rem] tracking-wide">Турніри</h4>
+                <ul class="flex flex-col gap-[1rem] text-[0.8rem] font-normal opacity-80">
+                    <li><a href="/tournaments" class="hover:text-[#CCFF00] transition-colors">Реєстрація відкрита</a></li>
+                    <li><a href="/tournaments" class="hover:text-[#CCFF00] transition-colors">Активні</a></li>
+                    <li><a href="/archive" class="hover:text-[#CCFF00] transition-colors">Завершені</a></li>
+                    <li><a href="/tournaments" class="hover:text-[#CCFF00] transition-colors">Усі турніри</a></li>
+                </ul>
+            </div>
+
+
+            <div class="xl:pr-[12.125rem] mb-10 xl:mb-0">
+                <h4 class="font-bold text-[1rem] mb-[1.4375rem] tracking-wide">Учасникам</h4>
+                <ul class="flex flex-col gap-[1rem] text-[0.75rem] font-normal opacity-80">
+                    <li><a href="/rules" class="hover:text-[#CCFF00] transition-colors">Правила турніру</a></li>
+                    <li><a href="/criteria" class="hover:text-[#CCFF00] transition-colors">Критерії оцінювання</a></li>
+                    <li><a href="/profile" class="hover:text-[#CCFF00] transition-colors">Особистий кабінет</a></li>
+                </ul>
+            </div>
+
+            <!-- Про нас (Відстань справа 194px) -->
+            <div class="xl:pr-[12.125rem] mb-10 xl:mb-0">
+                <h4 class="font-bold text-[1rem] mb-[1.4375rem] tracking-wide">Про нас</h4>
+                <ul class="flex flex-col gap-[1rem] text-[0.75rem] font-normal opacity-80">
+                    <li><span class="cursor-default">Команда A.I.D.O.</span></li>
+                    <li><span class="cursor-default">ПЛ НТУУ "КПІ"</span></li>
+                    <li><a href="mailto:aido_team@gmail.com" class="hover:text-[#CCFF00] transition-colors">aido_team10-art@gmail.com</a></li>
+                    <li><a href="https://github.com/aidoteam10-art/Hucky" target="_blank" class="hover:text-[#CCFF00] transition-colors">Hucky/github.com</a></li>
+                </ul>
+            </div>
+
+            <!-- A.I.D.O. -->
+            <div>
+                <h4 class="font-bold text-[1rem] mb-[1.4375rem] tracking-wide">A.I.D.O.</h4>
+                <ul class="flex flex-col gap-[1rem] text-[0.75rem] font-normal opacity-80">
+                    <li>Линовицька Надія</li>
+                    <li>Ніцак Богдан</li>
+                    <li>Осіпова Олеся</li>
+                    <li>Поліщук Владислава</li>
+                    <li>Тарасенко Денис</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Нижня лінія (padding зверху 61px) -->
+        <div class="pt-[3.8125rem] border-t border-white/10 flex flex-col sm:flex-row justify-between items-center gap-4 text-[10px] sm:text-xs opacity-50 uppercase tracking-widest">
+            <p>© 2026 Hucky · A.I.D.O. · Київ, Україна</p>
+            <div class="flex gap-6 italic">
+                <a href="/privacy" class="hover:text-white">Privacy Policy</a>
+                <a href="/terms" class="hover:text-white">Terms of Service</a>
+            </div>
+        </div>
+    </div>
+</footer>
+

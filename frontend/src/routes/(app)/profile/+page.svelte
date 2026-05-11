@@ -37,6 +37,46 @@
 			on:mouseenter={() => (currentAvatar = hoverAvatar)}
 			on:mouseleave={() => (currentAvatar = defaultAvatar)}
 		/>
+            {#if role === 'admin'}
+                <div class="flex flex-col gap-4 w-full md:w-auto">
+                    <a href="/tournaments/new" class="flex items-center gap-4 lg:gap-6 border border-[#191F00] rounded-2xl px-5 lg:px-7.5 py-3 lg:py-4 hover:ring-1 w-full md:w-auto justify-center">
+                        <div class="bg-[#CCFF00] w-8 h-8 lg:w-10 lg:h-10 rounded-full flex items-center justify-center text-xl lg:text-[1.65rem] font-semibold leading-none">
+                            +
+                        </div>
+                        <span class="text-lg lg:text-[1.5rem] font-semibold">Створити новий турнір</span>
+                    </a>
+
+                    <a href="/choose_jury" class="flex items-center gap-4 lg:gap-6 border border-[#191F00] rounded-2xl px-5 lg:px-7.5 py-3 lg:py-4 hover:ring-1 w-full md:w-auto justify-center">
+                        <div class=" w-9 h-9 lg:w-10 lg:h-10 rounded-full flex items-center justify-center">
+                            <img src="/icons/hummer.svg" alt="" class="w-9 h-9 lg:w-9 lg:h-9">
+                        </div>
+                        <span class="text-lg lg:text-[1.5rem] font-semibold">Обрати журі</span>
+                    </a>
+                </div>
+            {/if}
+        </div>
+    </section>
+
+    {#if role === 'admin'}
+        <h2 class="text-xl lg:text-[1.5rem] font-semibold mb-8 lg:mb-13 md:ml-32 lg:ml-46 text-center md:text-left">
+            Створені вами турніри:
+        </h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-8 lg:gap-12 max-w-7xl md:ml-32 lg:ml-46">
+            {#each user.createdTournaments as tournament}
+                <TournamentCard
+                        variant="grey"
+                        current_state={tournament.current_state}
+                        title={tournament.title}
+                        description={tournament.description}
+                        start_date={tournament.start_date}
+                        rounds={tournament.rounds}
+                        max_teams={tournament.max_teams}
+                        registered_teams={tournament.registered_teams}
+                        id={tournament.id}
+                />
+            {/each}
+        </div>
+    {/if}
 
 		<div class="w-full pt-0 md:pt-4">
 			<div class="mb-6 flex flex-col items-center gap-4 md:flex-row lg:gap-10">
