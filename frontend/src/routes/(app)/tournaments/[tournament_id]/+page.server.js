@@ -14,7 +14,9 @@ export const load = async ({ params, cookies, fetch }) => {
 		]);
 		const jury = token ? await loadJury(fetch, token, params.tournament_id) : { items: [] };
 		const userTeam =
-			myTeams.items?.find((item) => item.tournament.id === params.tournament_id) || null;
+			myTeams.items?.find(
+				(item) => item.tournament.id === params.tournament_id && item.status === 'accepted'
+			) || null;
 
 		return {
 			tournament,
