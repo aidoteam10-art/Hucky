@@ -46,7 +46,13 @@ async fn main() {
         .expect("FRONTEND_ORIGIN must be a valid origin");
     let cors = CorsLayer::new()
         .allow_origin(frontend_origin)
-        .allow_methods([Method::GET, Method::POST, Method::PATCH, Method::DELETE])
+        .allow_methods([
+            Method::GET,
+            Method::POST,
+            Method::PUT,
+            Method::PATCH,
+            Method::DELETE,
+        ])
         .allow_headers([header::AUTHORIZATION, header::CONTENT_TYPE]);
 
     // Збираємо додаток
