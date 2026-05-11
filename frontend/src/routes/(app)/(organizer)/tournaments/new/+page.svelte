@@ -110,6 +110,10 @@
 		<div class="rounded-xl border border-amber-200 bg-amber-50 px-5 py-4 text-sm font-semibold text-amber-800">
 			Потрібно увійти в акаунт, щоб створити турнір.
 		</div>
+	{:else if !data.canCreateTournament}
+		<div class="rounded-xl border border-amber-200 bg-amber-50 px-5 py-4 text-sm font-semibold text-amber-800">
+			Створювати турніри можуть лише організатори.
+		</div>
 	{/if}
 
 	{#if form?.message}
@@ -290,5 +294,9 @@
 		</Card>
 	{/each}
 
-	<Submit class="mt-4 flex h-12 w-full items-center justify-center" title="Створити турнір" />
+	<Submit
+		disabled={!data.isAuthenticated || !data.canCreateTournament}
+		class="mt-4 flex h-12 w-full items-center justify-center"
+		title="Створити турнір"
+	/>
 </form>

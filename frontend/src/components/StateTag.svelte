@@ -13,6 +13,7 @@
 		submission_closed: 'bg-[#191F00] text-sky-300 ring-[1.5px] ring-sky-300',
 		evaluated: 'bg-[#191F00] text-gray-400 ring-[1.5px] ring-gray-500',
 		participant: 'bg-[#191F00] text-[#CCFF00]',
+		organiser: 'bg-[#191F00] text-sky-300 ring-[1.5px] ring-sky-300',
 		jury: 'bg-[#191F00] text-[#F97316] ring-[1.5px] ring-[#F97316]',
 		admin: 'bg-[#191F00] text-gray-400 ring-[1.5px] ring-gray-500'
 	};
@@ -27,6 +28,7 @@
 		submission_closed: 'Прийом закрито',
 		evaluated: 'Оцінено',
 		participant: 'Учасник',
+		organiser: 'Організатор',
 		jury: 'Журі',
 		admin: 'Адмін'
 	};

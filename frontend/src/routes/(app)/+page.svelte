@@ -2,6 +2,20 @@
     import { onMount } from "svelte";
     import TournamentCard from "../../components/TournamentCard.svelte";
     import Link from "../../components/Link.svelte";
+
+    export let data;
+
+    const roleCtaLabels = {
+        participant: 'Мої команди',
+        jury: 'Мої оцінювання',
+        organiser: 'Мої турніри',
+        admin: 'Мій профіль'
+    };
+
+    $: profile = data.profile;
+    $: primaryCtaHref = profile ? '/profile' : '/registration';
+    $: primaryCtaLabel = profile ? roleCtaLabels[profile.role] || 'Мій профіль' : 'Розпочати';
+
     let features = [
         { title: 'Турніри', desc: 'Створюйте та керуйте багатосекундними змаганнями з гнучкими налаштуваннями', icon: '/icons/trophie.svg' },
         { title: 'Командна робота', desc: 'Реєстрація команд, взаємодія учасників та капітанів', icon: '/icons/team.svg' },
@@ -151,7 +165,7 @@
         </p>
         <div class="flex flex-col sm:flex-row gap-4 sm:gap-6 xl:gap-12 w-full sm:w-auto justify-stretch xl:justify-start">
             <div class="w-full sm:w-auto flex *:w-full">
-                <Link href="/registration" variant="green" size="lg">Розпочати</Link>
+                <Link href={primaryCtaHref} variant="green" size="lg">{primaryCtaLabel}</Link>
             </div>
             <div class="w-full sm:w-auto flex *:w-full whitespace-nowrap">
                 <Link href="/tournaments" variant="outline" size="lg">Переглянути турніри</Link>

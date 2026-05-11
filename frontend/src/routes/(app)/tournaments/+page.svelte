@@ -15,6 +15,7 @@
 	$: tournaments = data.tournaments;
 	$: currentStatus = data.filters.status;
 	$: searchQuery = data.filters.search;
+	$: canCreateTournament = data.profile?.role === 'organiser';
 	$: pageNumbers = Array.from({ length: tournaments.total_pages }, (_, index) => index + 1);
 
 	function queryFor(params) {
@@ -80,7 +81,7 @@
 					</button>
 				</form>
 
-					{#if data.user}
+					{#if canCreateTournament}
 					<a
 						href={resolve('/tournaments/new')}
 						class="w-full rounded-xl bg-[#191F00] px-5 py-3 text-center font-bold text-white transition hover:bg-[#2b3500]"
