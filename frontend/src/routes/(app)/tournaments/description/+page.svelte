@@ -13,6 +13,7 @@
         startDate: "21.03.2026",
         endDate: "30.04.2024",
         teamsMaxNum: 20,
+        teamsRoundNum: 2,
         teamsNum: 12,
         round: "MVP Development",
         time: "30:23:50:23",
@@ -74,9 +75,13 @@
                         <span class="text-[0.9rem] xl:text-[1.1rem] opacity-50">Реєстрація можлива:</span>
                         <span class="text-[0.9rem] xl:text-[1.1rem] font-regular text-right">{tournament.startRegDate} - {tournament.endRegDate}</span>
                     </div>
-                    <div class="flex justify-between items-center gap-4">
+                    <div class="flex justify-between items-center mb-5 gap-4">
                         <span class="text-[0.9rem] xl:text-[1.1rem] opacity-50">Максимальна кількість команд:</span>
                         <span class="text-[0.9rem] xl:text-[1.1rem] font-regular">{tournament.teamsMaxNum}</span>
+                    </div>
+                    <div class="flex justify-between items-center gap-4">
+                        <span class="text-[0.9rem] xl:text-[1.1rem] opacity-50">Кількість раундів:</span>
+                        <span class="text-[0.9rem] xl:text-[1.1rem] font-regular">{tournament.teamsRoundNum}</span>
                     </div>
                 </div>
 
