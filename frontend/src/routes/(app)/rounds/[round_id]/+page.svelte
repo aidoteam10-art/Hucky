@@ -49,6 +49,17 @@
 				>
 					До турніру
 				</a>
+				{#if round.status === 'active'}
+					<a
+						href={resolve('/tournaments/[tournament_id]/rounds/[round_id]/submission', {
+							tournament_id: String(round.tournament_id),
+							round_id: String(round.id)
+						})}
+						class="ml-3 inline-flex rounded-lg bg-[#CCFF00] px-5 py-2 text-sm font-bold text-[#191F00] hover:bg-[#A9D207]"
+					>
+						Здати роботу
+					</a>
+				{/if}
 			</div>
 
 			<div class="md:text-right">

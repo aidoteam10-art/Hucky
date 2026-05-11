@@ -12,6 +12,8 @@
 
 	$: tournament = data.tournament;
 	$: rounds = data.rounds || [];
+	$: registeredTeams = tournament.registered_teams || [];
+	$: userTeam = data.userTeam;
 
 	function formatDate(value) {
 		if (!value) return 'Не вказано';
@@ -37,8 +39,6 @@
 
 	function roundActions(round) {
 		if (round.status === 'draft') return [{ status: 'active', label: 'Опублікувати задачу' }];
-		if (round.status === 'active') return [{ status: 'submission_closed', label: 'Закрити прийом' }];
-		if (round.status === 'submission_closed') return [{ status: 'evaluated', label: 'Позначити оціненим' }];
 		return [];
 	}
 
@@ -71,7 +71,14 @@
 		</div>
 
 		<div class="flex w-full flex-col gap-3 lg:w-auto lg:items-end">
-			{#if tournament.status === 'registration'}
+			{#if userTeam}
+				<a
+					href={`/teams/${userTeam.team_id}`}
+					class="w-full rounded-2xl bg-[#191F00] px-10 py-3 text-center text-[1.1rem] font-bold text-[#CCFF00] shadow-sm transition-all hover:bg-[#2b3500] lg:w-auto"
+				>
+					Моя команда
+				</a>
+			{:else if tournament.status === 'registration' && data.isAuthenticated}
 				<a
 					href={resolve('/tournaments/[tournament_id]/team-registration', {
 						tournament_id: String(tournament.id)
@@ -80,12 +87,25 @@
 				>
 					Зареєструвати команду
 				</a>
+			{:else if tournament.status === 'registration'}
+				<a
+					href="/login"
+					class="w-full rounded-2xl bg-[#CCFF00] px-10 py-3 text-center text-[1.1rem] font-bold text-[#191F00] shadow-sm transition-all hover:bg-[#A9D207] lg:w-auto"
+				>
+					Увійти для реєстрації
+				</a>
 			{/if}
 			<a
 				href={resolve('/tournaments')}
 				class="w-full rounded-2xl border border-[#E5E7EB] px-8 py-3 text-center text-sm font-bold text-[#191F00] transition hover:bg-[#F4F4F5] lg:w-auto"
 			>
 				До списку турнірів
+			</a>
+			<a
+				href={`/tournaments/results?tournament_id=${tournament.id}`}
+				class="w-full rounded-2xl border border-[#191F00] px-8 py-3 text-center text-sm font-bold text-[#191F00] transition hover:bg-[#191F00] hover:text-white lg:w-auto"
+			>
+				Таблиця лідерів
 			</a>
 		</div>
 	</section>
@@ -165,6 +185,50 @@
 												</button>
 											</form>
 										{/each}
+										{#if round.status === 'active'}
+											<form method="POST" action="?/lockSubmissions">
+												<input type="hidden" name="round_id" value={round.id} />
+												<button
+													type="submit"
+													class="rounded-lg bg-[#191F00] px-4 py-2 text-sm font-bold text-white hover:bg-[#2b3500]"
+												>
+													Lock submissions
+												</button>
+											</form>
+										{/if}
+										{#if round.status === 'submission_closed'}
+											<form method="POST" action="?/generateAssignments" class="grid gap-2 rounded-lg border border-[#E5E7EB] bg-white p-3">
+												<input type="hidden" name="round_id" value={round.id} />
+												<label class="text-xs font-bold text-[#696969]">
+													Reviews
+													<input
+														name="reviews_per_submission"
+														type="number"
+														min="1"
+														step="1"
+														value="3"
+														class="mt-1 w-full rounded border border-[#B4B4B4] px-2 py-1 text-sm"
+													/>
+												</label>
+												<label class="text-xs font-bold text-[#696969]">
+													Max per jury
+													<input
+														name="max_assignments_per_jury"
+														type="number"
+														min="1"
+														step="1"
+														value="5"
+														class="mt-1 w-full rounded border border-[#B4B4B4] px-2 py-1 text-sm"
+													/>
+												</label>
+												<button
+													type="submit"
+													class="rounded-lg bg-[#CCFF00] px-4 py-2 text-sm font-bold text-[#191F00] hover:bg-[#A9D207]"
+												>
+													Generate assignments
+												</button>
+											</form>
+										{/if}
 									{/if}
 								</div>
 							</div>
@@ -175,6 +239,32 @@
 						</p>
 					{/each}
 				</div>
+			</div>
+
+			<div class="rounded-2xl border border-[#E5E7EB] bg-white p-6 shadow-sm lg:p-8">
+				<div class="mb-6 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+					<h2 class="text-2xl font-bold">Зареєстровані команди</h2>
+					<span class="text-sm font-semibold text-gray-500">{registeredTeams.length} у списку</span>
+				</div>
+
+				{#if registeredTeams.length > 0}
+					<div class="grid gap-4">
+						{#each registeredTeams as team (team.id)}
+							<div class="rounded-xl border border-[#E5E7EB] bg-[#FAFAFA] p-5">
+								<div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+									<h3 class="text-lg font-bold">{team.name}</h3>
+									<span class="rounded-full bg-[#191F00] px-4 py-1.5 text-xs font-semibold text-[#CCFF00]">
+										{team.members_count} учасників
+									</span>
+								</div>
+							</div>
+						{/each}
+					</div>
+				{:else}
+					<p class="rounded-xl bg-[#F4F4F5] px-5 py-6 text-center font-semibold text-gray-600">
+						Команди ще не зареєстровані.
+					</p>
+				{/if}
 			</div>
 		</div>
 
@@ -203,6 +293,40 @@
 			</div>
 
 			{#if data.isAuthenticated}
+				<div class="rounded-2xl border border-[#E5E7EB] bg-white p-6 shadow-sm">
+					<h2 class="mb-4 text-xl font-bold">Jury</h2>
+					<form method="POST" action="?/addJury" class="mb-5 grid gap-3">
+						<InputField name="email" header="Email jury" placeholder="jury@example.com" />
+						<button
+							type="submit"
+							class="w-full rounded-xl bg-[#CCFF00] px-5 py-3 text-sm font-bold text-[#191F00] hover:bg-[#A9D207]"
+						>
+							Додати журі
+						</button>
+					</form>
+					<div class="space-y-3">
+						{#each data.jury as jury (jury.id)}
+							<div class="rounded-xl border border-[#E5E7EB] bg-[#FAFAFA] p-4">
+								<p class="font-bold">{jury.full_name}</p>
+								<p class="mt-1 break-all text-sm text-[#696969]">{jury.email}</p>
+								<form method="POST" action="?/removeJury" class="mt-3">
+									<input type="hidden" name="user_id" value={jury.id} />
+									<button
+										type="submit"
+										class="rounded-lg border border-[#B4B4B4] px-4 py-2 text-sm font-bold hover:bg-[#F4F4F5]"
+									>
+										Зняти
+									</button>
+								</form>
+							</div>
+						{:else}
+							<p class="rounded-xl bg-[#F4F4F5] px-5 py-4 text-sm font-semibold text-[#696969]">
+								Журі ще не додано або у вас немає доступу до списку.
+							</p>
+						{/each}
+					</div>
+				</div>
+
 				<div class="rounded-2xl border border-[#E5E7EB] bg-white p-6 shadow-sm">
 					<h2 class="mb-4 text-xl font-bold">Organizer controls</h2>
 					<div class="flex flex-col gap-3">

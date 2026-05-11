@@ -1,6 +1,7 @@
 <script>
 	export let name = undefined;
 	export let required = false;
+	export let disabled = false;
 	export let placeholder = 'Example text';
 	export let header = 'header';
 	export let variant = 'big-header';
@@ -31,6 +32,7 @@
 	<textarea
 		{name}
 		{required}
+		{disabled}
 		{placeholder}
 		{rows}
 		bind:value
@@ -38,7 +40,7 @@
 			? 'border-red-500 bg-red-50 shake'
 			: success
 				? 'border-green-500 bg-green-50'
-				: 'border-[#B4B4B4] bg-[#F9FFE5]'} p-2 pl-2 text-[0.75rem] text-[#756157] outline-none transition-all focus:border-[#756157]"
+				: 'border-[#B4B4B4] bg-[#F9FFE5]'} p-2 pl-2 text-[0.75rem] text-[#756157] outline-none transition-all focus:border-[#756157] disabled:cursor-not-allowed disabled:bg-[#F4F4F5] disabled:text-[#696969]"
 	></textarea>
 	{#if error}
 		<span class="mt-[-0.25rem] text-[0.625rem] text-red-500 transition-all">{error}</span>

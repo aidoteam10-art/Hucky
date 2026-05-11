@@ -12,8 +12,8 @@ use crate::{
 use super::{
     dto::{
         ChangeTournamentStatusRequest, CreateTournamentRequest, CreateTournamentResponse,
-        RegisteredTeamPreview, TournamentDetailResponse, TournamentListQuery,
-        TournamentListResponse, UpdateTournamentRequest,
+        TournamentDetailResponse, TournamentListQuery, TournamentListResponse,
+        UpdateTournamentRequest,
     },
     model::{NewTournament, Tournament, TournamentListFilter, TournamentStatus, UpdateTournament},
     repository::TournamentRepository,
@@ -229,6 +229,8 @@ async fn build_detail_response(
     tournament: Tournament,
 ) -> ApiResult<TournamentDetailResponse> {
     let active_round = TournamentRepository::active_round(db, tournament.id).await?;
+    let registered_teams = TournamentRepository::registered_teams(db, tournament.id).await?;
+    let registered_teams_count = registered_teams.len() as i64;
 
     Ok(TournamentDetailResponse {
         id: tournament.id,
@@ -241,8 +243,8 @@ async fn build_detail_response(
         starts_at: tournament.starts_at,
         ends_at: tournament.ends_at,
         max_teams: tournament.max_teams,
-        registered_teams_count: 0,
-        registered_teams: Vec::<RegisteredTeamPreview>::new(),
+        registered_teams_count,
+        registered_teams,
         active_round,
     })
 }

@@ -7,9 +7,9 @@ use axum::{
 use jsonwebtoken::{DecodingKey, Validation, decode};
 use serde_json::json;
 
-use super::model::Claims;
+use crate::config::Config;
 
-pub(crate) const JWT_SECRET: &str = "супер_секретний_ключ";
+use super::model::Claims;
 
 #[derive(Clone, Copy)]
 pub struct AuthenticatedUser {
@@ -68,7 +68,7 @@ fn decode_user(headers: &HeaderMap) -> Result<Option<AuthenticatedUser>, Respons
     let token = &auth_header[7..];
     let token_data = decode::<Claims>(
         token,
-        &DecodingKey::from_secret(JWT_SECRET.as_ref()),
+        &DecodingKey::from_secret(Config::get().jwt_secret_bytes()),
         &Validation::default(),
     )
     .map_err(|_| {
