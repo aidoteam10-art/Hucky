@@ -1,17 +1,13 @@
 <script>
+    import { enhance } from '$app/forms';
     import Card from "/src/components/form/Card.svelte";
     import InputField from "/src/components/form/InputField.svelte";
     import Submit from "/src/components/form/Submit.svelte";
 
-    let name = "";
-    let email = "";
+    export let form;
+
     let password = "";
     let repeatPassword = "";
-
-    let nameError = "";
-    let emailError = "";
-    let passwordError = "";
-    let repeatPasswordError = "";
 
     $: passwordStrength = calculateStrength(password);
     $: passwordStrengthColor = getStrengthColor(passwordStrength);
@@ -40,48 +36,6 @@
         if (score === 3) return "Середній";
         return "Надійний";
     }
-
-    function validate() {
-        let valid = true;
-        nameError = "";
-        emailError = "";
-        passwordError = "";
-        repeatPasswordError = "";
-
-        if (!name) {
-            nameError = "ПІБ обов'язковий";
-            valid = false;
-        }
-        
-        if (!email) {
-            emailError = "Email обов'язковий";
-            valid = false;
-        } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-            emailError = "Невірний формат email";
-            valid = false;
-        }
-
-        if (!password) {
-            passwordError = "Пароль обов'язковий";
-            valid = false;
-        } else if (passwordStrength < 3) {
-            passwordError = "Пароль занадто слабкий (мінімум 8 символів, 1 велика літера, 1 цифра)";
-            valid = false;
-        }
-
-        if (password !== repeatPassword) {
-            repeatPasswordError = "Паролі не співпадають";
-            valid = false;
-        }
-
-        return valid;
-    }
-
-    function handleSubmit() {
-        if (validate()) {
-            console.log("Registration valid", { name, email, password });
-        }
-    }
 </script>
 <div class="flex w-full justify-center p-6">
     <Card class="flex flex-col gap-3 w-full max-w-sm">
@@ -90,13 +44,19 @@
             <h1 class="mt-3 text-2xl font-extrabold">Зареєструватися</h1>
         </div>
 
-        <form on:submit|preventDefault={handleSubmit} class="flex flex-col gap-3 w-full">
-            <InputField bind:value={name} error={nameError} type="text" placeholder="Ваш ПІБ" header="Ваше ім'я *" />
+        {#if form?.message}
+            <div class="p-2 mb-2 text-sm text-red-600 bg-red-100 rounded text-center">
+                {form.message}
+            </div>
+        {/if}
+
+        <form method="POST" use:enhance class="flex flex-col gap-3 w-full">
+            <InputField name="name" value={form?.full_name ?? ''} type="text" placeholder="Ваш ПІБ" header="Ваше ім'я *" required />
             
-            <InputField bind:value={email} error={emailError} type="email" placeholder="hello@example.com" header="Email *" />
+            <InputField name="email" value={form?.email ?? ''} type="email" placeholder="hello@example.com" header="Email *" required />
             
             <div class="flex flex-col gap-1 w-full relative">
-                <InputField bind:value={password} error={passwordError} type="password" placeholder="••••••••" header="Пароль *" />
+                <InputField name="password" bind:value={password} type="password" placeholder="••••••••" header="Пароль *" required />
                 {#if password.length > 0}
                     <div class="flex items-center gap-2 mt-1 px-1">
                         <div class="flex-1 h-1.5 rounded-full bg-gray-200 overflow-hidden">
@@ -107,7 +67,7 @@
                 {/if}
             </div>
 
-            <InputField bind:value={repeatPassword} error={repeatPasswordError} success={repeatPassword.length > 0 && password === repeatPassword} class="mb-3" type="password" placeholder="••••••••" header="Повторіть пароль *" />
+            <InputField name="repeatPassword" bind:value={repeatPassword} success={repeatPassword.length > 0 && password === repeatPassword} class="mb-3" type="password" placeholder="••••••••" header="Повторіть пароль *" required />
 
             <Submit class="mb-3" title="Зареєструватися" />
         </form>
