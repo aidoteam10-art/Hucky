@@ -1,0 +1,252 @@
+import { error as kitError, fail, redirect } from '@sveltejs/kit';
+import { ApiError, apiRequest, getAuthToken } from '$lib/server/api';
+
+export const load = async ({ params, cookies, fetch }) => {
+	const token = getAuthToken(cookies);
+
+	try {
+		const [tournament, rounds, myTeams] = await Promise.all([
+			apiRequest(fetch, `/api/tournaments/${params.tournament_id}`, { token }),
+			apiRequest(fetch, `/api/tournaments/${params.tournament_id}/rounds`, { token }),
+			token
+				? apiRequest(fetch, '/api/me/teams', { token })
+				: Promise.resolve({ items: [] })
+		]);
+		const jury = token ? await loadJury(fetch, token, params.tournament_id) : { items: [] };
+		const userTeam =
+			myTeams.items?.find((item) => item.tournament.id === params.tournament_id) || null;
+
+		return {
+			tournament,
+			rounds: rounds.items,
+			jury: jury.items || [],
+			userTeam,
+			isAuthenticated: Boolean(token)
+		};
+	} catch (error) {
+		if (error instanceof ApiError) {
+			throw kitError(error.status, error.message);
+		}
+
+		throw kitError(500, 'Backend недоступний');
+	}
+};
+
+export const actions = {
+	changeTournamentStatus: async ({ request, params, cookies, fetch }) => {
+		const token = getAuthToken(cookies);
+		if (!token) return fail(401, { message: 'Потрібно увійти' });
+
+		const formData = await request.formData();
+		const status = String(formData.get('status') || '');
+
+		try {
+			await apiRequest(fetch, `/api/tournaments/${params.tournament_id}/status`, {
+				method: 'PATCH',
+				token,
+				body: { status }
+			});
+		} catch (error) {
+			return actionError(error);
+		}
+
+		throw redirect(303, `/tournaments/${params.tournament_id}`);
+	},
+
+	changeRoundStatus: async ({ request, params, cookies, fetch }) => {
+		const token = getAuthToken(cookies);
+		if (!token) return fail(401, { message: 'Потрібно увійти' });
+
+		const formData = await request.formData();
+		const roundId = String(formData.get('round_id') || '');
+		const status = String(formData.get('status') || '');
+
+		try {
+			await apiRequest(fetch, `/api/rounds/${roundId}/status`, {
+				method: 'PATCH',
+				token,
+				body: { status }
+			});
+		} catch (error) {
+			return actionError(error);
+		}
+
+		throw redirect(303, `/tournaments/${params.tournament_id}`);
+	},
+
+	createRound: async ({ request, params, cookies, fetch }) => {
+		const token = getAuthToken(cookies);
+		if (!token) return fail(401, { message: 'Потрібно увійти' });
+
+		const formData = await request.formData();
+		const payload = buildRoundPayload(formData);
+
+		if (payload.error) {
+			return fail(400, { message: payload.error });
+		}
+
+		try {
+			await apiRequest(fetch, `/api/tournaments/${params.tournament_id}/rounds`, {
+				method: 'POST',
+				token,
+				body: payload.data
+			});
+		} catch (error) {
+			return actionError(error);
+		}
+
+		throw redirect(303, `/tournaments/${params.tournament_id}`);
+	},
+
+	lockSubmissions: async ({ request, params, cookies, fetch }) => {
+		const token = getAuthToken(cookies);
+		if (!token) return fail(401, { message: 'Потрібно увійти' });
+
+		const formData = await request.formData();
+		const roundId = String(formData.get('round_id') || '').trim();
+		if (!roundId) return fail(400, { message: 'Round id is required' });
+
+		try {
+			await apiRequest(fetch, `/api/rounds/${roundId}/submissions/lock`, {
+				method: 'POST',
+				token
+			});
+		} catch (error) {
+			return actionError(error);
+		}
+
+		throw redirect(303, `/tournaments/${params.tournament_id}`);
+	},
+
+	generateAssignments: async ({ request, params, cookies, fetch }) => {
+		const token = getAuthToken(cookies);
+		if (!token) return fail(401, { message: 'Потрібно увійти' });
+
+		const formData = await request.formData();
+		const roundId = String(formData.get('round_id') || '').trim();
+		const reviews_per_submission = readOptionalNumber(formData, 'reviews_per_submission') ?? 3;
+		const max_assignments_per_jury = readOptionalNumber(formData, 'max_assignments_per_jury') ?? 5;
+
+		if (!roundId) return fail(400, { message: 'Round id is required' });
+
+		try {
+			await apiRequest(fetch, `/api/rounds/${roundId}/assignments/generate`, {
+				method: 'POST',
+				token,
+				body: { reviews_per_submission, max_assignments_per_jury }
+			});
+		} catch (error) {
+			return actionError(error);
+		}
+
+		throw redirect(303, `/tournaments/${params.tournament_id}`);
+	},
+
+	addJury: async ({ request, params, cookies, fetch }) => {
+		const token = getAuthToken(cookies);
+		if (!token) return fail(401, { message: 'Потрібно увійти' });
+
+		const formData = await request.formData();
+		const email = readString(formData, 'email');
+		if (!email) return fail(400, { message: 'Email jury is required' });
+
+		try {
+			await apiRequest(fetch, `/api/tournaments/${params.tournament_id}/jury`, {
+				method: 'POST',
+				token,
+				body: { email }
+			});
+		} catch (error) {
+			return actionError(error);
+		}
+
+		throw redirect(303, `/tournaments/${params.tournament_id}`);
+	},
+
+	removeJury: async ({ request, params, cookies, fetch }) => {
+		const token = getAuthToken(cookies);
+		if (!token) return fail(401, { message: 'Потрібно увійти' });
+
+		const formData = await request.formData();
+		const userId = readString(formData, 'user_id');
+		if (!userId) return fail(400, { message: 'Jury user id is required' });
+
+		try {
+			await apiRequest(fetch, `/api/tournaments/${params.tournament_id}/jury/${userId}`, {
+				method: 'DELETE',
+				token
+			});
+		} catch (error) {
+			return actionError(error);
+		}
+
+		throw redirect(303, `/tournaments/${params.tournament_id}`);
+	}
+};
+
+async function loadJury(fetch, token, tournamentId) {
+	try {
+		return await apiRequest(fetch, `/api/tournaments/${tournamentId}/jury`, { token });
+	} catch (error) {
+		if (error instanceof ApiError && (error.status === 403 || error.status === 404)) {
+			return { items: [] };
+		}
+		throw error;
+	}
+}
+
+function buildRoundPayload(formData) {
+	const title = readString(formData, 'title');
+	const task_description = readString(formData, 'task_description');
+	const technology_requirements = readString(formData, 'technology_requirements');
+	const starts_at = readDate(formData, 'starts_at');
+	const deadline_at = readDate(formData, 'deadline_at');
+	const position = readOptionalNumber(formData, 'position');
+	const must_have = formData
+		.getAll('must_have')
+		.map((value) => String(value).trim())
+		.filter(Boolean);
+
+	if (!title || !task_description || !starts_at || !deadline_at) {
+		return { error: 'Заповніть назву, опис і дати раунду' };
+	}
+
+	return {
+		data: {
+			title,
+			task_description,
+			technology_requirements: technology_requirements || null,
+			must_have,
+			starts_at,
+			deadline_at,
+			position
+		}
+	};
+}
+
+function actionError(error) {
+	if (error instanceof ApiError) {
+		return fail(error.status, { message: error.message });
+	}
+
+	return fail(500, { message: 'Backend недоступний' });
+}
+
+function readString(formData, name) {
+	return String(formData.get(name) || '').trim();
+}
+
+function readDate(formData, name) {
+	const value = readString(formData, name);
+	if (!value) return null;
+	const date = new Date(value);
+	if (Number.isNaN(date.getTime())) return null;
+	return date.toISOString();
+}
+
+function readOptionalNumber(formData, name) {
+	const value = readString(formData, name);
+	if (!value) return null;
+	const number = Number(value);
+	return Number.isFinite(number) ? number : null;
+}

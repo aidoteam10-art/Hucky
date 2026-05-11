@@ -1,6 +1,7 @@
 <script>
     export let title = "title";
+    export let disabled = false;
 </script>
 
 
-<button class = "bg-[#CCFF00] rounded-xl text-[1rem] font-semibold py-2.5 hover:bg-[#DAFF44] transition-colors duration-200 ease-out cursor-pointer {$$props.class ?? ''}">{title}</button>
+<button {disabled} class = "bg-[#CCFF00] rounded-xl text-[1rem] font-semibold py-2.5 hover:bg-[#DAFF44] transition-colors duration-200 ease-out cursor-pointer disabled:cursor-not-allowed disabled:opacity-60 {$$props.class ?? ''}">{title}</button>
