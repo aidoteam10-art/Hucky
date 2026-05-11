@@ -1,6 +1,11 @@
 <script>
     export let item;
     export let isGraded = false;
+
+    function updateScore(event) {
+        const value = Number(event.currentTarget.value);
+        item.score = Math.min(100, Math.max(0, Number.isNaN(value) ? 0 : value));
+    }
 </script>
 
 <div class="w-full">
@@ -9,7 +14,16 @@
             <h4 class="text-[1.1rem] font-medium text-[#191F00] mb-0.5">{item.name}</h4>
             <p class="text-[0.875rem] font-regular text-[#696969]">{item.desc}</p>
         </div>
-        <span class="text-[1.25rem] font-black leading-none">{item.score}</span>
+        <input
+            type="number"
+            min="0"
+            max="100"
+            value={item.score}
+            disabled={isGraded}
+            aria-label="Score for {item.name}"
+            on:input={updateScore}
+            class="w-[3ch] bg-transparent p-0 text-right text-[1.25rem] font-black leading-none text-[#191F00] outline-none [appearance:textfield] disabled:opacity-100 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+        />
     </div>
 
     <input 
