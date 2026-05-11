@@ -1,8 +1,8 @@
-import { apiRequest } from '$lib/server/api';
+import { apiRequest, getAuthToken } from '$lib/server/api';
 
 const allowedStatuses = new Set(['draft', 'registration', 'running', 'finished']);
 
-export const load = async ({ url, fetch }) => {
+export const load = async ({ url, cookies, fetch }) => {
 	const status = url.searchParams.get('status') || 'all';
 	const search = url.searchParams.get('search') || '';
 	const page = Math.max(Number(url.searchParams.get('page') || 1), 1);
@@ -15,13 +15,18 @@ export const load = async ({ url, fetch }) => {
 
 	if (allowedStatuses.has(status)) params.set('status', status);
 	if (search.trim()) params.set('search', search.trim());
+	const token = getAuthToken(cookies);
 
 	try {
-		const tournaments = await apiRequest(fetch, `/api/tournaments?${params.toString()}`);
+		const [tournaments, profile] = await Promise.all([
+			apiRequest(fetch, `/api/tournaments?${params.toString()}`),
+			token ? apiRequest(fetch, '/api/users/me', { token }) : Promise.resolve(null)
+		]);
 
 		return {
 			tournaments,
-			filters: { status, search }
+			filters: { status, search },
+			profile
 		};
 	} catch (error) {
 		return {
@@ -33,6 +38,7 @@ export const load = async ({ url, fetch }) => {
 				total_pages: 0
 			},
 			filters: { status, search },
+			profile: null,
 			error: error.message || 'Backend недоступний'
 		};
 	}

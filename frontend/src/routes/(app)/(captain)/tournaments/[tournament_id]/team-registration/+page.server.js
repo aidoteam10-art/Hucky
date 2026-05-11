@@ -13,10 +13,17 @@ export const load = async ({ params, cookies, fetch }) => {
 			apiRequest(fetch, `/api/tournaments/${params.tournament_id}`, { token })
 		]);
 
+		if (user.role === 'organiser') {
+			throw kitError(403, 'Organisers cannot register tournament teams');
+		}
+
 		return { user, tournament };
 	} catch (error) {
 		if (error instanceof ApiError) {
 			throw kitError(error.status, error.message);
+		}
+		if (error?.status) {
+			throw error;
 		}
 
 		throw kitError(500, 'Backend недоступний');
@@ -58,6 +65,10 @@ export const actions = {
 
 		try {
 			const currentUser = await apiRequest(fetch, '/api/users/me', { token });
+			if (currentUser.role === 'organiser') {
+				return fail(403, { values, message: 'Організатор не може реєструвати команду на турнір' });
+			}
+
 			if (normalizedEmails.includes(String(currentUser.email || '').toLowerCase())) {
 				return fail(400, { values, message: 'Email капітана не потрібно додавати до інвайтів' });
 			}

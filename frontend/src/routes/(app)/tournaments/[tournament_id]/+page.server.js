@@ -5,23 +5,30 @@ export const load = async ({ params, cookies, fetch }) => {
 	const token = getAuthToken(cookies);
 
 	try {
-		const [tournament, rounds, myTeams] = await Promise.all([
+		const [tournament, rounds, myTeams, profile] = await Promise.all([
 			apiRequest(fetch, `/api/tournaments/${params.tournament_id}`, { token }),
 			apiRequest(fetch, `/api/tournaments/${params.tournament_id}/rounds`, { token }),
 			token
 				? apiRequest(fetch, '/api/me/teams', { token })
-				: Promise.resolve({ items: [] })
+				: Promise.resolve({ items: [] }),
+			token ? apiRequest(fetch, '/api/users/me', { token }) : Promise.resolve(null)
 		]);
-		const jury = token ? await loadJury(fetch, token, params.tournament_id) : { items: [] };
+		const jury = token ? await loadJury(fetch, token, params.tournament_id) : { items: [], canManage: false };
+		const canParticipate = profile?.role !== 'organiser';
 		const userTeam =
-			myTeams.items?.find(
-				(item) => item.tournament.id === params.tournament_id && item.status === 'accepted'
-			) || null;
+			canParticipate
+				? myTeams.items?.find(
+						(item) => item.tournament.id === params.tournament_id && item.status === 'accepted'
+					) || null
+				: null;
+		const canRegisterTeam = Boolean(token) && canParticipate;
 
 		return {
 			tournament,
 			rounds: rounds.items,
 			jury: jury.items || [],
+			canManage: jury.canManage,
+			canRegisterTeam,
 			userTeam,
 			isAuthenticated: Boolean(token)
 		};
@@ -188,10 +195,11 @@ export const actions = {
 
 async function loadJury(fetch, token, tournamentId) {
 	try {
-		return await apiRequest(fetch, `/api/tournaments/${tournamentId}/jury`, { token });
+		const response = await apiRequest(fetch, `/api/tournaments/${tournamentId}/jury`, { token });
+		return { ...response, canManage: true };
 	} catch (error) {
 		if (error instanceof ApiError && (error.status === 403 || error.status === 404)) {
-			return { items: [] };
+			return { items: [], canManage: false };
 		}
 		throw error;
 	}

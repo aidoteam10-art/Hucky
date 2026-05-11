@@ -8,18 +8,28 @@ export const load = async ({ cookies, fetch }) => {
 	}
 
 	try {
-		const [profile, teams, invitations, juryAssignments] = await Promise.all([
-			apiRequest(fetch, '/api/users/me', { token }),
-			apiRequest(fetch, '/api/me/teams', { token }),
-			apiRequest(fetch, '/api/me/invitations', { token }),
-			apiRequest(fetch, '/api/jury/assignments', { token })
+		const profile = await apiRequest(fetch, '/api/users/me', { token });
+		const shouldLoadManagedTournaments = profile.role === 'organiser';
+		const shouldLoadParticipantData = profile.role !== 'organiser';
+		const [teams, invitations, juryAssignments, createdTournaments] = await Promise.all([
+			shouldLoadParticipantData
+				? apiRequest(fetch, '/api/me/teams', { token })
+				: Promise.resolve({ items: [] }),
+			shouldLoadParticipantData
+				? apiRequest(fetch, '/api/me/invitations', { token })
+				: Promise.resolve({ items: [] }),
+			apiRequest(fetch, '/api/jury/assignments', { token }),
+			shouldLoadManagedTournaments
+				? apiRequest(fetch, '/api/me/tournaments', { token })
+				: Promise.resolve({ items: [] })
 		]);
 
 		return {
 			profile,
 			teams: teams.items || [],
 			invitations: invitations.items || [],
-			juryAssignments: juryAssignments.items || []
+			juryAssignments: juryAssignments.items || [],
+			createdTournaments: createdTournaments.items || []
 		};
 	} catch (error) {
 		if (error instanceof ApiError && error.status === 401) {

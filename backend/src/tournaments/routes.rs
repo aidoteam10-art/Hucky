@@ -10,7 +10,7 @@ use crate::{error::ApiResult, state::AppState, users::auth::AuthenticatedUser};
 use super::{
     dto::{
         ChangeTournamentStatusRequest, CreateTournamentRequest, CreateTournamentResponse,
-        TournamentDetailResponse, TournamentListQuery, TournamentListResponse,
+        MyTournamentsResponse, TournamentDetailResponse, TournamentListQuery, TournamentListResponse,
         UpdateTournamentRequest,
     },
     service::TournamentService,
@@ -30,6 +30,7 @@ pub fn routes() -> Router<AppState> {
             "/api/tournaments/:id/status",
             patch(change_tournament_status_handler),
         )
+        .route("/api/me/tournaments", get(my_tournaments_handler))
 }
 
 async fn create_tournament_handler(
@@ -75,5 +76,13 @@ async fn change_tournament_status_handler(
 ) -> ApiResult<Json<CreateTournamentResponse>> {
     let response =
         TournamentService::change_tournament_status(&state.db, user, id, payload).await?;
+    Ok(Json(response))
+}
+
+async fn my_tournaments_handler(
+    State(state): State<AppState>,
+    user: AuthenticatedUser,
+) -> ApiResult<Json<MyTournamentsResponse>> {
+    let response = TournamentService::my_tournaments(&state.db, user).await?;
     Ok(Json(response))
 }

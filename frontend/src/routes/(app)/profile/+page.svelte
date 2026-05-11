@@ -1,5 +1,6 @@
 <script>
 	import StateTag from '../../../components/StateTag.svelte';
+	import TournamentCard from '../../../components/TournamentCard.svelte';
 
 	export let data;
 	export let form;
@@ -8,6 +9,11 @@
 	let hoverAvatar = '/icons/avatar_change.svg';
 	let currentAvatar = defaultAvatar;
 
+	$: role = data.profile?.role || 'participant';
+	$: canOrganise = role === 'organiser';
+	$: isAdmin = role === 'admin';
+	$: createdTournaments = data.createdTournaments || [];
+	$: canAcceptInvitations = role !== 'organiser';
 	$: hasTeams = data.teams.length > 0;
 	$: hasInvitations = data.invitations.length > 0;
 	$: hasJuryAssignments = data.juryAssignments.length > 0;
@@ -37,60 +43,71 @@
 			on:mouseenter={() => (currentAvatar = hoverAvatar)}
 			on:mouseleave={() => (currentAvatar = defaultAvatar)}
 		/>
-            {#if role === 'admin'}
-                <div class="flex flex-col gap-4 w-full md:w-auto">
-                    <a href="/tournaments/new" class="flex items-center gap-4 lg:gap-6 border border-[#191F00] rounded-2xl px-5 lg:px-7.5 py-3 lg:py-4 hover:ring-1 w-full md:w-auto justify-center">
-                        <div class="bg-[#CCFF00] w-8 h-8 lg:w-10 lg:h-10 rounded-full flex items-center justify-center text-xl lg:text-[1.65rem] font-semibold leading-none">
-                            +
-                        </div>
-                        <span class="text-lg lg:text-[1.5rem] font-semibold">Створити новий турнір</span>
-                    </a>
-
-                    <a href="/choose_jury" class="flex items-center gap-4 lg:gap-6 border border-[#191F00] rounded-2xl px-5 lg:px-7.5 py-3 lg:py-4 hover:ring-1 w-full md:w-auto justify-center">
-                        <div class=" w-9 h-9 lg:w-10 lg:h-10 rounded-full flex items-center justify-center">
-                            <img src="/icons/hummer.svg" alt="" class="w-9 h-9 lg:w-9 lg:h-9">
-                        </div>
-                        <span class="text-lg lg:text-[1.5rem] font-semibold">Обрати журі</span>
-                    </a>
-                </div>
-            {/if}
-        </div>
-    </section>
-
-    {#if role === 'admin'}
-        <h2 class="text-xl lg:text-[1.5rem] font-semibold mb-8 lg:mb-13 md:ml-32 lg:ml-46 text-center md:text-left">
-            Створені вами турніри:
-        </h2>
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-8 lg:gap-12 max-w-7xl md:ml-32 lg:ml-46">
-            {#each user.createdTournaments as tournament}
-                <TournamentCard
-                        variant="grey"
-                        current_state={tournament.current_state}
-                        title={tournament.title}
-                        description={tournament.description}
-                        start_date={tournament.start_date}
-                        rounds={tournament.rounds}
-                        max_teams={tournament.max_teams}
-                        registered_teams={tournament.registered_teams}
-                        id={tournament.id}
-                />
-            {/each}
-        </div>
-    {/if}
-
 		<div class="w-full pt-0 md:pt-4">
 			<div class="mb-6 flex flex-col items-center gap-4 md:flex-row lg:gap-10">
 				<h1 class="text-3xl leading-tight font-bold lg:text-[3rem]">{data.profile.full_name}</h1>
-				{#if hasTeams}
-					<StateTag variant="participant" />
-				{/if}
+				<StateTag variant={role} />
 			</div>
 			<div class="flex flex-col items-center gap-2 md:flex-row md:gap-6">
 				<span class="text-lg font-semibold lg:text-[1.4rem]">Пошта:</span>
 				<span class="text-lg lg:text-[1.4rem]">{data.profile.email}</span>
 			</div>
 		</div>
+		{#if canOrganise || isAdmin}
+			<div class="flex w-full flex-col gap-4 md:w-auto">
+				{#if canOrganise}
+					<a href="/tournaments/new" class="flex w-full items-center justify-center gap-4 rounded-2xl border border-[#191F00] px-5 py-3 hover:ring-1 md:w-auto lg:gap-6 lg:px-7.5 lg:py-4">
+						<div class="flex h-8 w-8 items-center justify-center rounded-full bg-[#CCFF00] text-xl font-semibold leading-none lg:h-10 lg:w-10 lg:text-[1.65rem]">
+							+
+						</div>
+						<span class="text-lg font-semibold lg:text-[1.5rem]">Створити новий турнір</span>
+					</a>
+
+					<a href="/choose_jury" class="flex w-full items-center justify-center gap-4 rounded-2xl border border-[#191F00] px-5 py-3 hover:ring-1 md:w-auto lg:gap-6 lg:px-7.5 lg:py-4">
+						<div class="flex h-9 w-9 items-center justify-center rounded-full lg:h-10 lg:w-10">
+							<img src="/icons/hummer.svg" alt="" class="h-9 w-9 lg:h-9 lg:w-9" />
+						</div>
+						<span class="text-lg font-semibold lg:text-[1.5rem]">Обрати журі</span>
+					</a>
+				{/if}
+				{#if isAdmin}
+					<a href="/admin_panel" class="flex w-full items-center justify-center gap-4 rounded-2xl border border-[#191F00] px-5 py-3 hover:ring-1 md:w-auto lg:gap-6 lg:px-7.5 lg:py-4">
+						<div class="flex h-9 w-9 items-center justify-center rounded-full lg:h-10 lg:w-10">
+							<img src="/icons/top-admin.svg" alt="" class="h-8 w-8 lg:h-9 lg:w-9" />
+						</div>
+						<span class="text-lg font-semibold lg:text-[1.5rem]">Панель адміністратора</span>
+					</a>
+				{/if}
+			</div>
+		{/if}
 	</section>
+
+	{#if canOrganise}
+		<section class="mb-12">
+			<h2 class="mb-8 text-center text-xl font-semibold md:ml-32 md:text-left lg:mb-13 lg:ml-46 lg:text-[1.5rem]">
+				Турніри в управлінні:
+			</h2>
+			<div class="grid max-w-7xl grid-cols-1 gap-8 sm:grid-cols-2 md:ml-32 lg:ml-46 lg:gap-12">
+				{#each createdTournaments as tournament}
+					<TournamentCard
+						variant="grey"
+						current_state={tournament.status}
+						title={tournament.title}
+						description={tournament.description}
+						start_date={tournament.starts_at}
+						rounds={tournament.rounds_count}
+						max_teams={tournament.max_teams}
+						registered_teams={tournament.registered_teams}
+						id={tournament.id}
+					/>
+				{:else}
+					<p class="rounded-xl bg-[#F4F4F5] px-6 py-8 text-center font-semibold text-[#696969] sm:col-span-2">
+						Поки що немає турнірів в управлінні.
+					</p>
+				{/each}
+			</div>
+		</section>
+	{/if}
 
 	{#if form?.message}
 		<div class="mb-8 rounded-xl border border-red-200 bg-red-50 px-5 py-4 text-sm font-semibold text-red-700">
@@ -207,16 +224,18 @@
 								<p class="mt-1 text-xs font-semibold text-[#696969]">
 									Дійсне до: {formatDate(invitation.expires_at)}
 								</p>
-								<div class="mt-4 grid grid-cols-2 gap-2">
-									<form method="POST" action="?/acceptInvitation">
-										<input type="hidden" name="invitation_id" value={invitation.id} />
-										<button
-											type="submit"
-											class="w-full rounded-lg bg-[#CCFF00] px-4 py-2 text-sm font-bold text-[#191F00] hover:bg-[#A9D207]"
-										>
-											Прийняти
-										</button>
-									</form>
+								<div class={canAcceptInvitations ? 'mt-4 grid grid-cols-2 gap-2' : 'mt-4 grid gap-2'}>
+									{#if canAcceptInvitations}
+										<form method="POST" action="?/acceptInvitation">
+											<input type="hidden" name="invitation_id" value={invitation.id} />
+											<button
+												type="submit"
+												class="w-full rounded-lg bg-[#CCFF00] px-4 py-2 text-sm font-bold text-[#191F00] hover:bg-[#A9D207]"
+											>
+												Прийняти
+											</button>
+										</form>
+									{/if}
 									<form method="POST" action="?/declineInvitation">
 										<input type="hidden" name="invitation_id" value={invitation.id} />
 										<button

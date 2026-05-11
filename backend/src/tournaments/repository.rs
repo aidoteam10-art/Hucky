@@ -117,6 +117,36 @@ impl TournamentRepository {
         Ok((items, total))
     }
 
+    pub async fn list_for_organizer(
+        db: &PgPool,
+        user_id: Uuid,
+    ) -> Result<Vec<TournamentListItem>, sqlx::Error> {
+        sqlx::query_as::<_, TournamentListItem>(
+            "SELECT
+                t.id,
+                t.title,
+                t.description,
+                t.status,
+                t.starts_at,
+                COALESCE((SELECT COUNT(*) FROM rounds r WHERE r.tournament_id = t.id), 0)::bigint AS rounds_count,
+                t.max_teams,
+                COALESCE((SELECT COUNT(*) FROM teams tm WHERE tm.tournament_id = t.id), 0)::bigint AS registered_teams
+            FROM tournaments t
+            WHERE t.organizer_id = $1
+                OR EXISTS (
+                    SELECT 1
+                    FROM tournament_staff_roles tsr
+                    WHERE tsr.tournament_id = t.id
+                        AND tsr.user_id = $1
+                        AND tsr.role = 'organizer'
+                )
+            ORDER BY t.created_at DESC",
+        )
+        .bind(user_id)
+        .fetch_all(db)
+        .await
+    }
+
     pub async fn update(
         db: &PgPool,
         tournament_id: Uuid,
@@ -178,6 +208,12 @@ impl TournamentRepository {
                 SELECT 1
                 FROM tournaments t
                 WHERE t.id = $1
+                    AND EXISTS (
+                        SELECT 1
+                        FROM users u
+                        WHERE u.id = $2
+                            AND u.account_role = 'organiser'
+                    )
                     AND (
                         t.organizer_id = $2
                         OR EXISTS (

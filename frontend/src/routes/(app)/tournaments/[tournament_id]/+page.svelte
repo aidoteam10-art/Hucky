@@ -78,7 +78,7 @@
 				>
 					Моя команда
 				</a>
-			{:else if tournament.status === 'registration' && data.isAuthenticated}
+			{:else if tournament.status === 'registration' && data.canRegisterTeam}
 				<a
 					href={resolve('/tournaments/[tournament_id]/team-registration', {
 						tournament_id: String(tournament.id)
@@ -87,7 +87,7 @@
 				>
 					Зареєструвати команду
 				</a>
-			{:else if tournament.status === 'registration'}
+			{:else if tournament.status === 'registration' && !data.isAuthenticated}
 				<a
 					href="/login"
 					class="w-full rounded-2xl bg-[#CCFF00] px-10 py-3 text-center text-[1.1rem] font-bold text-[#191F00] shadow-sm transition-all hover:bg-[#A9D207] lg:w-auto"
@@ -172,7 +172,7 @@
 									>
 										Відкрити
 									</a>
-									{#if data.isAuthenticated}
+									{#if data.canManage}
 										{#each roundActions(round) as action (action.status)}
 											<form method="POST" action="?/changeRoundStatus">
 												<input type="hidden" name="round_id" value={round.id} />
@@ -292,7 +292,7 @@
 				</div>
 			</div>
 
-			{#if data.isAuthenticated}
+			{#if data.canManage}
 				<div class="rounded-2xl border border-[#E5E7EB] bg-white p-6 shadow-sm">
 					<h2 class="mb-4 text-xl font-bold">Jury</h2>
 					<form method="POST" action="?/addJury" class="mb-5 grid gap-3">

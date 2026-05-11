@@ -30,6 +30,12 @@ impl LeaderboardRepository {
                 SELECT 1
                 FROM tournaments t
                 WHERE t.id = $1
+                    AND EXISTS (
+                        SELECT 1
+                        FROM users u
+                        WHERE u.id = $2
+                            AND u.account_role = 'organiser'
+                    )
                     AND (
                         t.organizer_id = $2
                         OR EXISTS (

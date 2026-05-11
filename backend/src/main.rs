@@ -39,6 +39,9 @@ async fn main() {
         .await
         .expect("Failed to connect to db");
     println!("Successfully connected to db!!!");
+    users::service::UserService::bootstrap_superadmin(&pool)
+        .await
+        .expect("Failed to bootstrap superadmin");
 
     let app_state = AppState { db: pool };
 
@@ -59,6 +62,7 @@ async fn main() {
     let app = Router::new()
         .route("/api/ping", get(ping_handler))
         .nest("/api/users", users::routes::users_routes())
+        .merge(users::routes::admin_routes())
         .merge(tournaments::routes::routes())
         .merge(rounds::routes::routes())
         .merge(teams::routes::routes())
