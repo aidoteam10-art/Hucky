@@ -4,7 +4,7 @@
     export let text = "";
 </script>
 
-<a {href} target="_blank" rel="noreferrer" class="flex items-center gap-3 text-[#2563EB] hover:text-[#1D4ED8] w-max font-medium text-[1rem] transition-colors">
+<a {href} target="_blank" rel="noopener noreferrer" class="flex items-center gap-3 text-[#2563EB] hover:text-[#1D4ED8] w-max font-medium text-[1rem] transition-colors">
     <img src={icon} alt={text} class="w-5 h-5" />
     {text}
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="opacity-70 ml-1">

@@ -113,9 +113,9 @@ impl SubmissionService {
             ));
         }
 
-        if round.status == "evaluated" {
+        if round.status != "active" {
             return Err(ApiError::Validation(
-                "Evaluated round cannot be locked again".to_string(),
+                "Only active rounds can be locked".to_string(),
             ));
         }
 

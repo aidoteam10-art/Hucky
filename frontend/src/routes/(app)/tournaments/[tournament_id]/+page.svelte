@@ -205,6 +205,7 @@
 														name="reviews_per_submission"
 														type="number"
 														min="1"
+														step="1"
 														value="3"
 														class="mt-1 w-full rounded border border-[#B4B4B4] px-2 py-1 text-sm"
 													/>
@@ -215,6 +216,7 @@
 														name="max_assignments_per_jury"
 														type="number"
 														min="1"
+														step="1"
 														value="5"
 														class="mt-1 w-full rounded border border-[#B4B4B4] px-2 py-1 text-sm"
 													/>
