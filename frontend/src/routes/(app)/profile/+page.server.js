@@ -9,17 +9,20 @@ export const load = async ({ cookies, fetch }) => {
 
 	try {
 		const profile = await apiRequest(fetch, '/api/users/me', { token });
-		const shouldLoadManagedTournaments = profile.role === 'organiser';
-		const shouldLoadParticipantData = profile.role !== 'organiser';
+		const isParticipant = profile.role === 'participant';
+		const isOrganiser = profile.role === 'organiser';
+		const isJury = profile.role === 'jury';
 		const [teams, invitations, juryAssignments, createdTournaments] = await Promise.all([
-			shouldLoadParticipantData
+			isParticipant
 				? apiRequest(fetch, '/api/me/teams', { token })
 				: Promise.resolve({ items: [] }),
-			shouldLoadParticipantData
+			isParticipant
 				? apiRequest(fetch, '/api/me/invitations', { token })
 				: Promise.resolve({ items: [] }),
-			apiRequest(fetch, '/api/jury/assignments', { token }),
-			shouldLoadManagedTournaments
+			isJury
+				? apiRequest(fetch, '/api/jury/assignments', { token })
+				: Promise.resolve({ items: [] }),
+			isOrganiser
 				? apiRequest(fetch, '/api/me/tournaments', { token })
 				: Promise.resolve({ items: [] })
 		]);
