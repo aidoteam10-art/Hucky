@@ -151,46 +151,6 @@ export const actions = {
 		throw redirect(303, `/tournaments/${params.tournament_id}`);
 	},
 
-	addJury: async ({ request, params, cookies, fetch }) => {
-		const token = getAuthToken(cookies);
-		if (!token) return fail(401, { message: 'Потрібно увійти' });
-
-		const formData = await request.formData();
-		const email = readString(formData, 'email');
-		if (!email) return fail(400, { message: 'Email jury is required' });
-
-		try {
-			await apiRequest(fetch, `/api/tournaments/${params.tournament_id}/jury`, {
-				method: 'POST',
-				token,
-				body: { email }
-			});
-		} catch (error) {
-			return actionError(error);
-		}
-
-		throw redirect(303, `/tournaments/${params.tournament_id}`);
-	},
-
-	removeJury: async ({ request, params, cookies, fetch }) => {
-		const token = getAuthToken(cookies);
-		if (!token) return fail(401, { message: 'Потрібно увійти' });
-
-		const formData = await request.formData();
-		const userId = readString(formData, 'user_id');
-		if (!userId) return fail(400, { message: 'Jury user id is required' });
-
-		try {
-			await apiRequest(fetch, `/api/tournaments/${params.tournament_id}/jury/${userId}`, {
-				method: 'DELETE',
-				token
-			});
-		} catch (error) {
-			return actionError(error);
-		}
-
-		throw redirect(303, `/tournaments/${params.tournament_id}`);
-	}
 };
 
 async function loadJury(fetch, token, tournamentId) {
