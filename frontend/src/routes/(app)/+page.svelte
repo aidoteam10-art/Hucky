@@ -15,7 +15,6 @@
     $: profile = data.profile;
     $: primaryCtaHref = profile ? '/profile' : '/registration';
     $: primaryCtaLabel = profile ? roleCtaLabels[profile.role] || 'Мій профіль' : 'Розпочати';
-    $: registrationTournaments = data.tournaments?.items || [];
 
     let features = [
         { title: 'Турніри', desc: 'Створюйте та керуйте багатосекундними змаганнями з гнучкими налаштуваннями', icon: '/icons/trophie.svg' },
@@ -23,6 +22,14 @@
         { title: 'Оцінювання журі', desc: 'Оцінювання з автоматичним розподілом робіт між суддями', icon: '/icons/shield.svg' },
         { title: 'Лідерборд', desc: 'Автоматичний рейтинг з детальною розбивкою за категоріями', icon: '/icons/graph.svg' }
   ];
+  let tournaments = [
+    {title : "Hackathon Ukraine 2026", desc : "Національний хакатон для студентських команд. Створюйте інноваційні рішення за 48 годин.", max_teams : 50, registered_teams: 24, date : new Date(2026, 3, 15, 12, 0, 0, 0)},
+    {title : "Hackathon Ukraine 2026", desc : "Національний хакатон для студентських команд. Створюйте інноваційні рішення за 48 годин.", max_teams : 50, registered_teams: 24, date : new Date(2026, 3, 15, 12, 0, 0, 0)},
+    {title : "Hackathon Ukraine 2026", desc : "Національний хакатон для студентських команд. Створюйте інноваційні рішення за 48 годин.", max_teams : 50, registered_teams: 24, date : new Date(2026, 3, 15, 12, 0, 0, 0)},
+    {title : "Hackathon Ukraine 2026", desc : "Національний хакатон для студентських команд. Створюйте інноваційні рішення за 48 годин.", max_teams : 50, registered_teams: 24, date : new Date(2026, 3, 15, 12, 0, 0, 0)},
+    {title : "Hackathon Ukraine 2026", desc : "Національний хакатон для студентських команд. Створюйте інноваційні рішення за 48 годин.", max_teams : 50, registered_teams: 24, date : new Date(2026, 3, 15, 12, 0, 0, 0)},
+    {title : "Hackathon Ukraine 2026", desc : "Національний хакатон для студентських команд. Створюйте інноваційні рішення за 48 годин.", max_teams : 50, registered_teams: 24, date : new Date(2026, 3, 15, 12, 0, 0, 0)},
+  ]
 
   let scrollContainer;
 
@@ -193,40 +200,23 @@
 
 <div class="flex flex-col items-center gap-6 xl:gap-10 mb-16 xl:mb-24 w-full overflow-hidden">
     
-    <h1 class="font-bold text-3xl sm:text-4xl xl:text-[2.75rem] text-center px-4">Реєстрація відкрита</h1>
+    <h1 class="font-bold text-3xl sm:text-4xl xl:text-[2.75rem] text-center px-4">Майбутні турніри</h1>
     
     <!-- Горизонтальний скрол-контейнер з вільним прокручуванням (без магнетизму) -->
-    {#if registrationTournaments.length > 0}
     <div bind:this={scrollContainer} class="flex overflow-x-auto w-full gap-4 sm:gap-6 px-4 sm:px-10 xl:px-26 pb-8 pt-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden select-none cursor-pointer">
-        {#each registrationTournaments as tournament (tournament.id)}
+        {#each tournaments as tournament}
         <!-- Кожна картка має задану ширину, не стискається і вільно скролиться -->
         <div class="w-[85vw] sm:w-[45vw] xl:w-[28vw] shrink-0">
             <TournamentCard 
                 title={tournament.title}
-                description={tournament.description}
-                current_state={tournament.status}
+                description={tournament.desc}
                 max_teams={tournament.max_teams}
                 registered_teams={tournament.registered_teams}
-                rounds={tournament.rounds_count}
-                start_date={tournament.starts_at}
-                id={tournament.id}
+                start_date={tournament.date.toISOString()}
             />
         </div>
         {/each}
     </div>
-    {:else}
-        <div class="mx-4 max-w-3xl rounded-2xl bg-[#F4F4F5] px-6 py-10 text-center sm:mx-10">
-            <p class="text-lg font-semibold text-[#191F00]">
-                Зараз немає турнірів з відкритою реєстрацією.
-            </p>
-            {#if data.tournamentsError}
-                <p class="mt-2 text-sm font-medium text-[#696969]">{data.tournamentsError}</p>
-            {/if}
-            <div class="mt-6 inline-flex">
-                <Link href="/tournaments" variant="primary" size="md">Переглянути всі турніри</Link>
-            </div>
-        </div>
-    {/if}
 </div>
 
 <hr>
@@ -240,57 +230,59 @@
         </div>
     </div>
 </section>
-<footer class="bg-[#191F00] px-5 py-10 font-light text-white sm:px-10 sm:py-14 xl:px-26 xl:pb-[3.8125rem] xl:pt-[4.3125rem]">
+<footer class="bg-[#191F00] text-white pt-[4.3125rem] pb-[3.8125rem] px-6 sm:px-10 xl:px-26 font-light">
     <div class="max-w-[1600px] mx-auto">
 
-        <div class="mb-10 grid grid-cols-2 gap-x-6 gap-y-10 sm:grid-cols-3 md:grid-cols-4 xl:mb-[3.8125rem] xl:grid-cols-[1fr_auto_auto_auto_auto] xl:gap-0">
+        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-[1fr_auto_auto_auto_auto] xl:gap-0 mb-[3.8125rem]">
 
 
-            <div class="col-span-2 sm:col-span-3 md:col-span-4 xl:col-span-1 xl:pr-[13.1875rem]">
-                <div class="mb-4 flex items-center gap-3 sm:mb-6">
-                    <img src="/icons/logo_white.png" alt="Hucky Logo" class="h-12 w-12 object-contain sm:h-16 sm:w-16">
-                    <h2 class="text-2xl font-bold tracking-tighter sm:text-3xl">H<span class="text-[#89AB00]">u</span>cky</h2>
+            <div class="xl:pr-[13.1875rem] mb-12 xl:mb-0">
+                <div class="flex items-center gap-3 mb-6">
+                    <img src="/icons/logo_white.png" alt="Hucky Logo" class="w-16 h-16 object-contain">
+                    <h2 class="text-3xl font-bold tracking-tighter">H<span class="text-[#89AB00]">u</span>cky</h2>
                 </div>
-                <p class="mb-2 max-w-sm text-sm leading-relaxed opacity-80 sm:text-[0.8rem]">
+                <p class="text-[0.8rem] leading-relaxed opacity-80 mb-2">
                     Платформа для проведення командних IT-турнірів.
                 </p>
-                <p class="text-sm opacity-80 sm:text-[0.8rem]">Київ, Україна 2026</p>
+                <p class="text-[0.8rem] opacity-80">Київ, Україна 2026</p>
             </div>
 
             <!-- Турніри (Відстань справа 194px) -->
-            <div class="xl:pr-[12.125rem]">
-                <h4 class="mb-4 text-sm font-bold tracking-wide sm:text-[1rem] xl:mb-[1.4375rem]">Турніри</h4>
-                <ul class="flex flex-col gap-3 text-sm font-normal leading-5 opacity-80 sm:text-[0.8rem] xl:gap-[1rem]">
-                    <li><a href="/tournaments?status=registration" class="hover:text-[#CCFF00] transition-colors">Реєстрація відкрита</a></li>
-                    <li><a href="/tournaments?status=running" class="hover:text-[#CCFF00] transition-colors">Активні</a></li>
-                    <li><a href="/tournaments?status=finished" class="hover:text-[#CCFF00] transition-colors">Завершені</a></li>
+            <div class="xl:pr-[12.125rem] mb-10 xl:mb-0">
+                <h4 class="font-bold text-[1rem] mb-[1.4375rem] tracking-wide">Турніри</h4>
+                <ul class="flex flex-col gap-[1rem] text-[0.8rem] font-normal opacity-80">
+                    <li><a href="/tournaments" class="hover:text-[#CCFF00] transition-colors">Реєстрація відкрита</a></li>
+                    <li><a href="/tournaments" class="hover:text-[#CCFF00] transition-colors">Активні</a></li>
+                    <li><a href="/archive" class="hover:text-[#CCFF00] transition-colors">Завершені</a></li>
                     <li><a href="/tournaments" class="hover:text-[#CCFF00] transition-colors">Усі турніри</a></li>
                 </ul>
             </div>
 
 
-            <div class="xl:pr-[12.125rem]">
-                <h4 class="mb-4 text-sm font-bold tracking-wide sm:text-[1rem] xl:mb-[1.4375rem]">Учасникам</h4>
-                <ul class="flex flex-col gap-3 text-sm font-normal leading-5 opacity-80 sm:text-[0.75rem] xl:gap-[1rem]">
+            <div class="xl:pr-[12.125rem] mb-10 xl:mb-0">
+                <h4 class="font-bold text-[1rem] mb-[1.4375rem] tracking-wide">Учасникам</h4>
+                <ul class="flex flex-col gap-[1rem] text-[0.75rem] font-normal opacity-80">
+                    <li><a href="/rules" class="hover:text-[#CCFF00] transition-colors">Правила турніру</a></li>
+                    <li><a href="/criteria" class="hover:text-[#CCFF00] transition-colors">Критерії оцінювання</a></li>
                     <li><a href="/profile" class="hover:text-[#CCFF00] transition-colors">Особистий кабінет</a></li>
                 </ul>
             </div>
 
             <!-- Про нас (Відстань справа 194px) -->
-            <div class="xl:pr-[12.125rem]">
-                <h4 class="mb-4 text-sm font-bold tracking-wide sm:text-[1rem] xl:mb-[1.4375rem]">Про нас</h4>
-                <ul class="flex flex-col gap-3 text-sm font-normal leading-5 opacity-80 sm:text-[0.75rem] xl:gap-[1rem]">
+            <div class="xl:pr-[12.125rem] mb-10 xl:mb-0">
+                <h4 class="font-bold text-[1rem] mb-[1.4375rem] tracking-wide">Про нас</h4>
+                <ul class="flex flex-col gap-[1rem] text-[0.75rem] font-normal opacity-80">
                     <li><span class="cursor-default">Команда A.I.D.O.</span></li>
                     <li><span class="cursor-default">ПЛ НТУУ "КПІ"</span></li>
-                    <li><a href="mailto:aido_team@gmail.com" class="break-words hover:text-[#CCFF00] transition-colors">aido_team10-art@gmail.com</a></li>
-                    <li><a href="https://github.com/aidoteam10-art/Hucky" target="_blank" class="break-words hover:text-[#CCFF00] transition-colors">Hucky/github.com</a></li>
+                    <li><a href="mailto:aido_team@gmail.com" class="hover:text-[#CCFF00] transition-colors">aido_team10-art@gmail.com</a></li>
+                    <li><a href="https://github.com/aidoteam10-art/Hucky" target="_blank" class="hover:text-[#CCFF00] transition-colors">Hucky/github.com</a></li>
                 </ul>
             </div>
 
             <!-- A.I.D.O. -->
             <div>
-                <h4 class="mb-4 text-sm font-bold tracking-wide sm:text-[1rem] xl:mb-[1.4375rem]">A.I.D.O.</h4>
-                <ul class="flex flex-col gap-3 text-sm font-normal leading-5 opacity-80 sm:text-[0.75rem] xl:gap-[1rem]">
+                <h4 class="font-bold text-[1rem] mb-[1.4375rem] tracking-wide">A.I.D.O.</h4>
+                <ul class="flex flex-col gap-[1rem] text-[0.75rem] font-normal opacity-80">
                     <li>Линовицька Надія</li>
                     <li>Ніцак Богдан</li>
                     <li>Осіпова Олеся</li>
@@ -301,10 +293,10 @@
         </div>
 
         <!-- Нижня лінія (padding зверху 61px) -->
-        <div class="flex flex-col items-start justify-between gap-4 border-t border-white/10 pt-6 text-[10px] uppercase tracking-wider opacity-50 sm:flex-row sm:items-center sm:text-xs sm:tracking-widest xl:pt-[3.8125rem]">
-            <p class="leading-5">© 2026 Hucky · A.I.D.O. · Київ, Україна</p>
-            <div class="flex flex-wrap gap-x-6 gap-y-2 italic">
-                <a href="/privacy-policy" class="hover:text-white">Privacy Policy</a>
+        <div class="pt-[3.8125rem] border-t border-white/10 flex flex-col sm:flex-row justify-between items-center gap-4 text-[10px] sm:text-xs opacity-50 uppercase tracking-widest">
+            <p>© 2026 Hucky · A.I.D.O. · Київ, Україна</p>
+            <div class="flex gap-6 italic">
+                <a href="/privacy" class="hover:text-white">Privacy Policy</a>
                 <a href="/terms" class="hover:text-white">Terms of Service</a>
             </div>
         </div>
