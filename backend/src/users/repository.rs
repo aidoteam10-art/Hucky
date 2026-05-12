@@ -10,7 +10,6 @@ pub struct AdminUserRow {
     pub email: String,
     pub full_name: String,
     pub account_role: String,
-    pub avatar_url: Option<String>,
     pub created_at: Option<chrono::DateTime<chrono::Utc>>,
 }
 
@@ -47,7 +46,7 @@ impl UserRepository {
 
     pub async fn find_by_email(db: &PgPool, email: &str) -> Result<Option<User>, sqlx::Error> {
         let user = sqlx::query_as::<_, User>(
-            "SELECT id, email, full_name, account_role, avatar_url, password_hash, created_at, updated_at
+            "SELECT id, email, full_name, account_role, password_hash, created_at, updated_at
             FROM users
             WHERE email = $1",
         )
@@ -60,7 +59,7 @@ impl UserRepository {
 
     pub async fn find_by_id(db: &PgPool, id: Uuid) -> Result<Option<User>, sqlx::Error> {
         let user = sqlx::query_as::<_, User>(
-            "SELECT id, email, full_name, account_role, avatar_url, password_hash, created_at, updated_at
+            "SELECT id, email, full_name, account_role, password_hash, created_at, updated_at
             FROM users
             WHERE id = $1",
         )
@@ -112,7 +111,7 @@ impl UserRepository {
             "UPDATE users
             SET account_role = $2, updated_at = NOW()
             WHERE id = $1
-            RETURNING id, email, full_name, account_role, avatar_url, created_at",
+            RETURNING id, email, full_name, account_role, created_at",
         )
         .bind(user_id)
         .bind(role.as_str())
@@ -120,24 +119,10 @@ impl UserRepository {
         .await
     }
 
-    pub async fn update_avatar(
+    pub async fn bootstrap_superadmin(
         db: &PgPool,
-        user_id: Uuid,
-        avatar_url: Option<&str>,
-    ) -> Result<Option<User>, sqlx::Error> {
-        sqlx::query_as::<_, User>(
-            "UPDATE users
-            SET avatar_url = $2, updated_at = NOW()
-            WHERE id = $1
-            RETURNING id, email, full_name, account_role, avatar_url, password_hash, created_at, updated_at",
-        )
-        .bind(user_id)
-        .bind(avatar_url)
-        .fetch_optional(db)
-        .await
-    }
-
-    pub async fn bootstrap_superadmin(db: &PgPool, email: &str) -> Result<(), sqlx::Error> {
+        email: &str,
+    ) -> Result<(), sqlx::Error> {
         sqlx::query(
             "UPDATE users
             SET account_role = 'admin', updated_at = NOW()
@@ -159,7 +144,7 @@ impl UserRepository {
     ) -> Result<(Vec<AdminUserRow>, i64), sqlx::Error> {
         let offset = (page - 1) * per_page;
         let mut list_builder = QueryBuilder::<Postgres>::new(
-            "SELECT id, email, full_name, account_role, avatar_url, created_at FROM users",
+            "SELECT id, email, full_name, account_role, created_at FROM users",
         );
         push_admin_user_filters(&mut list_builder, role, search);
         list_builder

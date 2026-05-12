@@ -1,28 +1,23 @@
 <script>
 	import StateTag from '../../../components/StateTag.svelte';
 	import TournamentCard from '../../../components/TournamentCard.svelte';
-	import { tick } from 'svelte';
-	import { avatarSrc, DEFAULT_AVATAR, isDefaultAvatar, setAvatar } from '$lib/avatar';
+	import { avatarSrc, DEFAULT_AVATAR, isDefaultAvatar, saveAvatar } from '$lib/avatar';
 
 	export let data;
 	export let form;
 
 	let hoverAvatar = '/icons/avatar_change.svg';
 	let avatarInput;
-	let avatarForm;
-	let avatarUrl = '';
 	let avatarError = '';
 	let isAvatarHovering = false;
 
 	$: shownAvatar = isAvatarHovering && isDefaultAvatar($avatarSrc) ? hoverAvatar : $avatarSrc;
-	$: setAvatar(data.profile?.avatar_url);
 
 	$: role = data.profile?.role || 'participant';
-	$: isParticipant = role === 'participant';
-	$: isOrganiser = role === 'organiser';
-	$: isJury = role === 'jury';
+	$: canOrganise = role === 'organiser';
 	$: isAdmin = role === 'admin';
 	$: createdTournaments = data.createdTournaments || [];
+	$: canAcceptInvitations = role !== 'organiser';
 	$: hasTeams = data.teams.length > 0;
 	$: hasInvitations = data.invitations.length > 0;
 	$: hasJuryAssignments = data.juryAssignments.length > 0;
@@ -52,19 +47,16 @@
 			avatarError = 'Оберіть файл зображення.';
 			return;
 		}
-		if (file.size > 900 * 1024) {
-			avatarError = 'Зображення має бути не більше 900 КБ.';
+		if (file.size > 2 * 1024 * 1024) {
+			avatarError = 'Зображення має бути не більше 2 МБ.';
 			return;
 		}
 
 		const reader = new FileReader();
-		reader.onload = async () => {
+		reader.onload = () => {
 			if (typeof reader.result === 'string') {
-				avatarUrl = reader.result;
-				setAvatar(reader.result);
+				saveAvatar(reader.result);
 				avatarError = '';
-				await tick();
-				avatarForm?.requestSubmit();
 			}
 		};
 		reader.onerror = () => {
@@ -105,9 +97,6 @@
 				class="sr-only"
 				on:change={handleAvatarChange}
 			/>
-			<form bind:this={avatarForm} method="POST" action="?/updateAvatar" class="hidden">
-				<input type="hidden" name="avatar_url" value={avatarUrl} />
-			</form>
 			{#if avatarError}
 				<p class="max-w-36 text-center text-xs font-semibold text-red-600 md:text-left">{avatarError}</p>
 			{/if}
@@ -122,9 +111,9 @@
 				<span class="text-lg lg:text-[1.4rem]">{data.profile.email}</span>
 			</div>
 		</div>
-		{#if isOrganiser || isAdmin}
+		{#if canOrganise || isAdmin}
 			<div class="flex w-full flex-col gap-4 md:w-auto">
-				{#if isOrganiser}
+				{#if canOrganise}
 					<a href="/tournaments/new" class="flex w-full items-center justify-center gap-4 rounded-2xl border border-[#191F00] px-5 py-3 hover:ring-1 md:w-auto lg:gap-6 lg:px-7.5 lg:py-4">
 						<div class="flex h-8 w-8 items-center justify-center rounded-full bg-[#CCFF00] text-xl font-semibold leading-none lg:h-10 lg:w-10 lg:text-[1.65rem]">
 							+
@@ -151,7 +140,7 @@
 		{/if}
 	</section>
 
-	{#if isOrganiser}
+	{#if canOrganise}
 		<section class="mb-12">
 			<h2 class="mb-8 text-center text-xl font-semibold md:ml-32 md:text-left lg:mb-13 lg:ml-46 lg:text-[1.5rem]">
 				Турніри в управлінні:
@@ -184,9 +173,8 @@
 		</div>
 	{/if}
 
-	{#if isParticipant}
-		<section class="grid grid-cols-1 gap-8 xl:grid-cols-[minmax(0,1fr)_24rem]">
-			<div class="space-y-8">
+	<section class="grid grid-cols-1 gap-8 xl:grid-cols-[minmax(0,1fr)_24rem]">
+		<div class="space-y-8">
 			<div class="rounded-2xl border border-[#E5E7EB] bg-white p-6 shadow-sm lg:p-8">
 				<div class="mb-6 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
 					<h2 class="text-2xl font-bold">Мої команди</h2>
@@ -233,9 +221,47 @@
 					</div>
 				{/if}
 			</div>
-			</div>
 
-			<aside class="space-y-8">
+			<div class="rounded-2xl border border-[#E5E7EB] bg-white p-6 shadow-sm lg:p-8">
+				<div class="mb-6 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+					<h2 class="text-2xl font-bold">Мої оцінювання</h2>
+					<span class="text-sm font-semibold text-gray-500">{data.juryAssignments.length} у списку</span>
+				</div>
+
+				{#if hasJuryAssignments}
+					<div class="grid gap-4">
+						{#each data.juryAssignments as assignment (assignment.id)}
+							<a
+								href={`/tournaments/results/${assignment.id}`}
+								class="block rounded-xl border border-[#E5E7EB] p-5 transition {assignment.status === 'pending'
+									? 'bg-[#FBFFE9] hover:border-[#CCFF00]'
+									: 'bg-[#FAFAFA] hover:border-[#B4B4B4]'}"
+							>
+								<div class="mb-4 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+									<div>
+										<h3 class="text-xl font-bold">{assignment.team_name}</h3>
+										<p class="mt-1 text-sm text-[#696969]">{assignment.tournament_title}</p>
+										<p class="mt-1 text-sm text-[#696969]">{assignment.round_title}</p>
+									</div>
+									<span class="rounded-full bg-[#191F00] px-4 py-1.5 text-xs font-semibold text-[#CCFF00]">
+										{assignment.status === 'pending' ? 'Очікує' : 'Оцінено'}
+									</span>
+								</div>
+								<p class="text-sm font-semibold text-[#696969]">
+									Submitted: {formatDate(assignment.submitted_at)}
+								</p>
+							</a>
+						{/each}
+					</div>
+				{:else}
+					<p class="rounded-xl bg-[#F4F4F5] px-5 py-6 text-center text-sm font-semibold text-[#696969]">
+						У вас немає призначених робіт для оцінювання.
+					</p>
+				{/if}
+			</div>
+		</div>
+
+		<aside class="space-y-8">
 			<div class="rounded-2xl border border-[#E5E7EB] bg-white p-6 shadow-sm">
 				<div class="mb-5 flex items-center justify-between gap-3">
 					<h2 class="text-xl font-bold">Запрошення</h2>
@@ -256,16 +282,18 @@
 								<p class="mt-1 text-xs font-semibold text-[#696969]">
 									Дійсне до: {formatDate(invitation.expires_at)}
 								</p>
-								<div class="mt-4 grid grid-cols-2 gap-2">
-									<form method="POST" action="?/acceptInvitation">
-										<input type="hidden" name="invitation_id" value={invitation.id} />
-										<button
-											type="submit"
-											class="w-full rounded-lg bg-[#CCFF00] px-4 py-2 text-sm font-bold text-[#191F00] hover:bg-[#A9D207]"
-										>
-											Прийняти
-										</button>
-									</form>
+								<div class={canAcceptInvitations ? 'mt-4 grid grid-cols-2 gap-2' : 'mt-4 grid gap-2'}>
+									{#if canAcceptInvitations}
+										<form method="POST" action="?/acceptInvitation">
+											<input type="hidden" name="invitation_id" value={invitation.id} />
+											<button
+												type="submit"
+												class="w-full rounded-lg bg-[#CCFF00] px-4 py-2 text-sm font-bold text-[#191F00] hover:bg-[#A9D207]"
+											>
+												Прийняти
+											</button>
+										</form>
+									{/if}
 									<form method="POST" action="?/declineInvitation">
 										<input type="hidden" name="invitation_id" value={invitation.id} />
 										<button
@@ -285,47 +313,6 @@
 					</p>
 				{/if}
 			</div>
-			</aside>
-		</section>
-	{/if}
-
-	{#if isJury}
-		<section class="rounded-2xl border border-[#E5E7EB] bg-white p-6 shadow-sm lg:p-8">
-			<div class="mb-6 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-				<h2 class="text-2xl font-bold">Мої оцінювання</h2>
-				<span class="text-sm font-semibold text-gray-500">{data.juryAssignments.length} у списку</span>
-			</div>
-
-			{#if hasJuryAssignments}
-				<div class="grid gap-4">
-					{#each data.juryAssignments as assignment (assignment.id)}
-						<a
-							href={`/tournaments/results/${assignment.id}`}
-							class="block rounded-xl border border-[#E5E7EB] p-5 transition {assignment.status === 'pending'
-								? 'bg-[#FBFFE9] hover:border-[#CCFF00]'
-								: 'bg-[#FAFAFA] hover:border-[#B4B4B4]'}"
-						>
-							<div class="mb-4 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-								<div>
-									<h3 class="text-xl font-bold">{assignment.team_name}</h3>
-									<p class="mt-1 text-sm text-[#696969]">{assignment.tournament_title}</p>
-									<p class="mt-1 text-sm text-[#696969]">{assignment.round_title}</p>
-								</div>
-								<span class="rounded-full bg-[#191F00] px-4 py-1.5 text-xs font-semibold text-[#CCFF00]">
-									{assignment.status === 'pending' ? 'Очікує' : 'Оцінено'}
-								</span>
-							</div>
-							<p class="text-sm font-semibold text-[#696969]">
-								Submitted: {formatDate(assignment.submitted_at)}
-							</p>
-						</a>
-					{/each}
-				</div>
-			{:else}
-				<p class="rounded-xl bg-[#F4F4F5] px-5 py-6 text-center text-sm font-semibold text-[#696969]">
-					У вас немає призначених робіт для оцінювання.
-				</p>
-			{/if}
-		</section>
-	{/if}
+		</aside>
+	</section>
 </main>

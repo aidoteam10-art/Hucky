@@ -133,7 +133,7 @@
 						<article class="grid gap-4 bg-white p-4 md:grid-cols-[minmax(18rem,1fr)_10rem_13rem] md:items-center md:px-5">
 							<div class="flex min-w-0 items-start gap-4">
 								<img
-									src={isCurrentUser(user) ? $avatarSrc : user.avatar_url || '/icons/avatar.svg'}
+									src={isCurrentUser(user) ? $avatarSrc : '/icons/avatar.svg'}
 									alt=""
 									class="h-12 w-12 shrink-0 rounded-full bg-white object-cover"
 								/>

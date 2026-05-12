@@ -9,20 +9,17 @@ export const load = async ({ cookies, fetch }) => {
 
 	try {
 		const profile = await apiRequest(fetch, '/api/users/me', { token });
-		const isParticipant = profile.role === 'participant';
-		const isOrganiser = profile.role === 'organiser';
-		const isJury = profile.role === 'jury';
+		const shouldLoadManagedTournaments = profile.role === 'organiser';
+		const shouldLoadParticipantData = profile.role !== 'organiser';
 		const [teams, invitations, juryAssignments, createdTournaments] = await Promise.all([
-			isParticipant
+			shouldLoadParticipantData
 				? apiRequest(fetch, '/api/me/teams', { token })
 				: Promise.resolve({ items: [] }),
-			isParticipant
+			shouldLoadParticipantData
 				? apiRequest(fetch, '/api/me/invitations', { token })
 				: Promise.resolve({ items: [] }),
-			isJury
-				? apiRequest(fetch, '/api/jury/assignments', { token })
-				: Promise.resolve({ items: [] }),
-			isOrganiser
+			apiRequest(fetch, '/api/jury/assignments', { token }),
+			shouldLoadManagedTournaments
 				? apiRequest(fetch, '/api/me/tournaments', { token })
 				: Promise.resolve({ items: [] })
 		]);
@@ -78,30 +75,6 @@ export const actions = {
 			await apiRequest(fetch, `/api/invitations/${invitationId}/decline`, {
 				method: 'POST',
 				token
-			});
-		} catch (error) {
-			return actionError(error);
-		}
-
-		throw redirect(303, '/profile');
-	},
-
-	updateAvatar: async ({ request, cookies, fetch }) => {
-		const token = getAuthToken(cookies);
-		if (!token) return fail(401, { message: 'Потрібно увійти' });
-
-		const formData = await request.formData();
-		const avatarUrl = String(formData.get('avatar_url') || '').trim();
-
-		if (!avatarUrl) {
-			return fail(400, { message: 'Оберіть зображення для аватарки' });
-		}
-
-		try {
-			await apiRequest(fetch, '/api/users/me/avatar', {
-				method: 'PATCH',
-				token,
-				body: { avatar_url: avatarUrl }
 			});
 		} catch (error) {
 			return actionError(error);

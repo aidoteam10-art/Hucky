@@ -76,7 +76,6 @@ pub struct UserProfileResponse {
     pub email: String,
     pub full_name: String,
     pub role: String,
-    pub avatar_url: Option<String>,
 }
 
 pub async fn get_me_handler(
@@ -89,7 +88,6 @@ pub async fn get_me_handler(
             email: db_user.email,
             full_name: db_user.full_name,
             role: db_user.account_role,
-            avatar_url: db_user.avatar_url,
         })),
         Ok(None) => {
             let error_response = serde_json::json!({"error": "Користувач не знайдений в БД"});
@@ -108,65 +106,6 @@ pub fn users_routes() -> Router<AppState> {
         .route("/register", post(register_user_handler))
         .route("/login", post(login_user_handler))
         .route("/me", get(get_me_handler))
-        .route("/me/avatar", patch(update_avatar_handler))
-}
-
-#[derive(Debug, Deserialize)]
-pub struct UpdateAvatarRequest {
-    pub avatar_url: Option<String>,
-}
-
-async fn update_avatar_handler(
-    State(state): State<AppState>,
-    user: AuthenticatedUser,
-    Json(payload): Json<UpdateAvatarRequest>,
-) -> ApiResult<Json<UserProfileResponse>> {
-    let avatar_url = normalize_avatar_url(payload.avatar_url)?;
-    let updated = UserRepository::update_avatar(&state.db, user.user_id, avatar_url.as_deref())
-        .await?
-        .ok_or_else(|| ApiError::NotFound("User not found".to_string()))?;
-
-    Ok(Json(UserProfileResponse {
-        id: updated.id,
-        email: updated.email,
-        full_name: updated.full_name,
-        role: updated.account_role,
-        avatar_url: updated.avatar_url,
-    }))
-}
-
-fn normalize_avatar_url(value: Option<String>) -> ApiResult<Option<String>> {
-    let Some(value) = value
-        .map(|value| value.trim().to_string())
-        .filter(|value| !value.is_empty())
-    else {
-        return Ok(None);
-    };
-
-    if value.len() > 1_400_000 {
-        return Err(ApiError::Validation(
-            "Avatar image is too large".to_string(),
-        ));
-    }
-
-    let allowed_prefixes = [
-        "data:image/png;base64,",
-        "data:image/jpeg;base64,",
-        "data:image/jpg;base64,",
-        "data:image/webp;base64,",
-        "data:image/gif;base64,",
-    ];
-
-    if !allowed_prefixes
-        .iter()
-        .any(|prefix| value.starts_with(prefix))
-    {
-        return Err(ApiError::Validation(
-            "Avatar must be a PNG, JPEG, WEBP, or GIF image".to_string(),
-        ));
-    }
-
-    Ok(Some(value))
 }
 
 #[derive(Debug, Deserialize)]
@@ -188,7 +127,6 @@ pub struct AdminUserResponse {
     pub email: String,
     pub full_name: String,
     pub role: String,
-    pub avatar_url: Option<String>,
     pub created_at: Option<chrono::DateTime<chrono::Utc>>,
 }
 
@@ -202,12 +140,14 @@ pub struct AdminUserListResponse {
 }
 
 pub fn admin_routes() -> Router<AppState> {
-    Router::new()
-        .route("/api/admin/users", get(list_admin_users_handler))
-        .route(
-            "/api/admin/users/:id/role",
-            patch(update_admin_user_role_handler),
-        )
+    Router::new().route(
+        "/api/admin/users",
+        get(list_admin_users_handler),
+    )
+    .route(
+        "/api/admin/users/:id/role",
+        patch(update_admin_user_role_handler),
+    )
 }
 
 async fn list_admin_users_handler(
@@ -225,14 +165,15 @@ async fn list_admin_users_handler(
         .map_err(|_| ApiError::Validation("Invalid role filter".to_string()))?;
     let page = query.page.unwrap_or(1).max(1);
     let per_page = query.per_page.unwrap_or(20).clamp(1, 100);
-    let (items, total) =
-        UserRepository::list_admin_users(&state.db, role, query.search.as_deref(), page, per_page)
-            .await?;
-    let total_pages = if total == 0 {
-        0
-    } else {
-        (total + per_page - 1) / per_page
-    };
+    let (items, total) = UserRepository::list_admin_users(
+        &state.db,
+        role,
+        query.search.as_deref(),
+        page,
+        per_page,
+    )
+    .await?;
+    let total_pages = if total == 0 { 0 } else { (total + per_page - 1) / per_page };
 
     Ok(Json(AdminUserListResponse {
         items: items.into_iter().map(admin_user_response).collect(),
@@ -266,9 +207,7 @@ async fn update_admin_user_role_handler(
 async fn require_admin(state: &AppState, user: AuthenticatedUser) -> ApiResult<()> {
     match UserRepository::account_role(&state.db, user.user_id).await? {
         Some(AccountRole::Admin) => Ok(()),
-        _ => Err(ApiError::Forbidden(
-            "Only admin can perform this action".to_string(),
-        )),
+        _ => Err(ApiError::Forbidden("Only admin can perform this action".to_string())),
     }
 }
 
@@ -278,7 +217,6 @@ fn admin_user_response(row: super::repository::AdminUserRow) -> AdminUserRespons
         email: row.email,
         full_name: row.full_name,
         role: row.account_role,
-        avatar_url: row.avatar_url,
         created_at: row.created_at,
     }
 }
