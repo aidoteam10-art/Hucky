@@ -81,6 +81,30 @@ export const actions = {
 		}
 
 		throw redirect(303, '/profile');
+	},
+
+	updateAvatar: async ({ request, cookies, fetch }) => {
+		const token = getAuthToken(cookies);
+		if (!token) return fail(401, { message: 'Потрібно увійти' });
+
+		const formData = await request.formData();
+		const avatarUrl = String(formData.get('avatar_url') || '').trim();
+
+		if (!avatarUrl) {
+			return fail(400, { message: 'Оберіть зображення для аватарки' });
+		}
+
+		try {
+			await apiRequest(fetch, '/api/users/me/avatar', {
+				method: 'PATCH',
+				token,
+				body: { avatar_url: avatarUrl }
+			});
+		} catch (error) {
+			return actionError(error);
+		}
+
+		throw redirect(303, '/profile');
 	}
 };
 

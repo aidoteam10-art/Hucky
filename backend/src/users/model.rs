@@ -53,6 +53,7 @@ pub struct User {
     pub email: String,
     pub full_name: String,
     pub account_role: String,
+    pub avatar_url: Option<String>,
     #[serde(skip_serializing)]
     pub password_hash: String,
     pub created_at: Option<DateTime<Utc>>,

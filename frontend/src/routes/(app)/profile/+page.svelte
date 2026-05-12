@@ -1,17 +1,21 @@
 <script>
 	import StateTag from '../../../components/StateTag.svelte';
 	import TournamentCard from '../../../components/TournamentCard.svelte';
-	import { avatarSrc, DEFAULT_AVATAR, isDefaultAvatar, saveAvatar } from '$lib/avatar';
+	import { tick } from 'svelte';
+	import { avatarSrc, DEFAULT_AVATAR, isDefaultAvatar, setAvatar } from '$lib/avatar';
 
 	export let data;
 	export let form;
 
 	let hoverAvatar = '/icons/avatar_change.svg';
 	let avatarInput;
+	let avatarForm;
+	let avatarUrl = '';
 	let avatarError = '';
 	let isAvatarHovering = false;
 
 	$: shownAvatar = isAvatarHovering && isDefaultAvatar($avatarSrc) ? hoverAvatar : $avatarSrc;
+	$: setAvatar(data.profile?.avatar_url);
 
 	$: role = data.profile?.role || 'participant';
 	$: canOrganise = role === 'organiser';
@@ -47,16 +51,19 @@
 			avatarError = 'Оберіть файл зображення.';
 			return;
 		}
-		if (file.size > 2 * 1024 * 1024) {
-			avatarError = 'Зображення має бути не більше 2 МБ.';
+		if (file.size > 900 * 1024) {
+			avatarError = 'Зображення має бути не більше 900 КБ.';
 			return;
 		}
 
 		const reader = new FileReader();
-		reader.onload = () => {
+		reader.onload = async () => {
 			if (typeof reader.result === 'string') {
-				saveAvatar(reader.result);
+				avatarUrl = reader.result;
+				setAvatar(reader.result);
 				avatarError = '';
+				await tick();
+				avatarForm?.requestSubmit();
 			}
 		};
 		reader.onerror = () => {
@@ -97,6 +104,9 @@
 				class="sr-only"
 				on:change={handleAvatarChange}
 			/>
+			<form bind:this={avatarForm} method="POST" action="?/updateAvatar" class="hidden">
+				<input type="hidden" name="avatar_url" value={avatarUrl} />
+			</form>
 			{#if avatarError}
 				<p class="max-w-36 text-center text-xs font-semibold text-red-600 md:text-left">{avatarError}</p>
 			{/if}
