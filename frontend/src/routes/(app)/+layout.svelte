@@ -3,9 +3,10 @@
 	import Link from '/src/components/Link.svelte';
 	import { page } from '$app/stores';
 	import { slide } from 'svelte/transition';
-	import { avatarSrc } from '$lib/avatar';
+	import { avatarSrc, setAvatar } from '$lib/avatar';
 
 	$: isHomePage = $page.url.pathname === '/';
+	$: setAvatar($page.data.profile?.avatar_url);
 
 	let isMenuOpen = false;
 	const toggleMenu = () => isMenuOpen = !isMenuOpen;
