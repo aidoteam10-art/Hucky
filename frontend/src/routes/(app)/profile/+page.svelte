@@ -1,13 +1,17 @@
 <script>
 	import StateTag from '../../../components/StateTag.svelte';
 	import TournamentCard from '../../../components/TournamentCard.svelte';
+	import { avatarSrc, DEFAULT_AVATAR, isDefaultAvatar, saveAvatar } from '$lib/avatar';
 
 	export let data;
 	export let form;
 
-	let defaultAvatar = '/icons/avatar.svg';
 	let hoverAvatar = '/icons/avatar_change.svg';
-	let currentAvatar = defaultAvatar;
+	let avatarInput;
+	let avatarError = '';
+	let isAvatarHovering = false;
+
+	$: shownAvatar = isAvatarHovering && isDefaultAvatar($avatarSrc) ? hoverAvatar : $avatarSrc;
 
 	$: role = data.profile?.role || 'participant';
 	$: canOrganise = role === 'organiser';
@@ -28,6 +32,38 @@
 			minute: '2-digit'
 		}).format(new Date(value));
 	}
+
+	function openAvatarPicker() {
+		avatarError = '';
+		avatarInput?.click();
+	}
+
+	function handleAvatarChange(event) {
+		const file = event.currentTarget.files?.[0];
+		event.currentTarget.value = '';
+
+		if (!file) return;
+		if (!file.type.startsWith('image/')) {
+			avatarError = 'Оберіть файл зображення.';
+			return;
+		}
+		if (file.size > 2 * 1024 * 1024) {
+			avatarError = 'Зображення має бути не більше 2 МБ.';
+			return;
+		}
+
+		const reader = new FileReader();
+		reader.onload = () => {
+			if (typeof reader.result === 'string') {
+				saveAvatar(reader.result);
+				avatarError = '';
+			}
+		};
+		reader.onerror = () => {
+			avatarError = 'Не вдалося прочитати зображення.';
+		};
+		reader.readAsDataURL(file);
+	}
 </script>
 
 <svelte:head>
@@ -36,13 +72,35 @@
 
 <main class="w-full px-6 py-10 font-sans text-[#191F00] md:px-16 lg:px-28 lg:py-20">
 	<section class="mb-12 flex flex-col items-center gap-8 text-center md:flex-row md:items-start md:text-left">
-		<img
-			src={currentAvatar}
-			alt="Profile Avatar"
-			class="h-24 w-24 cursor-pointer pt-0 transition-all duration-500 lg:h-35 lg:w-35 md:pt-4"
-			on:mouseenter={() => (currentAvatar = hoverAvatar)}
-			on:mouseleave={() => (currentAvatar = defaultAvatar)}
-		/>
+		<div class="flex flex-col items-center gap-3 md:items-start">
+			<button
+				type="button"
+				class="group relative h-24 w-24 overflow-hidden rounded-full border border-[#B4B4B4] bg-white transition hover:ring-2 hover:ring-[#CCFF00] focus:outline-none focus:ring-2 focus:ring-[#191F00] lg:h-35 lg:w-35"
+				aria-label="Змінити фото профілю"
+				on:click={openAvatarPicker}
+				on:mouseenter={() => (isAvatarHovering = true)}
+				on:mouseleave={() => (isAvatarHovering = false)}
+			>
+				<img
+					src={shownAvatar || DEFAULT_AVATAR}
+					alt="Profile Avatar"
+					class="h-full w-full object-cover transition-all duration-300"
+				/>
+				<span class="absolute inset-x-0 bottom-0 bg-[#191F00]/80 px-2 py-1 text-xs font-semibold text-white opacity-0 transition group-hover:opacity-100">
+					Змінити
+				</span>
+			</button>
+			<input
+				bind:this={avatarInput}
+				type="file"
+				accept="image/*"
+				class="sr-only"
+				on:change={handleAvatarChange}
+			/>
+			{#if avatarError}
+				<p class="max-w-36 text-center text-xs font-semibold text-red-600 md:text-left">{avatarError}</p>
+			{/if}
+		</div>
 		<div class="w-full pt-0 md:pt-4">
 			<div class="mb-6 flex flex-col items-center gap-4 md:flex-row lg:gap-10">
 				<h1 class="text-3xl leading-tight font-bold lg:text-[3rem]">{data.profile.full_name}</h1>
