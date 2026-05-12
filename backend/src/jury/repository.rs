@@ -2,7 +2,7 @@ use sqlx::{PgPool, Postgres, Transaction};
 use uuid::Uuid;
 
 use super::{
-    dto::{AssignmentCriterion, AssignmentListItem, JuryListItem},
+    dto::{AssignmentCriterion, AssignmentListItem, JuryListItem, OrganizerJuryTournament},
     model::{AssignmentDetailRow, AssignmentRound, AssignmentSubmissionRow},
 };
 
@@ -17,6 +17,55 @@ impl JuryRepository {
         )
         .bind(email)
         .fetch_optional(db)
+        .await
+    }
+
+    pub async fn list_organizer_registration_tournaments(
+        db: &PgPool,
+        user_id: Uuid,
+    ) -> Result<Vec<OrganizerJuryTournament>, sqlx::Error> {
+        sqlx::query_as::<_, OrganizerJuryTournament>(
+            "SELECT
+                t.id,
+                t.title,
+                t.status,
+                COALESCE(
+                    array_agg(tsr.user_id ORDER BY u.full_name ASC)
+                        FILTER (WHERE tsr.role = 'jury'),
+                    ARRAY[]::uuid[]
+                ) AS jury_ids
+            FROM tournaments t
+            LEFT JOIN tournament_staff_roles tsr
+                ON tsr.tournament_id = t.id
+                AND tsr.role = 'jury'
+            LEFT JOIN users u ON u.id = tsr.user_id
+            WHERE t.status = 'registration'
+                AND (
+                    t.organizer_id = $1
+                    OR EXISTS (
+                        SELECT 1
+                        FROM tournament_staff_roles organizer_role
+                        WHERE organizer_role.tournament_id = t.id
+                            AND organizer_role.user_id = $1
+                            AND organizer_role.role = 'organizer'
+                    )
+                )
+            GROUP BY t.id, t.title, t.status, t.created_at
+            ORDER BY t.created_at DESC",
+        )
+        .bind(user_id)
+        .fetch_all(db)
+        .await
+    }
+
+    pub async fn list_jury_candidates(db: &PgPool) -> Result<Vec<JuryListItem>, sqlx::Error> {
+        sqlx::query_as::<_, JuryListItem>(
+            "SELECT id, email, full_name
+            FROM users
+            WHERE account_role = 'jury'
+            ORDER BY full_name ASC, email ASC",
+        )
+        .fetch_all(db)
         .await
     }
 
