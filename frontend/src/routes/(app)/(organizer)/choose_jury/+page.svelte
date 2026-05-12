@@ -56,7 +56,7 @@
 			</div>
 			<p class="max-w-5xl text-[1.0625rem] leading-8 text-[#696969] sm:text-[1.25rem]">
 				Призначайте користувачів з роллю журі на турніри, де ще відкрита реєстрація.
-				Одне журі може працювати в кількох турнірах.
+				Якщо журі вже є в іншому вашому турнірі, це буде показано окремо.
 			</p>
 		</div>
 
@@ -136,7 +136,7 @@
 					</div>
 
 					<div class="rounded-xl border border-[#B4B4B4] bg-white p-5 sm:p-6">
-						<h2 class="mb-4 text-[1.125rem] font-semibold text-[#191F00]">Додати журі</h2>
+						<h2 class="mb-4 text-[1.125rem] font-semibold text-[#191F00]">Додати журі до турніру</h2>
 						<form method="POST" action="?/addJury" class="grid gap-3 sm:grid-cols-[minmax(0,1fr)_8rem]">
 							<input type="hidden" name="tournament_id" value={selectedTournament.id} />
 							<select
@@ -159,7 +159,9 @@
 							</button>
 						</form>
 						<p class="mt-3 text-[0.9375rem] text-[#696969]">
-							Доступні користувачі з роллю журі, які ще не призначені на цей турнір.
+							{juries.length === 0
+								? 'У системі ще немає користувачів з роллю журі.'
+								: 'У списку лише користувачі з роллю журі, які ще не додані до вибраного турніру.'}
 						</p>
 					</div>
 
@@ -206,7 +208,7 @@
 
 					<div class="rounded-xl border border-[#B4B4B4] bg-white p-5 sm:p-6">
 						<h2 class="mb-4 text-[1.125rem] font-semibold text-[#191F00]">
-							Призначені на інші мої турніри
+							Також призначені на інші мої турніри
 						</h2>
 						<div class="grid gap-2">
 							{#each assignedElsewhere as jury}
