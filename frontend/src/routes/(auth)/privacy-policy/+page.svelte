@@ -57,7 +57,7 @@
 		},
 		{
 			title: '8. Контакти',
-			items: ['Email: aido_team@gmail.com', 'GitHub: https://github.com/aidoteam10-art/Hucky']
+			items: ['Email: a.i.d.o.team10@gmail.com', 'GitHub: https://github.com/aidoteam10-art/Hucky']
 		}
 	];
 </script>

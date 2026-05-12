@@ -251,10 +251,13 @@
             <div class="xl:pr-[12.125rem] mb-10 xl:mb-0">
                 <h4 class="font-bold text-[1rem] mb-[1.4375rem] tracking-wide">Турніри</h4>
                 <ul class="flex flex-col gap-[1rem] text-[0.8rem] font-normal opacity-80">
-                    <li><a href="/tournaments" class="hover:text-[#CCFF00] transition-colors">Реєстрація відкрита</a></li>
-                    <li><a href="/tournaments" class="hover:text-[#CCFF00] transition-colors">Активні</a></li>
-                    <li><a href="/archive" class="hover:text-[#CCFF00] transition-colors">Завершені</a></li>
-                    <li><a href="/tournaments" class="hover:text-[#CCFF00] transition-colors">Усі турніри</a></li>
+                    <li><a href="/tournaments?status=registration" class="hover:text-[#CCFF00] transition-colors">Реєстрація відкрита</a></li>
+
+                    <li><a href="/tournaments?status=running" class="hover:text-[#CCFF00] transition-colors">Активні</a></li>
+
+                    <li><a href="/tournaments?status=finished" class="hover:text-[#CCFF00] transition-colors">Завершені</a></li>
+
+                    <li><a href="/tournaments?status=all" class="hover:text-[#CCFF00] transition-colors">Усі турніри</a></li>
                 </ul>
             </div>
 
@@ -274,7 +277,7 @@
                 <ul class="flex flex-col gap-[1rem] text-[0.75rem] font-normal opacity-80">
                     <li><span class="cursor-default">Команда A.I.D.O.</span></li>
                     <li><span class="cursor-default">ПЛ НТУУ "КПІ"</span></li>
-                    <li><a href="mailto:aido_team@gmail.com" class="hover:text-[#CCFF00] transition-colors">aido_team10-art@gmail.com</a></li>
+                    <li><a href="mailto:a.i.d.o.team10@gmail.com" class="hover:text-[#CCFF00] transition-colors">a.i.d.o.team10@gmail.com</a></li>
                     <li><a href="https://github.com/aidoteam10-art/Hucky" target="_blank" class="hover:text-[#CCFF00] transition-colors">Hucky/github.com</a></li>
                 </ul>
             </div>
@@ -296,7 +299,7 @@
         <div class="pt-[3.8125rem] border-t border-white/10 flex flex-col sm:flex-row justify-between items-center gap-4 text-[10px] sm:text-xs opacity-50 uppercase tracking-widest">
             <p>© 2026 Hucky · A.I.D.O. · Київ, Україна</p>
             <div class="flex gap-6 italic">
-                <a href="/privacy" class="hover:text-white">Privacy Policy</a>
+                <a href="/privacy-policy" class="hover:text-white">Privacy Policy</a>
                 <a href="/terms" class="hover:text-white">Terms of Service</a>
             </div>
         </div>

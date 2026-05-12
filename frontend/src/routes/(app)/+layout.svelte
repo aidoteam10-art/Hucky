@@ -36,7 +36,7 @@
                 <!-- залогінений -->
                 <li>
                     <a href="/profile" class="flex items-center gap-2 {isHomePage ? 'text-[#191F00] hover:text-[#89AB00]' : 'text-white hover:text-gray-300'} transition-colors">
-                        
+
                         <img src="/icons/avatar.svg" alt="Профіль" class="w-8 h-8 rounded-full border border-gray-300 bg-white" />
                         <span class="font-medium hidden lg:block">Профіль</span>
                     </a>
@@ -99,8 +99,8 @@
 				</form>
 			</li>
 		{:else}
-			
-			
+
+
 			<li class="w-full">
 				<Link on:click={toggleMenu} href="/login" variant={isHomePage ? "ghost" : "second"} size="sm" className="w-full">Увійти</Link>
 			</li>
@@ -108,9 +108,11 @@
 				<Link on:click={toggleMenu} href="/registration" variant={isHomePage ? "primary" : "green"} size="sm" className="w-full">Реєстрація</Link>
 			</li>
 		{/if}
-			
+
 		</ol>
 	</div>
 {/if}
 
-<slot></slot>
+{#key $page.url.pathname}
+	<slot></slot>
+{/key}

@@ -40,14 +40,14 @@
       <img src="/icons/task_desc.svg" alt="task_description" class="w-5 h-5 lg:w-auto">
       <span class='font-semibold text-[#191F00]'>Опис завдання</span>
     </div>
-    <p class="text-[#191F00] font-regular text-[1rem] leading-relaxed">{tournament.taskDescription}</p>
+    <p class="text-[#191F00] font-regular text-[1rem] leading-relaxed break-words">{tournament.taskDescription}</p>
   </div>
 
   <div class="border border-[#B4B4B4] rounded-2xl px-6 lg:px-7.5 py-7 lg:py-9 bg-white">
     <div class="flex items-center gap-2 mb-3 text-gray-900 font-medium">
       <span class='font-semibold text-[#191F00]'>Необхідні технології</span>
     </div>
-    <p class="text-[#191F00] font-regular text-[1rem] leading-relaxed">{tournament.technologies}</p>
+    <p class="text-[#191F00] font-regular text-[1rem] leading-relaxed break-words">{tournament.technologies}</p>
   </div>
 
   <div class="border border-[#B4B4B4] rounded-2xl px-6 lg:px-7.5 py-7 lg:py-9 bg-white">
