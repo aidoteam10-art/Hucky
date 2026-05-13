@@ -12,6 +12,7 @@ use super::{
     dto::{
         AddJuryRequest, AssignmentDetailResponse, AssignmentListResponse,
         GenerateAssignmentsRequest, GenerateAssignmentsResponse, JuryListResponse,
+        OrganizerJuryManagementResponse,
     },
     service::JuryService,
 };
@@ -27,11 +28,23 @@ pub fn routes() -> Router<AppState> {
             delete(remove_jury_handler),
         )
         .route(
+            "/api/organizer/jury-management",
+            get(organizer_jury_management_handler),
+        )
+        .route(
             "/api/rounds/:id/assignments/generate",
             post(generate_assignments_handler),
         )
         .route("/api/jury/assignments", get(my_assignments_handler))
         .route("/api/jury/assignments/:id", get(assignment_detail_handler))
+}
+
+async fn organizer_jury_management_handler(
+    State(state): State<AppState>,
+    user: AuthenticatedUser,
+) -> ApiResult<Json<OrganizerJuryManagementResponse>> {
+    let response = JuryService::organizer_jury_management(&state.db, user).await?;
+    Ok(Json(response))
 }
 
 async fn add_jury_handler(

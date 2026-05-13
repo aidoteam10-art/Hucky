@@ -4,7 +4,8 @@ use uuid::Uuid;
 
 #[derive(Debug, Deserialize)]
 pub struct AddJuryRequest {
-    pub email: String,
+    pub email: Option<String>,
+    pub user_id: Option<Uuid>,
 }
 
 #[derive(Debug, Serialize)]
@@ -17,6 +18,20 @@ pub struct JuryListItem {
     pub id: Uuid,
     pub email: String,
     pub full_name: String,
+}
+
+#[derive(Debug, Serialize)]
+pub struct OrganizerJuryManagementResponse {
+    pub tournaments: Vec<OrganizerJuryTournament>,
+    pub juries: Vec<JuryListItem>,
+}
+
+#[derive(Debug, Serialize, sqlx::FromRow)]
+pub struct OrganizerJuryTournament {
+    pub id: Uuid,
+    pub title: String,
+    pub status: String,
+    pub jury_ids: Vec<Uuid>,
 }
 
 #[derive(Debug, Deserialize)]
