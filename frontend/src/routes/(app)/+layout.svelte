@@ -96,6 +96,18 @@
 		{#if $page.data.user}
 			<hr class="w-full opacity-5 my-1" />
 			<li class="w-full">
+				<a
+					on:click={toggleMenu}
+					href="/profile"
+					class="flex w-full items-center justify-center gap-2 rounded-[0.3rem] px-4 py-2 text-[0.9rem] font-bold transition lg:text-[1rem] {isHomePage
+						? 'text-[#191F00] hover:bg-[#F4F4F5]'
+						: 'bg-[#191F00] text-white hover:ring-1'}"
+				>
+					<img src={$avatarSrc} alt="" class="h-6 w-6 shrink-0 rounded-full border border-gray-300 bg-white object-cover" />
+					<span>Профіль</span>
+				</a>
+			</li>
+			<li class="w-full">
 				<form action="/logout" method="POST">
 					<button type="submit" class="w-full text-center text-red-500 hover:text-red-700 py-2">Вийти</button>
 				</form>
