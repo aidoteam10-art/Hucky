@@ -20,13 +20,13 @@
     {#if !leaderboard}
         <section class="rounded-2xl border border-[#E5E7EB] bg-white px-6 py-10 text-center shadow-sm">
             <h1 class="mb-4 text-3xl font-bold">Результати турніру</h1>
-            <p class="mb-6 text-[#696969]">{data.message}</p>
+            <p class="text-anywhere mb-6 text-[#696969]">{data.message}</p>
             <a href="/tournaments" class="inline-flex rounded-xl bg-[#CCFF00] px-7 py-3 font-bold text-[#191F00] hover:bg-[#A9D207]">
                 До турнірів
             </a>
         </section>
     {:else}
-    <h1 class="text-4xl font-bold mb-8 md:mb-10">
+    <h1 class="text-anywhere text-4xl font-bold mb-8 md:mb-10">
         {leaderboard.tournament.title}
     </h1>
 
@@ -40,8 +40,8 @@
                     <span class="text-5xl font-extrabold leading-none">{String(team.rank).padStart(2, '0')}</span>
                 </header>
                 <div class="p-6">
-                    <p class="text-base font-bold">{team.team_name}</p>
-                    <p class="mt-1 text-xs font-medium text-gray-500">{team.organization || 'No organization'}</p>
+                    <p class="text-anywhere text-base font-bold">{team.team_name}</p>
+                    <p class="text-anywhere mt-1 text-xs font-medium text-gray-500">{team.organization || 'No organization'}</p>
                     <span class="mt-8 block text-4xl font-extrabold">{team.total}</span>
                 </div>
             </article>
@@ -70,7 +70,7 @@
                     {#each teams as team (team.team_id)}
                         <tr class="border-b border-[#E5E7EB] last:border-b-0 hover:bg-gray-50 transition-colors">
                             <td class="py-5 px-6 font-bold">{team.rank}</td>
-                            <td class="py-5 px-6 font-bold">{team.team_name}</td>
+                            <td class="text-anywhere py-5 px-6 font-bold whitespace-normal">{team.team_name}</td>
                             {#each criteria as criterion}
                                 <td class="py-5 px-4 font-medium text-gray-500 text-center">{team.scores[criterion] ?? '-'}</td>
                             {/each}

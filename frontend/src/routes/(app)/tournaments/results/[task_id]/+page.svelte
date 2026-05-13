@@ -28,7 +28,7 @@
         <section class="xl:col-span-7 flex flex-col pt-0 xl:pt-11">
             
             <div class="flex flex-col sm:flex-row justify-start sm:justify-between items-start sm:items-center gap-4 sm:gap-0 mb-6 sm:mb-8">
-                <h2 class="text-2xl sm:text-[1.5rem] font-bold leading-none">{assignment.team.name}</h2>
+                <h2 class="text-anywhere text-2xl sm:text-[1.5rem] font-bold leading-none">{assignment.team.name}</h2>
                 <button 
                     on:click={() => history.back()} 
                     class="flex items-center gap-2 text-sm sm:text-[1rem] text-[#191F00] hover:text-[#696969] transition-colors font-medium bg-transparent"
@@ -53,7 +53,7 @@
 
             <article class="border border-[#E5E7EB] rounded-[1.5rem] p-6 sm:p-8 bg-white shadow-sm">
                 <h3 class="text-lg sm:text-[1.13rem] font-bold mb-4">Опис від команди</h3>
-                <p class="whitespace-pre-line text-sm sm:text-[1rem] text-[#696969]">
+                <p class="text-anywhere whitespace-pre-line text-sm sm:text-[1rem] text-[#696969]">
                     {assignment.submission.description || 'Команда не додала опис.'}
                 </p>
             </article>
@@ -64,7 +64,7 @@
             
             {#if form?.message}
                 <div class="mb-5 rounded-xl border border-red-200 bg-red-50 px-5 py-4 text-sm font-semibold text-red-700">
-                    {form.message}
+                    <span class="text-anywhere block">{form.message}</span>
                 </div>
             {/if}
 
@@ -82,7 +82,7 @@
                 </article>
 
                 <article class="border border-[#E5E7EB] rounded-[1.5rem] py-5 px-6 sm:py-6 sm:px-8 bg-white shadow-sm flex justify-between items-center mb-5">
-                    <div>
+                    <div class="min-w-0">
                         <h3 class="text-xl sm:text-[1.25rem] font-bold mb-1">Загальний підсумок</h3>
                         <p class="text-xs sm:text-sm font-normal text-[#696969]">Із {criteria.length * 100}</p>
                     </div>

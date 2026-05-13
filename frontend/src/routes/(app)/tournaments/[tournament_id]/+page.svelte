@@ -57,15 +57,15 @@
 </svelte:head>
 
 <main class="w-full px-6 py-10 font-sans text-[#191F00] lg:px-12 lg:py-16 xl:px-16">
-	<section class="mb-12 flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
-		<div class="max-w-4xl">
+	<section class="mb-12 grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
+		<div class="min-w-0">
 			<div class="mb-6 flex flex-wrap items-center gap-4 lg:gap-8">
-				<h1 class="text-2xl leading-tight font-bold md:text-3xl xl:text-[2.5rem]">
+				<h1 class="text-anywhere text-2xl leading-tight font-bold md:text-3xl xl:text-[2.5rem]">
 					{tournament.title}
 				</h1>
 				<StateTag variant={tournament.status} />
 			</div>
-			<p class="max-w-3xl text-[1rem] leading-relaxed xl:text-[1.25rem] break-words">
+			<p class="text-anywhere w-full text-[1rem] leading-relaxed xl:text-[1.25rem]">
 				{tournament.description}
 			</p>
 		</div>
@@ -112,7 +112,7 @@
 
 	{#if form?.message}
 		<div class="mb-8 rounded-xl border border-red-200 bg-red-50 px-5 py-4 text-sm font-semibold text-red-700">
-			{form.message}
+			<span class="text-anywhere block">{form.message}</span>
 		</div>
 	{/if}
 
@@ -120,16 +120,16 @@
 		<div class="space-y-8">
 			<div class="rounded-2xl border border-[#E5E7EB] bg-white p-6 shadow-sm lg:p-8">
 				<h2 class="mb-5 text-2xl font-bold">Правила</h2>
-				<p class="whitespace-pre-line text-[1rem] leading-relaxed break-words">{tournament.rules}</p>
+				<p class="text-anywhere whitespace-pre-line text-[1rem] leading-relaxed">{tournament.rules}</p>
 			</div>
 
 			{#if tournament.active_round}
 				<div class="rounded-2xl bg-[#191F00] p-7 text-white lg:p-10">
 					<div class="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
-						<div>
+						<div class="min-w-0">
 							<p class="mb-2 text-sm font-semibold text-[#CCFF00]">Активний раунд</p>
-							<h2 class="text-2xl font-bold">{tournament.active_round.title}</h2>
-							<p class="mt-3 text-sm opacity-80">
+							<h2 class="text-anywhere text-2xl font-bold">{tournament.active_round.title}</h2>
+							<p class="text-anywhere mt-3 text-sm opacity-80">
 								Дедлайн: {formatDate(tournament.active_round.deadline_at)}
 							</p>
 						</div>
@@ -154,18 +154,8 @@
 				<div class="space-y-4">
 					{#each rounds as round (round.id)}
 						<div class="rounded-xl border border-[#E5E7EB] bg-[#FAFAFA] p-5">
-							<div class="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
-								<div>
-									<div class="mb-2 flex flex-wrap items-center gap-3">
-										<h3 class="text-lg font-bold">{round.position}. {round.title}</h3>
-										<StateTag variant={round.status} />
-									</div>
-									<p class="line-clamp-2 text-sm text-gray-700 overflow-hidden break-words">{round.task_description}</p>
-									<p class="mt-2 text-xs font-semibold text-gray-500">
-										{formatDate(round.starts_at)} - {formatDate(round.deadline_at)}
-									</p>
-								</div>
-								<div class="flex flex-col gap-2 md:items-end">
+							<div class="flow-root">
+								<div class="mb-4 flex flex-col gap-2 md:float-right md:mb-3 md:ml-5 md:w-32 md:items-stretch">
 									<a
 										href={resolve('/rounds/[round_id]', { round_id: String(round.id) })}
 										class="rounded-lg border border-[#191F00] px-4 py-2 text-center text-sm font-bold text-[#191F00] hover:bg-[#191F00] hover:text-white"
@@ -179,7 +169,7 @@
 												<input type="hidden" name="status" value={action.status} />
 												<button
 													type="submit"
-													class="rounded-lg bg-[#CCFF00] px-4 py-2 text-sm font-bold text-[#191F00] hover:bg-[#A9D207]"
+													class="w-full rounded-lg bg-[#CCFF00] px-4 py-2 text-sm font-bold text-[#191F00] hover:bg-[#A9D207]"
 												>
 													{action.label}
 												</button>
@@ -190,7 +180,7 @@
 												<input type="hidden" name="round_id" value={round.id} />
 												<button
 													type="submit"
-													class="rounded-lg bg-[#191F00] px-4 py-2 text-sm font-bold text-white hover:bg-[#2b3500]"
+													class="w-full rounded-lg bg-[#191F00] px-4 py-2 text-sm font-bold text-white hover:bg-[#2b3500]"
 												>
 													Lock submissions
 												</button>
@@ -231,6 +221,15 @@
 										{/if}
 									{/if}
 								</div>
+
+								<div class="mb-2 flex flex-wrap items-center gap-3">
+									<h3 class="text-anywhere text-lg font-bold">{round.position}. {round.title}</h3>
+									<StateTag variant={round.status} />
+								</div>
+								<p class="text-anywhere line-clamp-2 overflow-hidden text-sm text-gray-700">{round.task_description}</p>
+								<p class="text-anywhere mt-2 text-xs font-semibold text-gray-500">
+									{formatDate(round.starts_at)} - {formatDate(round.deadline_at)}
+								</p>
 							</div>
 						</div>
 					{:else}
@@ -252,7 +251,7 @@
 						{#each registeredTeams as team (team.id)}
 							<div class="rounded-xl border border-[#E5E7EB] bg-[#FAFAFA] p-5">
 								<div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-									<h3 class="text-lg font-bold">{team.name}</h3>
+									<h3 class="text-anywhere text-lg font-bold">{team.name}</h3>
 									<span class="rounded-full bg-[#191F00] px-4 py-1.5 text-xs font-semibold text-[#CCFF00]">
 										{team.members_count} учасників
 									</span>
@@ -274,12 +273,12 @@
 				<div class="space-y-4 text-sm">
 					<div>
 						<p class="font-semibold text-gray-500">Реєстрація</p>
-						<p>{formatDate(tournament.registration_starts_at)}</p>
-						<p>{formatDate(tournament.registration_ends_at)}</p>
+						<p class="text-anywhere">{formatDate(tournament.registration_starts_at)}</p>
+						<p class="text-anywhere">{formatDate(tournament.registration_ends_at)}</p>
 					</div>
 					<div>
 						<p class="font-semibold text-gray-500">Початок турніру</p>
-						<p>{formatDate(tournament.starts_at)}</p>
+						<p class="text-anywhere">{formatDate(tournament.starts_at)}</p>
 					</div>
 					<div>
 						<p class="font-semibold text-gray-500">Максимум команд</p>

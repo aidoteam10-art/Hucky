@@ -9,14 +9,30 @@
 
 
 @layer base {
+  *,
+  ::before,
+  ::after {
+    min-width: 0;
+  }
+
   html, body {
     height: 100%;
     margin: 0;
     padding: 0;
+    overflow-x: hidden;
+  }
+
+  :where(p, h1, h2, h3, h4, h5, h6, li, dd, dt, figcaption, blockquote, a, button, label, span) {
+    overflow-wrap: break-word;
   }
 }
 
 @layer utilities {
+  .text-anywhere {
+    overflow-wrap: anywhere;
+    word-break: normal;
+  }
+
   @keyframes shake {
     0%, 100% { transform: translateX(0); }
     25% { transform: translateX(-4px); }

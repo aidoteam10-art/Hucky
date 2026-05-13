@@ -33,9 +33,9 @@
 
 <main class="w-full px-6 py-10 font-sans text-[#191F00] lg:px-12 lg:py-16 xl:px-16">
 	<section class="mb-10 flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
-		<div>
+		<div class="min-w-0">
 			<div class="mb-4 flex flex-wrap items-center gap-4">
-				<h1 class="text-3xl font-bold lg:text-[2.75rem]">{team.name}</h1>
+				<h1 class="text-anywhere text-3xl font-bold lg:text-[2.75rem]">{team.name}</h1>
 				{#if currentMember}
 					<span class="rounded-full bg-[#191F00] px-4 py-1.5 text-sm font-semibold text-[#CCFF00]">
 						{currentMember.role === 'captain' ? 'Капітан' : 'Учасник'}
@@ -43,7 +43,7 @@
 				{/if}
 			</div>
 			{#if tournament}
-				<a href={`/tournaments/${tournament.id}`} class="text-base font-semibold text-[#516600] underline">
+				<a href={`/tournaments/${tournament.id}`} class="text-anywhere text-base font-semibold text-[#516600] underline">
 					{tournament.title}
 				</a>
 			{:else}
@@ -60,7 +60,7 @@
 
 	{#if form?.message}
 		<div class="mb-8 rounded-xl border border-red-200 bg-red-50 px-5 py-4 text-sm font-semibold text-red-700">
-			{form.message}
+			<span class="text-anywhere block">{form.message}</span>
 		</div>
 	{/if}
 
@@ -72,16 +72,16 @@
 					{#each team.members as member (member.user_id)}
 						<div class="rounded-xl bg-[#CCFF00] p-5">
 							<div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-								<div>
+								<div class="min-w-0">
 									<div class="mb-2 flex flex-wrap items-center gap-3">
-										<h3 class="text-lg font-bold">{member.full_name}</h3>
+										<h3 class="text-anywhere text-lg font-bold">{member.full_name}</h3>
 										{#if member.role === 'captain'}
 											<span class="rounded-full bg-[#191F00] px-4 py-1 text-xs font-semibold text-[#CCFF00]">
 												Капітан
 											</span>
 										{/if}
 									</div>
-									<p class="text-sm font-semibold text-[#516600]">{member.email}</p>
+									<p class="text-anywhere text-sm font-semibold text-[#516600]">{member.email}</p>
 									<p class="mt-2 text-xs font-semibold text-[#516600]">Статус: {member.status}</p>
 								</div>
 								{#if canManage && member.role !== 'captain' && member.status === 'accepted'}
@@ -112,9 +112,9 @@
 						{#each team.pending_invitations as invitation (invitation.id)}
 							<div class="rounded-xl border border-[#E5E7EB] bg-[#FAFAFA] p-5">
 								<div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-									<div>
-										<p class="font-bold">{invitation.email}</p>
-										<p class="mt-1 text-xs font-semibold text-[#696969]">
+									<div class="min-w-0">
+										<p class="text-anywhere font-bold">{invitation.email}</p>
+										<p class="text-anywhere mt-1 text-xs font-semibold text-[#696969]">
 											Дійсне до: {formatDate(invitation.expires_at)}
 										</p>
 									</div>
@@ -147,11 +147,11 @@
 				<div class="space-y-4 text-sm">
 					<div>
 						<p class="font-semibold text-gray-500">Організація</p>
-						<p>{team.organization || 'Не вказано'}</p>
+						<p class="text-anywhere">{team.organization || 'Не вказано'}</p>
 					</div>
 					<div>
 						<p class="font-semibold text-gray-500">Контакт</p>
-						<p>{team.contact || 'Не вказано'}</p>
+						<p class="text-anywhere">{team.contact || 'Не вказано'}</p>
 					</div>
 					{#if tournament}
 						<div>
