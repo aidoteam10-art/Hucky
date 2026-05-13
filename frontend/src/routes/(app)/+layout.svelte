@@ -3,6 +3,7 @@
 	import Link from '/src/components/Link.svelte';
 	import { page } from '$app/stores';
 	import { slide } from 'svelte/transition';
+	import { avatarSrc } from '$lib/avatar';
 
 	$: isHomePage = $page.url.pathname === '/';
 
@@ -37,7 +38,7 @@
                 <li>
                     <a href="/profile" class="flex items-center gap-2 {isHomePage ? 'text-[#191F00] hover:text-[#89AB00]' : 'text-white hover:text-gray-300'} transition-colors">
                         
-                        <img src="/icons/avatar.svg" alt="Профіль" class="w-8 h-8 rounded-full border border-gray-300 bg-white" />
+                        <img src={$avatarSrc} alt="Профіль" class="h-8 w-8 rounded-full border border-gray-300 bg-white object-cover" />
                         <span class="font-medium hidden lg:block">Профіль</span>
                     </a>
                 </li>

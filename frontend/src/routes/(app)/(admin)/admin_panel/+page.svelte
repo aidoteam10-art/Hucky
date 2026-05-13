@@ -1,4 +1,6 @@
 <script>
+	import { avatarSrc } from '$lib/avatar';
+
 	export let data;
 	export let form;
 
@@ -130,7 +132,11 @@
 					{#each users as user}
 						<article class="grid gap-4 bg-white p-4 md:grid-cols-[minmax(18rem,1fr)_10rem_13rem] md:items-center md:px-5">
 							<div class="flex min-w-0 items-start gap-4">
-								<img src="/icons/avatar.svg" alt="" class="h-12 w-12 shrink-0" />
+								<img
+									src={isCurrentUser(user) ? $avatarSrc : '/icons/avatar.svg'}
+									alt=""
+									class="h-12 w-12 shrink-0 rounded-full bg-white object-cover"
+								/>
 								<div class="min-w-0">
 									<h3 class="break-words text-sm font-bold">{user.full_name}</h3>
 									<div class="mt-2 flex min-w-0 items-center gap-2 text-xs text-[#696969]">
