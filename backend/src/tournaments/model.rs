@@ -46,6 +46,7 @@ impl fmt::Display for TournamentStatus {
 #[derive(Debug, Clone, sqlx::FromRow)]
 pub struct Tournament {
     pub id: Uuid,
+    pub organizer_id: Uuid,
     pub title: String,
     pub description: String,
     pub rules: String,
@@ -80,6 +81,7 @@ pub struct ActiveRoundPreview {
 pub struct TournamentListFilter {
     pub status: Option<TournamentStatus>,
     pub search: Option<String>,
+    pub viewer_id: Option<Uuid>,
     pub page: i64,
     pub per_page: i64,
 }

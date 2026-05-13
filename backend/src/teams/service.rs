@@ -845,6 +845,7 @@ mod tests {
     ) -> Tournament {
         Tournament {
             id: Uuid::new_v4(),
+            organizer_id: Uuid::new_v4(),
             title: "Test tournament".to_string(),
             description: "Description".to_string(),
             rules: "Rules".to_string(),

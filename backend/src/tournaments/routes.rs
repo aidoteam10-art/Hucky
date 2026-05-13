@@ -5,7 +5,11 @@ use axum::{
 };
 use uuid::Uuid;
 
-use crate::{error::ApiResult, state::AppState, users::auth::AuthenticatedUser};
+use crate::{
+    error::ApiResult,
+    state::AppState,
+    users::auth::{AuthenticatedUser, OptionalAuthenticatedUser},
+};
 
 use super::{
     dto::{
@@ -44,17 +48,19 @@ async fn create_tournament_handler(
 
 async fn list_tournaments_handler(
     State(state): State<AppState>,
+    user: OptionalAuthenticatedUser,
     Query(query): Query<TournamentListQuery>,
 ) -> ApiResult<Json<TournamentListResponse>> {
-    let response = TournamentService::list_tournaments(&state.db, query).await?;
+    let response = TournamentService::list_tournaments(&state.db, user, query).await?;
     Ok(Json(response))
 }
 
 async fn get_tournament_handler(
     State(state): State<AppState>,
+    user: OptionalAuthenticatedUser,
     Path(id): Path<Uuid>,
 ) -> ApiResult<Json<TournamentDetailResponse>> {
-    let response = TournamentService::get_tournament(&state.db, id).await?;
+    let response = TournamentService::get_tournament(&state.db, user, id).await?;
     Ok(Json(response))
 }
 

@@ -26,7 +26,7 @@ impl TournamentRepository {
                 max_teams
             )
             VALUES ($1, $2, $3, $4, 'draft', $5, $6, $7, $8)
-            RETURNING id, title, description, rules, status, registration_starts_at,
+            RETURNING id, organizer_id, title, description, rules, status, registration_starts_at,
                 registration_ends_at, starts_at, ends_at, max_teams",
         )
         .bind(tournament.organizer_id)
@@ -64,7 +64,7 @@ impl TournamentRepository {
         tournament_id: Uuid,
     ) -> Result<Option<Tournament>, sqlx::Error> {
         sqlx::query_as::<_, Tournament>(
-            "SELECT id, title, description, rules, status, registration_starts_at,
+            "SELECT id, organizer_id, title, description, rules, status, registration_starts_at,
                 registration_ends_at, starts_at, ends_at, max_teams
             FROM tournaments
             WHERE id = $1",
@@ -93,7 +93,12 @@ impl TournamentRepository {
             FROM tournaments t",
         );
 
-        push_filters(&mut list_builder, filter.status, filter.search.as_deref());
+        push_filters(
+            &mut list_builder,
+            filter.status,
+            filter.search.as_deref(),
+            filter.viewer_id,
+        );
         list_builder
             .push(" ORDER BY t.created_at DESC LIMIT ")
             .push_bind(filter.per_page)
@@ -107,7 +112,12 @@ impl TournamentRepository {
 
         let mut count_builder =
             QueryBuilder::<Postgres>::new("SELECT COUNT(*)::bigint FROM tournaments t");
-        push_filters(&mut count_builder, filter.status, filter.search.as_deref());
+        push_filters(
+            &mut count_builder,
+            filter.status,
+            filter.search.as_deref(),
+            filter.viewer_id,
+        );
 
         let total = count_builder
             .build_query_scalar::<i64>()
@@ -164,7 +174,7 @@ impl TournamentRepository {
                 max_teams = $9,
                 updated_at = NOW()
             WHERE id = $1
-            RETURNING id, title, description, rules, status, registration_starts_at,
+            RETURNING id, organizer_id, title, description, rules, status, registration_starts_at,
                 registration_ends_at, starts_at, ends_at, max_teams",
         )
         .bind(tournament_id)
@@ -189,7 +199,7 @@ impl TournamentRepository {
             "UPDATE tournaments
             SET status = $2, updated_at = NOW()
             WHERE id = $1
-            RETURNING id, title, description, rules, status, registration_starts_at,
+            RETURNING id, organizer_id, title, description, rules, status, registration_starts_at,
                 registration_ends_at, starts_at, ends_at, max_teams",
         )
         .bind(tournament_id)
@@ -282,8 +292,17 @@ fn push_filters(
     builder: &mut QueryBuilder<'_, Postgres>,
     status: Option<TournamentStatus>,
     search: Option<&str>,
+    viewer_id: Option<Uuid>,
 ) {
     builder.push(" WHERE 1 = 1");
+
+    if let Some(viewer_id) = viewer_id {
+        builder.push(" AND (t.status <> 'draft' OR t.organizer_id = ");
+        builder.push_bind(viewer_id);
+        builder.push(")");
+    } else {
+        builder.push(" AND t.status <> 'draft'");
+    }
 
     if let Some(status) = status {
         builder.push(" AND t.status = ");

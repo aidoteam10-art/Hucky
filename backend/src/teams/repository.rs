@@ -79,7 +79,7 @@ impl TeamRepository {
         tournament_id: Uuid,
     ) -> Result<Option<Tournament>, sqlx::Error> {
         sqlx::query_as::<_, Tournament>(
-            "SELECT id, title, description, rules, status, registration_starts_at,
+            "SELECT id, organizer_id, title, description, rules, status, registration_starts_at,
                 registration_ends_at, starts_at, ends_at, max_teams
             FROM tournaments
             WHERE id = $1",
