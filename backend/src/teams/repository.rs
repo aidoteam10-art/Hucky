@@ -308,11 +308,16 @@ impl TeamRepository {
         team_id: Uuid,
     ) -> Result<Vec<TeamInvitation>, sqlx::Error> {
         sqlx::query_as::<_, TeamInvitation>(
-            "SELECT id, team_id, tournament_id, email, invited_user_id, invited_by, status,
-                expires_at, created_at, updated_at
-            FROM team_invitations
-            WHERE team_id = $1 AND status = 'pending'
-            ORDER BY created_at DESC",
+            "SELECT i.id, i.team_id, i.tournament_id, i.email, i.invited_user_id, i.invited_by,
+                i.status, i.expires_at, i.created_at, i.updated_at
+            FROM team_invitations i
+            JOIN tournaments t ON t.id = i.tournament_id
+            WHERE i.team_id = $1
+                AND i.status = 'pending'
+                AND i.expires_at > NOW()
+                AND t.status = 'registration'
+                AND t.registration_ends_at > NOW()
+            ORDER BY i.created_at DESC",
         )
         .bind(team_id)
         .fetch_all(db)
@@ -339,6 +344,9 @@ impl TeamRepository {
             JOIN tournaments t ON t.id = i.tournament_id
             JOIN users invited_by_user ON invited_by_user.id = i.invited_by
             WHERE i.status = 'pending'
+                AND i.expires_at > NOW()
+                AND t.status = 'registration'
+                AND t.registration_ends_at > NOW()
                 AND (i.invited_user_id = $1 OR lower(i.email) = lower($2))
             ORDER BY i.created_at DESC",
         )

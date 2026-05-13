@@ -9,6 +9,7 @@ pub struct StatusAutomationReport {
     pub tournaments_finished: u64,
     pub rounds_activated: u64,
     pub rounds_closed: u64,
+    pub invitations_expired: u64,
 }
 
 impl StatusAutomationReport {
@@ -18,6 +19,7 @@ impl StatusAutomationReport {
             || self.tournaments_finished > 0
             || self.rounds_activated > 0
             || self.rounds_closed > 0
+            || self.invitations_expired > 0
     }
 }
 
@@ -27,12 +29,13 @@ pub fn spawn_status_automation(db: PgPool) {
             match run_due_status_transitions(&db).await {
                 Ok(report) if report.has_changes() => {
                     println!(
-                        "Status automation updated: registration={}, running={}, finished={}, active_rounds={}, closed_rounds={}",
+                        "Status automation updated: registration={}, running={}, finished={}, active_rounds={}, closed_rounds={}, expired_invitations={}",
                         report.tournaments_opened_registration,
                         report.tournaments_started,
                         report.tournaments_finished,
                         report.rounds_activated,
-                        report.rounds_closed
+                        report.rounds_closed,
+                        report.invitations_expired
                     );
                 }
                 Ok(_) => {}
@@ -120,11 +123,33 @@ pub async fn run_due_status_transitions(
     .await?
     .rows_affected();
 
+    let invitations_expired = sqlx::query(
+        "UPDATE team_invitations i
+        SET status = 'expired', updated_at = NOW()
+        WHERE i.status = 'pending'
+            AND (
+                i.expires_at <= NOW()
+                OR EXISTS (
+                    SELECT 1
+                    FROM tournaments t
+                    WHERE t.id = i.tournament_id
+                        AND (
+                            t.status <> 'registration'
+                            OR t.registration_ends_at <= NOW()
+                        )
+                )
+            )",
+    )
+    .execute(db)
+    .await?
+    .rows_affected();
+
     Ok(StatusAutomationReport {
         tournaments_opened_registration,
         tournaments_started,
         tournaments_finished,
         rounds_activated,
         rounds_closed,
+        invitations_expired,
     })
 }
