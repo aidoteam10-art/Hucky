@@ -107,12 +107,6 @@ impl SubmissionService {
             ));
         }
 
-        if Utc::now() < round.deadline_at {
-            return Err(ApiError::Validation(
-                "Submissions can be locked only after the round deadline".to_string(),
-            ));
-        }
-
         if round.status != "active" {
             return Err(ApiError::Validation(
                 "Only active rounds can be locked".to_string(),
