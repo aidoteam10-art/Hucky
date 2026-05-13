@@ -568,13 +568,6 @@ fn ensure_team_registration_is_open(tournament: &Tournament) -> ApiResult<()> {
         ));
     }
 
-    let now = Utc::now();
-    if now < tournament.registration_starts_at || now > tournament.registration_ends_at {
-        return Err(ApiError::Validation(
-            "Team registration is outside the registration window".to_string(),
-        ));
-    }
-
     Ok(())
 }
 
@@ -795,6 +788,39 @@ mod tests {
     }
 
     #[test]
+    fn allows_team_registration_when_status_is_registration_before_date_window() {
+        let tournament = tournament_with_status(
+            TournamentStatus::Registration,
+            Utc::now() + Duration::days(1),
+            Utc::now() + Duration::days(2),
+        );
+
+        assert!(ensure_team_registration_is_open(&tournament).is_ok());
+    }
+
+    #[test]
+    fn allows_team_registration_when_status_is_registration_after_date_window() {
+        let tournament = tournament_with_status(
+            TournamentStatus::Registration,
+            Utc::now() - Duration::days(2),
+            Utc::now() - Duration::days(1),
+        );
+
+        assert!(ensure_team_registration_is_open(&tournament).is_ok());
+    }
+
+    #[test]
+    fn rejects_team_registration_when_status_is_not_registration() {
+        let tournament = tournament_with_status(
+            TournamentStatus::Draft,
+            Utc::now() - Duration::days(1),
+            Utc::now() + Duration::days(1),
+        );
+
+        assert!(ensure_team_registration_is_open(&tournament).is_err());
+    }
+
+    #[test]
     fn rejects_expired_invitation() {
         let invitation = super::super::model::TeamInvitation {
             id: Uuid::new_v4(),
@@ -810,5 +836,24 @@ mod tests {
         };
 
         assert!(ensure_pending_and_unexpired(&invitation).is_err());
+    }
+
+    fn tournament_with_status(
+        status: TournamentStatus,
+        registration_starts_at: chrono::DateTime<Utc>,
+        registration_ends_at: chrono::DateTime<Utc>,
+    ) -> Tournament {
+        Tournament {
+            id: Uuid::new_v4(),
+            title: "Test tournament".to_string(),
+            description: "Description".to_string(),
+            rules: "Rules".to_string(),
+            status: status.as_str().to_string(),
+            registration_starts_at,
+            registration_ends_at,
+            starts_at: Utc::now() + Duration::days(3),
+            ends_at: None,
+            max_teams: None,
+        }
     }
 }
