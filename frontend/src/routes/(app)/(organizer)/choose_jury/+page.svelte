@@ -1,127 +1,45 @@
 <script>
-	const currentOrganizerId = 1;
+	export let data;
+	export let form;
 
 	let selectedJuryId = '';
-	let selectedTournamentId;
+	let selectedTournamentId = data.selectedTournamentId || '';
 
-	let tournaments = [
-		{
-			id: 1,
-			organizerId: 1,
-			title: 'Spring Hackaton 2024',
-			status: 'registration',
-			juryIds: [1]
-		},
-		{
-			id: 2,
-			organizerId: 1,
-			title: 'AI Challenge 2026',
-			status: 'registration',
-			juryIds: [2]
-		},
-		{
-			id: 3,
-			organizerId: 1,
-			title: 'Cool Hackaton 2026',
-			status: 'registration',
-			juryIds: []
-		},
-		{
-			id: 4,
-			organizerId: 1,
-			title: 'Winter Coding Cup',
-			status: 'active',
-			juryIds: []
-		},
-		{
-			id: 5,
-			organizerId: 2,
-			title: 'Other Organizer Cup',
-			status: 'registration',
-			juryIds: [3]
-		}
-	];
-
-	const juries = [
-		{
-			id: 1,
-			name: 'Alex Kovalenko',
-			email: 'example@example.com',
-			school: 'KPI University'
-		},
-		{
-			id: 2,
-			name: 'Dr. Nataliya Boyko',
-			email: 'nataliya@example.com',
-			school: 'Lviv Polytechnic'
-		},
-		{
-			id: 3,
-			name: 'Maria Shevchenko',
-			email: 'maria@example.com',
-			school: 'KNU'
-		},
-		{
-			id: 4,
-			name: 'Danylo Melnyk',
-			email: 'danylo@example.com',
-			school: 'Kharkiv IT Cluster'
-		}
-	];
-
-	$: registrationTournaments = tournaments.filter(
-		(tournament) =>
-			tournament.organizerId === currentOrganizerId && tournament.status === 'registration'
-	);
-	$: selectedTournamentId = selectedTournamentId || registrationTournaments[0]?.id;
+	$: registrationTournaments = data.tournaments || [];
+	$: juries = data.juries || [];
+	$: if (!selectedTournamentId && registrationTournaments.length > 0) {
+		selectedTournamentId = registrationTournaments[0].id;
+	}
 	$: selectedTournament = registrationTournaments.find(
 		(tournament) => tournament.id === selectedTournamentId
 	);
 	$: assignedJuries = selectedTournament
-		? juries.filter((jury) => selectedTournament.juryIds.includes(jury.id))
+		? juries.filter((jury) => selectedTournament.jury_ids.includes(jury.id))
 		: [];
-	$: assignedJuryIds = tournaments.flatMap((tournament) => tournament.juryIds);
-	$: availableJuries = juries.filter((jury) => !assignedJuryIds.includes(jury.id));
-	$: busyJuries = juries
+	$: availableJuries = selectedTournament
+		? juries.filter((jury) => !selectedTournament.jury_ids.includes(jury.id))
+		: [];
+	$: assignedElsewhere = juries
 		.map((jury) => {
-			const tournament = tournaments.find(
-				(item) => item.id !== selectedTournament?.id && item.juryIds.includes(jury.id)
+			const assignedTournaments = registrationTournaments.filter(
+				(item) => item.id !== selectedTournament?.id && item.jury_ids.includes(jury.id)
 			);
 
-			return tournament ? { ...jury, tournamentTitle: tournament.title } : null;
+			return assignedTournaments.length
+				? { ...jury, tournamentTitles: assignedTournaments.map((item) => item.title) }
+				: null;
 		})
 		.filter(Boolean);
 
 	const statusLabel = {
 		registration: 'Реєстрація',
-		active: 'Активний',
+		running: 'Активний',
 		finished: 'Завершений'
 	};
 
 	function selectTournament(tournamentId) {
 		selectedTournamentId = tournamentId;
 		selectedJuryId = '';
-	}
-
-	function addJury() {
-		if (!selectedTournament || !selectedJuryId) return;
-
-		tournaments = tournaments.map((tournament) =>
-			tournament.id === selectedTournament.id
-				? { ...tournament, juryIds: [...tournament.juryIds, Number(selectedJuryId)] }
-				: tournament
-		);
-		selectedJuryId = '';
-	}
-
-	function removeJury(juryId) {
-		if (!selectedTournament) return;
-
-		tournaments = tournaments.map((tournament) =>
-			tournament.id === selectedTournament.id
-				? { ...tournament, juryIds: tournament.juryIds.filter((id) => id !== juryId) }
-				: tournament
-		);
 	}
 </script>
 
@@ -137,10 +55,16 @@
 				</h1>
 			</div>
 			<p class="max-w-5xl text-[1.0625rem] leading-8 text-[#696969] sm:text-[1.25rem]">
-				Призначайте журі на ваші турніри. Одне журі може бути призначене лише на один
-				турнір одночасно.
+				Призначайте користувачів з роллю журі на турніри, де ще відкрита реєстрація.
+				Якщо журі вже є в іншому вашому турнірі, це буде показано окремо.
 			</p>
 		</div>
+
+		{#if form?.message}
+			<div class="mb-7 rounded-xl border border-red-200 bg-red-50 px-5 py-4 text-sm font-semibold text-red-700">
+				{form.message}
+			</div>
+		{/if}
 
 		<div class="grid gap-7 lg:grid-cols-[18rem_minmax(0,1fr)] xl:grid-cols-[20rem_minmax(0,1fr)]">
 			<aside>
@@ -176,13 +100,17 @@
 											{statusLabel[tournament.status]}
 										</span>
 										<span class="text-[0.8125rem] text-[#696969]">
-											{tournament.juryIds.length}
-											{tournament.juryIds.length === 1 ? 'журі' : 'журі'}
+											{tournament.jury_ids.length}
+											{tournament.jury_ids.length === 1 ? 'журі' : 'журі'}
 										</span>
 									</div>
 								</div>
 							</div>
 						</button>
+					{:else}
+						<p class="rounded-lg border border-[#B4B4B4] p-4 text-[0.9375rem] text-[#696969]">
+							У вас немає турнірів з відкритою реєстрацією.
+						</p>
 					{/each}
 				</div>
 			</aside>
@@ -208,28 +136,32 @@
 					</div>
 
 					<div class="rounded-xl border border-[#B4B4B4] bg-white p-5 sm:p-6">
-						<h2 class="mb-4 text-[1.125rem] font-semibold text-[#191F00]">Додати журі</h2>
-						<div class="grid gap-3 sm:grid-cols-[minmax(0,1fr)_8rem]">
+						<h2 class="mb-4 text-[1.125rem] font-semibold text-[#191F00]">Додати журі до турніру</h2>
+						<form method="POST" action="?/addJury" class="grid gap-3 sm:grid-cols-[minmax(0,1fr)_8rem]">
+							<input type="hidden" name="tournament_id" value={selectedTournament.id} />
 							<select
+								name="user_id"
 								bind:value={selectedJuryId}
+								disabled={availableJuries.length === 0}
 								class="h-12 w-full rounded-lg border border-[#B4B4B4] bg-white px-4 text-[1rem] text-[#191F00] outline-none transition focus:border-[#89AB00] focus:ring-1 focus:ring-[#89AB00]"
 							>
 								<option value="">Оберіть журі...</option>
 								{#each availableJuries as jury}
-									<option value={jury.id}>{jury.name}</option>
+									<option value={jury.id}>{jury.full_name}</option>
 								{/each}
 							</select>
 							<button
-								type="button"
-								on:click={addJury}
+								type="submit"
 								disabled={!selectedJuryId}
 								class="h-12 rounded-lg bg-[#CCFF00] px-4 text-[1rem] font-semibold text-[#191F00] transition disabled:cursor-not-allowed disabled:opacity-70"
 							>
 								+ Додати
 							</button>
-						</div>
+						</form>
 						<p class="mt-3 text-[0.9375rem] text-[#696969]">
-							Доступні лише журі, які ще не призначені на жоден турнір.
+							{juries.length === 0
+								? 'У системі ще немає користувачів з роллю журі.'
+								: 'У списку лише користувачі з роллю журі, які ще не додані до вибраного турніру.'}
 						</p>
 					</div>
 
@@ -244,7 +176,7 @@
 								>
 									<div class="min-w-0">
 										<h3 class="break-words text-[1rem] font-semibold text-[#191F00]">
-											{jury.name}
+											{jury.full_name}
 										</h3>
 										<div
 											class="mt-2 flex flex-col gap-2 text-[0.875rem] text-[#696969] sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-5"
@@ -253,19 +185,18 @@
 												<img src="/icons/mail.svg" alt="" class="h-4 w-4 shrink-0" />
 												<span class="break-all">{jury.email}</span>
 											</span>
-											<span class="flex min-w-0 items-center gap-2">
-												<img src="/icons/school.svg" alt="" class="h-4 w-4 shrink-0" />
-												<span class="break-words">{jury.school}</span>
-											</span>
 										</div>
 									</div>
-									<button
-										type="button"
-										on:click={() => removeJury(jury.id)}
-										class="self-start rounded-lg px-4 py-2 text-[0.9375rem] font-semibold text-[#191F00] transition hover:bg-[#CCFF00] sm:self-center"
-									>
-										Зняти
-									</button>
+									<form method="POST" action="?/removeJury" class="self-start sm:self-center">
+										<input type="hidden" name="tournament_id" value={selectedTournament.id} />
+										<input type="hidden" name="user_id" value={jury.id} />
+										<button
+											type="submit"
+											class="rounded-lg px-4 py-2 text-[0.9375rem] font-semibold text-[#191F00] transition hover:bg-[#CCFF00]"
+										>
+											Зняти
+										</button>
+									</form>
 								</article>
 							{:else}
 								<p class="rounded-lg border border-[#B4B4B4] p-4 text-[0.9375rem] text-[#696969]">
@@ -277,26 +208,31 @@
 
 					<div class="rounded-xl border border-[#B4B4B4] bg-white p-5 sm:p-6">
 						<h2 class="mb-4 text-[1.125rem] font-semibold text-[#191F00]">
-							Зайняті журі (на інших турнірах)
+							Також призначені на інші мої турніри
 						</h2>
 						<div class="grid gap-2">
-							{#each busyJuries as jury}
+							{#each assignedElsewhere as jury}
 								<article
 									class="flex flex-col gap-2 rounded-lg bg-[#F4F4F4] px-4 py-3 text-[0.9375rem] sm:flex-row sm:items-center sm:justify-between"
 								>
-									<span class="font-semibold text-[#191F00]">{jury.name}</span>
+									<span class="font-semibold text-[#191F00]">{jury.full_name}</span>
 									<span class="flex items-center gap-2 text-[#696969]">
 										<span aria-hidden="true">→</span>
-										<span>{jury.tournamentTitle}</span>
+										<span>{jury.tournamentTitles.join(', ')}</span>
 									</span>
 								</article>
 							{:else}
 								<p class="rounded-lg bg-[#F4F4F4] px-4 py-3 text-[0.9375rem] text-[#696969]">
-									Немає журі, зайнятих на інших турнірах.
+									Немає журі, призначених на інші турніри з відкритою реєстрацією.
 								</p>
 							{/each}
 						</div>
 					</div>
+				</section>
+			{:else}
+				<section class="rounded-xl border border-[#B4B4B4] bg-white p-6 text-[#696969]">
+					<h2 class="mb-2 text-[1.25rem] font-semibold text-[#191F00]">Немає доступних турнірів</h2>
+					<p>Відкрийте реєстрацію для турніру, щоб призначити на нього журі.</p>
 				</section>
 			{/if}
 		</div>

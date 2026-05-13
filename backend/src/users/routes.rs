@@ -76,6 +76,7 @@ pub struct UserProfileResponse {
     pub email: String,
     pub full_name: String,
     pub role: String,
+    pub avatar_url: Option<String>,
 }
 
 pub async fn get_me_handler(
@@ -88,6 +89,7 @@ pub async fn get_me_handler(
             email: db_user.email,
             full_name: db_user.full_name,
             role: db_user.account_role,
+            avatar_url: db_user.avatar_url,
         })),
         Ok(None) => {
             let error_response = serde_json::json!({"error": "Користувач не знайдений в БД"});
@@ -106,6 +108,65 @@ pub fn users_routes() -> Router<AppState> {
         .route("/register", post(register_user_handler))
         .route("/login", post(login_user_handler))
         .route("/me", get(get_me_handler))
+        .route("/me/avatar", patch(update_avatar_handler))
+}
+
+#[derive(Debug, Deserialize)]
+pub struct UpdateAvatarRequest {
+    pub avatar_url: Option<String>,
+}
+
+async fn update_avatar_handler(
+    State(state): State<AppState>,
+    user: AuthenticatedUser,
+    Json(payload): Json<UpdateAvatarRequest>,
+) -> ApiResult<Json<UserProfileResponse>> {
+    let avatar_url = normalize_avatar_url(payload.avatar_url)?;
+    let updated = UserRepository::update_avatar(&state.db, user.user_id, avatar_url.as_deref())
+        .await?
+        .ok_or_else(|| ApiError::NotFound("User not found".to_string()))?;
+
+    Ok(Json(UserProfileResponse {
+        id: updated.id,
+        email: updated.email,
+        full_name: updated.full_name,
+        role: updated.account_role,
+        avatar_url: updated.avatar_url,
+    }))
+}
+
+fn normalize_avatar_url(value: Option<String>) -> ApiResult<Option<String>> {
+    let Some(value) = value
+        .map(|value| value.trim().to_string())
+        .filter(|value| !value.is_empty())
+    else {
+        return Ok(None);
+    };
+
+    if value.len() > 1_400_000 {
+        return Err(ApiError::Validation(
+            "Avatar image is too large".to_string(),
+        ));
+    }
+
+    let allowed_prefixes = [
+        "data:image/png;base64,",
+        "data:image/jpeg;base64,",
+        "data:image/jpg;base64,",
+        "data:image/webp;base64,",
+        "data:image/gif;base64,",
+    ];
+
+    if !allowed_prefixes
+        .iter()
+        .any(|prefix| value.starts_with(prefix))
+    {
+        return Err(ApiError::Validation(
+            "Avatar must be a PNG, JPEG, WEBP, or GIF image".to_string(),
+        ));
+    }
+
+    Ok(Some(value))
 }
 
 #[derive(Debug, Deserialize)]
@@ -127,6 +188,7 @@ pub struct AdminUserResponse {
     pub email: String,
     pub full_name: String,
     pub role: String,
+    pub avatar_url: Option<String>,
     pub created_at: Option<chrono::DateTime<chrono::Utc>>,
 }
 
@@ -216,6 +278,7 @@ fn admin_user_response(row: super::repository::AdminUserRow) -> AdminUserRespons
         email: row.email,
         full_name: row.full_name,
         role: row.account_role,
+        avatar_url: row.avatar_url,
         created_at: row.created_at,
     }
 }

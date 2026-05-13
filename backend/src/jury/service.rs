@@ -6,13 +6,14 @@ use uuid::Uuid;
 use crate::{
     error::{ApiError, ApiResult},
     tournaments::service::TournamentService,
-    users::{auth::AuthenticatedUser, repository::UserRepository},
+    users::{auth::AuthenticatedUser, model::AccountRole, repository::UserRepository},
 };
 
 use super::{
     dto::{
         AddJuryRequest, AssignmentDetailResponse, AssignmentListResponse, AssignmentSubmission,
         AssignmentTeam, GenerateAssignmentsRequest, GenerateAssignmentsResponse, JuryListResponse,
+        OrganizerJuryManagementResponse,
     },
     model::{AssignmentCandidate, PlannedAssignment},
     repository::JuryRepository,
@@ -21,6 +22,30 @@ use super::{
 pub struct JuryService;
 
 impl JuryService {
+    pub async fn organizer_jury_management(
+        db: &PgPool,
+        user: AuthenticatedUser,
+    ) -> ApiResult<OrganizerJuryManagementResponse> {
+        match UserRepository::account_role(db, user.user_id).await? {
+            Some(AccountRole::Organiser) => {}
+            _ => {
+                return Err(ApiError::Forbidden(
+                    "Only organisers can manage tournament jury".to_string(),
+                ));
+            }
+        }
+
+        let (tournaments, juries) = tokio::try_join!(
+            JuryRepository::list_organizer_registration_tournaments(db, user.user_id),
+            JuryRepository::list_jury_candidates(db)
+        )?;
+
+        Ok(OrganizerJuryManagementResponse {
+            tournaments,
+            juries,
+        })
+    }
+
     pub async fn add_jury(
         db: &PgPool,
         user: AuthenticatedUser,
@@ -29,14 +54,36 @@ impl JuryService {
     ) -> ApiResult<JuryListResponse> {
         TournamentService::require_tournament_organizer(db, tournament_id, user).await?;
 
-        let email = payload.email.trim();
-        if email.is_empty() {
-            return Err(ApiError::Validation("Jury email is required".to_string()));
-        }
+        let added_by_email = payload.email.is_some();
+        let target_user_id = match (payload.user_id, payload.email) {
+            (Some(user_id), None) => {
+                match UserRepository::account_role(db, user_id).await? {
+                    Some(AccountRole::Jury) => {}
+                    Some(_) => {
+                        return Err(ApiError::Validation(
+                            "Selected user must have jury role".to_string(),
+                        ));
+                    }
+                    None => return Err(ApiError::NotFound("User not found".to_string())),
+                }
+                user_id
+            }
+            (None, Some(email)) => {
+                let email = email.trim();
+                if email.is_empty() {
+                    return Err(ApiError::Validation("Jury email is required".to_string()));
+                }
 
-        let target_user_id = JuryRepository::find_user_by_email(db, email)
-            .await?
-            .ok_or_else(|| ApiError::NotFound("User not found".to_string()))?;
+                JuryRepository::find_user_by_email(db, email)
+                    .await?
+                    .ok_or_else(|| ApiError::NotFound("User not found".to_string()))?
+            }
+            _ => {
+                return Err(ApiError::Validation(
+                    "Provide either user_id or email".to_string(),
+                ));
+            }
+        };
 
         let rows = JuryRepository::add_jury_role(db, tournament_id, target_user_id).await?;
         if rows == 0 {
@@ -44,7 +91,9 @@ impl JuryService {
                 "This user is already jury for the tournament".to_string(),
             ));
         }
-        UserRepository::promote_to_jury_if_participant(db, target_user_id).await?;
+        if added_by_email {
+            UserRepository::promote_to_jury_if_participant(db, target_user_id).await?;
+        }
 
         Self::list_jury(db, user, tournament_id).await
     }

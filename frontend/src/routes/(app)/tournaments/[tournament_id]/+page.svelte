@@ -294,37 +294,12 @@
 
 			{#if data.canManage}
 				<div class="rounded-2xl border border-[#E5E7EB] bg-white p-6 shadow-sm">
-					<h2 class="mb-4 text-xl font-bold">Jury</h2>
-					<form method="POST" action="?/addJury" class="mb-5 grid gap-3">
-						<InputField name="email" header="Email jury" placeholder="jury@example.com" />
-						<button
-							type="submit"
-							class="w-full rounded-xl bg-[#CCFF00] px-5 py-3 text-sm font-bold text-[#191F00] hover:bg-[#A9D207]"
-						>
-							Додати журі
-						</button>
-					</form>
-					<div class="space-y-3">
-						{#each data.jury as jury (jury.id)}
-							<div class="rounded-xl border border-[#E5E7EB] bg-[#FAFAFA] p-4">
-								<p class="font-bold">{jury.full_name}</p>
-								<p class="mt-1 break-all text-sm text-[#696969]">{jury.email}</p>
-								<form method="POST" action="?/removeJury" class="mt-3">
-									<input type="hidden" name="user_id" value={jury.id} />
-									<button
-										type="submit"
-										class="rounded-lg border border-[#B4B4B4] px-4 py-2 text-sm font-bold hover:bg-[#F4F4F5]"
-									>
-										Зняти
-									</button>
-								</form>
-							</div>
-						{:else}
-							<p class="rounded-xl bg-[#F4F4F5] px-5 py-4 text-sm font-semibold text-[#696969]">
-								Журі ще не додано або у вас немає доступу до списку.
-							</p>
-						{/each}
-					</div>
+					<a href={`/choose_jury?tournament_id=${tournament.id}`} class="flex w-full items-center justify-center gap-4 rounded-2xl border border-[#191F00] px-5 py-3 hover:ring-1">
+						<div class="flex h-9 w-9 items-center justify-center rounded-full">
+							<img src="/icons/hummer.svg" alt="" class="h-9 w-9" />
+						</div>
+						<span class="text-lg font-semibold">Обрати журі</span>
+					</a>
 				</div>
 
 				<div class="rounded-2xl border border-[#E5E7EB] bg-white p-6 shadow-sm">
