@@ -65,7 +65,7 @@
 				</h1>
 				<StateTag variant={tournament.status} />
 			</div>
-			<p class="max-w-3xl text-[1rem] leading-relaxed xl:text-[1.25rem]">
+			<p class="max-w-3xl text-[1rem] leading-relaxed xl:text-[1.25rem] break-words">
 				{tournament.description}
 			</p>
 		</div>
@@ -120,7 +120,7 @@
 		<div class="space-y-8">
 			<div class="rounded-2xl border border-[#E5E7EB] bg-white p-6 shadow-sm lg:p-8">
 				<h2 class="mb-5 text-2xl font-bold">Правила</h2>
-				<p class="whitespace-pre-line text-[1rem] leading-relaxed">{tournament.rules}</p>
+				<p class="whitespace-pre-line text-[1rem] leading-relaxed break-words">{tournament.rules}</p>
 			</div>
 
 			{#if tournament.active_round}
@@ -160,7 +160,7 @@
 										<h3 class="text-lg font-bold">{round.position}. {round.title}</h3>
 										<StateTag variant={round.status} />
 									</div>
-									<p class="line-clamp-2 text-sm text-gray-700">{round.task_description}</p>
+									<p class="line-clamp-2 text-sm text-gray-700 overflow-hidden break-words">{round.task_description}</p>
 									<p class="mt-2 text-xs font-semibold text-gray-500">
 										{formatDate(round.starts_at)} - {formatDate(round.deadline_at)}
 									</p>

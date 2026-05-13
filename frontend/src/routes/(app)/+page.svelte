@@ -258,13 +258,16 @@
             </div>
 
             <!-- Турніри (Відстань справа 194px) -->
-            <div class="xl:pr-[12.125rem]">
-                <h4 class="mb-4 text-sm font-bold tracking-wide sm:text-[1rem] xl:mb-[1.4375rem]">Турніри</h4>
-                <ul class="flex flex-col gap-3 text-sm font-normal leading-5 opacity-80 sm:text-[0.8rem] xl:gap-[1rem]">
+            <div class="xl:pr-[12.125rem] mb-10 xl:mb-0">
+                <h4 class="font-bold text-[1rem] mb-[1.4375rem] tracking-wide">Турніри</h4>
+                <ul class="flex flex-col gap-[1rem] text-[0.8rem] font-normal opacity-80">
                     <li><a href="/tournaments?status=registration" class="hover:text-[#CCFF00] transition-colors">Реєстрація відкрита</a></li>
+
                     <li><a href="/tournaments?status=running" class="hover:text-[#CCFF00] transition-colors">Активні</a></li>
+
                     <li><a href="/tournaments?status=finished" class="hover:text-[#CCFF00] transition-colors">Завершені</a></li>
-                    <li><a href="/tournaments" class="hover:text-[#CCFF00] transition-colors">Усі турніри</a></li>
+
+                    <li><a href="/tournaments?status=all" class="hover:text-[#CCFF00] transition-colors">Усі турніри</a></li>
                 </ul>
             </div>
 
@@ -282,6 +285,8 @@
                 <ul class="flex flex-col gap-3 text-sm font-normal leading-5 opacity-80 sm:text-[0.75rem] xl:gap-[1rem]">
                     <li><span class="cursor-default">Команда A.I.D.O.</span></li>
                     <li><span class="cursor-default">ПЛ НТУУ "КПІ"</span></li>
+                    <li><a href="mailto:a.i.d.o.team10@gmail.com" class="hover:text-[#CCFF00] transition-colors">a.i.d.o.team10@gmail.com</a></li>
+                    <li><a href="https://github.com/aidoteam10-art/Hucky" target="_blank" class="hover:text-[#CCFF00] transition-colors">Hucky/github.com</a></li>
                     <li><a href="mailto:aido_team@gmail.com" class="break-words hover:text-[#CCFF00] transition-colors">aido_team10-art@gmail.com</a></li>
                     <li><a href="https://github.com/aidoteam10-art/Hucky" target="_blank" class="break-words hover:text-[#CCFF00] transition-colors">Hucky/github.com</a></li>
                 </ul>
@@ -301,9 +306,9 @@
         </div>
 
         <!-- Нижня лінія (padding зверху 61px) -->
-        <div class="flex flex-col items-start justify-between gap-4 border-t border-white/10 pt-6 text-[10px] uppercase tracking-wider opacity-50 sm:flex-row sm:items-center sm:text-xs sm:tracking-widest xl:pt-[3.8125rem]">
-            <p class="leading-5">© 2026 Hucky · A.I.D.O. · Київ, Україна</p>
-            <div class="flex flex-wrap gap-x-6 gap-y-2 italic">
+        <div class="pt-[3.8125rem] border-t border-white/10 flex flex-col sm:flex-row justify-between items-center gap-4 text-[10px] sm:text-xs opacity-50 uppercase tracking-widest">
+            <p>© 2026 Hucky · A.I.D.O. · Київ, Україна</p>
+            <div class="flex gap-6 italic">
                 <a href="/privacy-policy" class="hover:text-white">Privacy Policy</a>
                 <a href="/terms" class="hover:text-white">Terms of Service</a>
             </div>

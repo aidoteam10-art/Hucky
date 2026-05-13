@@ -101,8 +101,8 @@
 				</form>
 			</li>
 		{:else}
-			
-			
+
+
 			<li class="w-full">
 				<Link on:click={toggleMenu} href="/login" variant={isHomePage ? "ghost" : "second"} size="sm" className="w-full">Увійти</Link>
 			</li>
@@ -110,9 +110,11 @@
 				<Link on:click={toggleMenu} href="/registration" variant={isHomePage ? "primary" : "green"} size="sm" className="w-full">Реєстрація</Link>
 			</li>
 		{/if}
-			
+
 		</ol>
 	</div>
 {/if}
 
-<slot></slot>
+{#key $page.url.pathname}
+	<slot></slot>
+{/key}
