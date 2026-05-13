@@ -1,4 +1,4 @@
-use backend::{build_app, config::Config, state::AppState, users};
+use backend::{automation, build_app, config::Config, state::AppState, users};
 use sqlx::PgPool;
 use tokio::net::TcpListener;
 
@@ -15,6 +15,7 @@ async fn main() {
     users::service::UserService::bootstrap_superadmin(&pool)
         .await
         .expect("Failed to bootstrap superadmin");
+    automation::spawn_status_automation(pool.clone());
 
     let app = build_app(AppState { db: pool }, &config);
     let bind_addr = config.bind_addr();
