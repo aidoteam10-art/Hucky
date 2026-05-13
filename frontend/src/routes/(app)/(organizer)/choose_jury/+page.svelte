@@ -95,7 +95,7 @@
 									</h3>
 									<div class="mt-2 flex flex-wrap items-center gap-3">
 										<span
-											class="rounded-full bg-[#191F00] px-3 py-1 text-[0.6875rem] font-medium text-[#CCFF00]"
+											class="shrink-0 whitespace-nowrap rounded-full bg-[#191F00] px-3 py-1 text-[0.6875rem] font-medium text-[#CCFF00]"
 										>
 											{statusLabel[tournament.status]}
 										</span>
@@ -119,7 +119,7 @@
 				<section class="grid gap-5">
 					<div class="rounded-xl border border-[#B4B4B4] bg-white p-5 sm:p-6">
 						<div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-							<div>
+							<div class="min-w-0">
 								<h2 class="break-words text-[1.375rem] font-semibold text-[#191F00]">
 									{selectedTournament.title}
 								</h2>
@@ -128,7 +128,7 @@
 								</p>
 							</div>
 							<span
-								class="w-fit rounded-full bg-[#191F00] px-4 py-1.5 text-[0.8125rem] font-medium text-[#CCFF00]"
+								class="w-fit shrink-0 whitespace-nowrap rounded-full bg-[#191F00] px-4 py-1.5 text-[0.8125rem] font-medium text-[#CCFF00]"
 							>
 								{statusLabel[selectedTournament.status]}
 							</span>

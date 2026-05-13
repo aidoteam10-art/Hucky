@@ -155,10 +155,10 @@
 					{#each rounds as round (round.id)}
 						<div class="rounded-xl border border-[#E5E7EB] bg-[#FAFAFA] p-5">
 							<div class="flow-root">
-								<div class="mb-4 flex flex-col gap-2 md:float-right md:mb-3 md:ml-5 md:w-32 md:items-stretch">
+								<div class="mb-4 flex flex-col gap-2 md:float-right md:mb-3 md:ml-5 md:w-40 md:items-stretch">
 									<a
 										href={resolve('/rounds/[round_id]', { round_id: String(round.id) })}
-										class="rounded-lg border border-[#191F00] px-4 py-2 text-center text-sm font-bold text-[#191F00] hover:bg-[#191F00] hover:text-white"
+										class="whitespace-normal break-normal rounded-lg border border-[#191F00] px-4 py-2 text-center text-sm font-bold text-[#191F00] hover:bg-[#191F00] hover:text-white"
 									>
 										Відкрити
 									</a>
@@ -169,7 +169,7 @@
 												<input type="hidden" name="status" value={action.status} />
 												<button
 													type="submit"
-													class="w-full rounded-lg bg-[#CCFF00] px-4 py-2 text-sm font-bold text-[#191F00] hover:bg-[#A9D207]"
+													class="w-full whitespace-normal break-normal rounded-lg bg-[#CCFF00] px-4 py-2 text-sm font-bold text-[#191F00] hover:bg-[#A9D207]"
 												>
 													{action.label}
 												</button>
