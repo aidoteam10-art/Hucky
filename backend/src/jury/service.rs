@@ -42,7 +42,7 @@ impl JuryService {
         }
 
         let (tournaments, juries) = tokio::try_join!(
-            JuryRepository::list_organizer_registration_tournaments(db, user.user_id),
+            JuryRepository::list_organizer_manageable_tournaments(db, user.user_id),
             JuryRepository::list_jury_candidates(db)
         )?;
 
@@ -321,13 +321,13 @@ fn validate_jury_management_status(status: &str) -> ApiResult<()> {
     let status = TournamentStatus::from_str(status)
         .map_err(|_| ApiError::Validation("Tournament has invalid status".to_string()))?;
 
-    if status == TournamentStatus::Registration {
-        return Ok(());
+    if status == TournamentStatus::Finished {
+        return Err(ApiError::Validation(
+            "Jury members cannot be changed after tournament is finished".to_string(),
+        ));
     }
 
-    Err(ApiError::Validation(
-        "Jury members can be changed only while tournament registration is open".to_string(),
-    ))
+    Ok(())
 }
 
 fn ensure_assignment_generation_allowed(
@@ -419,10 +419,10 @@ mod tests {
     }
 
     #[test]
-    fn jury_management_is_allowed_only_during_registration() {
+    fn jury_management_is_allowed_until_tournament_is_finished() {
+        assert!(validate_jury_management_status("draft").is_ok());
         assert!(validate_jury_management_status("registration").is_ok());
-        assert!(validate_jury_management_status("draft").is_err());
-        assert!(validate_jury_management_status("running").is_err());
+        assert!(validate_jury_management_status("running").is_ok());
         assert!(validate_jury_management_status("finished").is_err());
     }
 

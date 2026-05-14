@@ -208,6 +208,15 @@ impl TournamentRepository {
         .await
     }
 
+    pub async fn delete(db: &PgPool, tournament_id: Uuid) -> Result<u64, sqlx::Error> {
+        let result = sqlx::query("DELETE FROM tournaments WHERE id = $1")
+            .bind(tournament_id)
+            .execute(db)
+            .await?;
+
+        Ok(result.rows_affected())
+    }
+
     pub async fn is_organizer(
         db: &PgPool,
         tournament_id: Uuid,

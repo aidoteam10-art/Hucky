@@ -20,7 +20,7 @@ impl JuryRepository {
         .await
     }
 
-    pub async fn list_organizer_registration_tournaments(
+    pub async fn list_organizer_manageable_tournaments(
         db: &PgPool,
         user_id: Uuid,
     ) -> Result<Vec<OrganizerJuryTournament>, sqlx::Error> {
@@ -39,7 +39,7 @@ impl JuryRepository {
                 ON tsr.tournament_id = t.id
                 AND tsr.role = 'jury'
             LEFT JOIN users u ON u.id = tsr.user_id
-            WHERE t.status = 'registration'
+            WHERE t.status <> 'finished'
                 AND (
                     t.organizer_id = $1
                     OR EXISTS (

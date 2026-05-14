@@ -7,6 +7,7 @@ use serde::Serialize;
 use tower_http::cors::CorsLayer;
 
 pub mod automation;
+pub mod certificates;
 pub mod config;
 pub mod error;
 pub mod evaluations;
@@ -52,6 +53,7 @@ pub fn build_app(app_state: AppState, config: &Config) -> Router {
         .merge(jury::routes())
         .merge(evaluations::routes())
         .merge(leaderboard::routes())
+        .merge(certificates::routes::routes())
         .layer(cors)
         .with_state(app_state)
 }

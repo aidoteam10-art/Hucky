@@ -15,7 +15,7 @@
 	$: registeredTeams = tournament.registered_teams || [];
 	$: userTeam = data.userTeam;
 	$: canSetupRounds = data.canManage && ['draft', 'registration'].includes(tournament.status);
-	$: canManageJury = data.canManage && tournament.status === 'registration';
+	$: canManageJury = data.canManage && tournament.status !== 'finished';
 	$: canOperateRounds = data.canManage && tournament.status === 'running';
 
 	function formatDate(value) {
@@ -328,6 +328,24 @@
 						{:else}
 							<p class="text-sm font-semibold text-gray-500">Для цього статусу немає доступних переходів.</p>
 						{/each}
+						{#if tournament.status === 'draft'}
+							<form
+								method="POST"
+								action="?/deleteTournament"
+								on:submit={(event) => {
+									if (!confirm('Видалити чернетку турніру? Цю дію не можна скасувати.')) {
+										event.preventDefault();
+									}
+								}}
+							>
+								<button
+									type="submit"
+									class="w-full rounded-xl border border-red-600 bg-white px-5 py-3 text-sm font-bold text-red-700 transition hover:bg-red-50"
+								>
+									Видалити чернетку
+								</button>
+							</form>
+						{/if}
 					</div>
 				</div>
 

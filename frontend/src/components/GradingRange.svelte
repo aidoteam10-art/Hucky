@@ -1,10 +1,27 @@
 <script>
     export let item;
+    export let score = 0;
+    export let maxScore = 100;
     export let isGraded = false;
+    export let onScoreChange = () => {};
+
+    $: safeMaxScore = normalizeMaxScore(maxScore);
+    $: safeScore = clampScore(score, safeMaxScore);
+
+    function normalizeMaxScore(value) {
+        const parsed = Number(value);
+        return Number.isFinite(parsed) && parsed > 0 ? parsed : 100;
+    }
+
+    function clampScore(value, max) {
+        const parsed = Number(value);
+        if (!Number.isFinite(parsed)) return 0;
+        return Math.min(max, Math.max(0, Math.round(parsed)));
+    }
 
     function updateScore(event) {
-        const value = Number(event.currentTarget.value);
-        item.score = Math.min(100, Math.max(0, Number.isNaN(value) ? 0 : value));
+        if (isGraded) return;
+        onScoreChange(clampScore(event.currentTarget.value, safeMaxScore));
     }
 </script>
 
@@ -17,8 +34,8 @@
         <input
             type="number"
             min="0"
-            max="100"
-            value={item.score}
+            max={safeMaxScore}
+            value={safeScore}
             disabled={isGraded}
             aria-label="Score for {item.name}"
             on:input={updateScore}
@@ -28,9 +45,12 @@
 
     <input 
         type="range" 
-        min="0" max="100" 
-        bind:value={item.score}
+        min="0"
+        max={safeMaxScore}
+        value={safeScore}
         disabled={isGraded}
+        aria-label="Score slider for {item.name}"
+        on:input={updateScore}
         class="w-full h-1.5 rounded-full appearance-none outline-none transition-all bg-[#E5E7EB]
                 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-[#9BC200] [&::-webkit-slider-thumb]:cursor-pointer hover:[&::-webkit-slider-thumb]:scale-110
                 disabled:[&::-webkit-slider-thumb]:bg-[#9BC200] disabled:[&::-webkit-slider-thumb]:cursor-default disabled:hover:[&::-webkit-slider-thumb]:scale-100
@@ -40,6 +60,6 @@
     
     <div class="flex justify-between items-center mt-3 text-[0.75rem] text-[#A3A3A3] font-medium">
         <span>0</span>
-        <span>100</span>
+        <span>{safeMaxScore}</span>
     </div>
 </div>

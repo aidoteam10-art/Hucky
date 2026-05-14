@@ -5,15 +5,46 @@
     export let data;
     export let form;
 
+    let criteria = [];
+    let comment = '';
+    let initializedAssignmentId = null;
+
     $: assignment = data.assignment;
     $: isGraded = assignment.status === 'completed';
-    $: criteria = assignment.criteria.map((item) => ({
-        ...item,
-        desc: item.description,
-        score: item.score ?? 0
-    }));
-    $: comment = assignment.comment ?? '';
+    $: if (assignment.id !== initializedAssignmentId) {
+        initializedAssignmentId = assignment.id;
+        criteria = assignment.criteria.map((item) => {
+            const maxScore = normalizeMaxScore(item.max_score);
+            return {
+                ...item,
+                desc: item.description,
+                maxScore,
+                score: clampScore(item.score ?? 0, maxScore)
+            };
+        });
+        comment = assignment.comment ?? '';
+    }
     $: totalScore = criteria.reduce((sum, item) => sum + Number(item.score || 0), 0);
+    $: maxTotalScore = criteria.reduce((sum, item) => sum + Number(item.maxScore || 100), 0);
+
+    function normalizeMaxScore(value) {
+        const parsed = Number(value);
+        return Number.isFinite(parsed) && parsed > 0 ? parsed : 100;
+    }
+
+    function clampScore(value, maxScore = 100) {
+        const parsed = Number(value);
+        if (!Number.isFinite(parsed)) return 0;
+        return Math.min(maxScore, Math.max(0, Math.round(parsed)));
+    }
+
+    function updateCriterionScore(criterionId, score) {
+        if (isGraded) return;
+
+        criteria = criteria.map((item) =>
+            item.id === criterionId ? { ...item, score: clampScore(score, item.maxScore) } : item
+        );
+    }
 </script>
 
 <main class="w-full min-h-screen bg-white px-5 md:px-10 xl:pl-16 xl:pr-38 py-8 xl:py-16 font-sans text-[#191F00]">
@@ -76,7 +107,13 @@
                         {#each criteria as item}
                             <input type="hidden" name="criterion_id" value={item.id} />
                             <input type="hidden" name="score" value={item.score} />
-                            <GradingRange bind:item {isGraded} />
+                            <GradingRange
+                                {item}
+                                score={item.score}
+                                maxScore={item.maxScore}
+                                {isGraded}
+                                onScoreChange={(score) => updateCriterionScore(item.id, score)}
+                            />
                         {/each}
                     </div>
                 </article>
@@ -84,9 +121,9 @@
                 <article class="border border-[#E5E7EB] rounded-[1.5rem] py-5 px-6 sm:py-6 sm:px-8 bg-white shadow-sm flex justify-between items-center mb-5">
                     <div class="min-w-0">
                         <h3 class="text-xl sm:text-[1.25rem] font-bold mb-1">Загальний підсумок</h3>
-                        <p class="text-xs sm:text-sm font-normal text-[#696969]">Із {criteria.length * 100}</p>
+                        <p class="text-xs sm:text-sm font-normal text-[#696969]">Із {maxTotalScore}</p>
                     </div>
-                    <span class="text-4xl sm:text-[2.25rem] font-black leading-none">{totalScore}</span>
+                    <span class="text-4xl sm:text-[2.25rem] font-black leading-none" data-testid="total-score">{totalScore}</span>
                 </article>
 
                 <article class="border border-[#E5E7EB] rounded-[1.5rem] p-6 sm:p-8 bg-white shadow-sm mb-5">

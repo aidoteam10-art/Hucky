@@ -12,7 +12,7 @@ export const load = async ({ cookies, fetch }) => {
 		const isParticipant = profile.role === 'participant';
 		const isOrganiser = profile.role === 'organiser';
 		const isJury = profile.role === 'jury';
-		const [teams, invitations, juryAssignments, createdTournaments] = await Promise.all([
+		const [teams, invitations, juryAssignments, createdTournaments, certificates] = await Promise.all([
 			isParticipant
 				? apiRequest(fetch, '/api/me/teams', { token })
 				: Promise.resolve({ items: [] }),
@@ -24,7 +24,8 @@ export const load = async ({ cookies, fetch }) => {
 				: Promise.resolve({ items: [] }),
 			isOrganiser
 				? apiRequest(fetch, '/api/me/tournaments', { token })
-				: Promise.resolve({ items: [] })
+				: Promise.resolve({ items: [] }),
+			loadCertificates(fetch, token)
 		]);
 
 		return {
@@ -32,7 +33,8 @@ export const load = async ({ cookies, fetch }) => {
 			teams: teams.items || [],
 			invitations: invitations.items || [],
 			juryAssignments: juryAssignments.items || [],
-			createdTournaments: createdTournaments.items || []
+			createdTournaments: createdTournaments.items || [],
+			certificates: certificates.items || []
 		};
 	} catch (error) {
 		if (error instanceof ApiError && error.status === 401) {
@@ -46,6 +48,18 @@ export const load = async ({ cookies, fetch }) => {
 		throw kitError(500, 'Backend недоступний');
 	}
 };
+
+async function loadCertificates(fetch, token) {
+	try {
+		return await apiRequest(fetch, '/api/me/certificates', { token });
+	} catch (error) {
+		if (error instanceof ApiError && error.status === 401) {
+			throw error;
+		}
+
+		return { items: [] };
+	}
+}
 
 export const actions = {
 	acceptInvitation: async ({ request, cookies, fetch }) => {

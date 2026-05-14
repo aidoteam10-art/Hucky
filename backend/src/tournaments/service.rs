@@ -4,6 +4,7 @@ use sqlx::PgPool;
 use uuid::Uuid;
 
 use crate::{
+    certificates::service::CertificateService,
     error::{ApiError, ApiResult},
     rounds::{model::NewRound, repository::RoundRepository, service::RoundService},
     users::{
@@ -231,11 +232,32 @@ impl TournamentService {
         let updated =
             TournamentRepository::update_status(db, tournament_id, payload.status).await?;
 
+        if current == TournamentStatus::Running && payload.status == TournamentStatus::Finished {
+            CertificateService::generate_for_tournament(db, tournament_id).await?;
+        }
+
         Ok(CreateTournamentResponse {
             id: updated.id,
             status: payload.status,
             title: updated.title,
         })
+    }
+
+    pub async fn delete_tournament(
+        db: &PgPool,
+        user: AuthenticatedUser,
+        tournament_id: Uuid,
+    ) -> ApiResult<()> {
+        Self::require_tournament_organizer(db, tournament_id, user).await?;
+        let tournament = find_tournament(db, tournament_id).await?;
+        ensure_tournament_deletable(&tournament)?;
+
+        let rows = TournamentRepository::delete(db, tournament_id).await?;
+        if rows == 0 {
+            return Err(ApiError::NotFound("Tournament not found".to_string()));
+        }
+
+        Ok(())
     }
 
     pub async fn require_tournament_organizer(
@@ -330,6 +352,17 @@ fn ensure_tournament_editable(tournament: &Tournament) -> ApiResult<()> {
 
     Err(ApiError::Validation(
         "Tournament can be edited only before it starts".to_string(),
+    ))
+}
+
+fn ensure_tournament_deletable(tournament: &Tournament) -> ApiResult<()> {
+    let status = parse_tournament_status(&tournament.status)?;
+    if status == TournamentStatus::Draft {
+        return Ok(());
+    }
+
+    Err(ApiError::Validation(
+        "Only draft tournaments can be deleted".to_string(),
     ))
 }
 
@@ -517,6 +550,19 @@ mod tests {
 
         assert!(ensure_tournament_editable(&draft).is_ok());
         assert!(ensure_tournament_editable(&registration).is_ok());
+    }
+
+    #[test]
+    fn allows_only_draft_tournament_deletion() {
+        let draft = tournament_with_owner(Uuid::new_v4(), TournamentStatus::Draft);
+        let registration = tournament_with_owner(Uuid::new_v4(), TournamentStatus::Registration);
+        let running = tournament_with_owner(Uuid::new_v4(), TournamentStatus::Running);
+        let finished = tournament_with_owner(Uuid::new_v4(), TournamentStatus::Finished);
+
+        assert!(ensure_tournament_deletable(&draft).is_ok());
+        assert!(ensure_tournament_deletable(&registration).is_err());
+        assert!(ensure_tournament_deletable(&running).is_err());
+        assert!(ensure_tournament_deletable(&finished).is_err());
     }
 
     #[test]

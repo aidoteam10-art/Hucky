@@ -62,6 +62,22 @@ export const actions = {
 		throw redirect(303, `/tournaments/${params.tournament_id}`);
 	},
 
+	deleteTournament: async ({ params, cookies, fetch }) => {
+		const token = getAuthToken(cookies);
+		if (!token) return fail(401, { message: 'Потрібно увійти' });
+
+		try {
+			await apiRequest(fetch, `/api/tournaments/${params.tournament_id}`, {
+				method: 'DELETE',
+				token
+			});
+		} catch (error) {
+			return actionError(error);
+		}
+
+		throw redirect(303, '/tournaments');
+	},
+
 	changeRoundStatus: async ({ request, params, cookies, fetch }) => {
 		const token = getAuthToken(cookies);
 		if (!token) return fail(401, { message: 'Потрібно увійти' });
