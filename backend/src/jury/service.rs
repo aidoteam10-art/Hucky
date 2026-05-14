@@ -1,11 +1,17 @@
-use std::collections::{HashMap, HashSet};
+use std::{
+    collections::{HashMap, HashSet},
+    str::FromStr,
+};
 
 use sqlx::PgPool;
 use uuid::Uuid;
 
 use crate::{
     error::{ApiError, ApiResult},
-    tournaments::service::TournamentService,
+    rounds::model::RoundStatus,
+    tournaments::{
+        model::TournamentStatus, repository::TournamentRepository, service::TournamentService,
+    },
     users::{auth::AuthenticatedUser, model::AccountRole, repository::UserRepository},
 };
 
@@ -53,6 +59,7 @@ impl JuryService {
         payload: AddJuryRequest,
     ) -> ApiResult<JuryListResponse> {
         TournamentService::require_tournament_organizer(db, tournament_id, user).await?;
+        ensure_jury_management_allowed(db, tournament_id).await?;
 
         let added_by_email = payload.email.is_some();
         let target_user_id = match (payload.user_id, payload.email) {
@@ -115,6 +122,7 @@ impl JuryService {
         target_user_id: Uuid,
     ) -> ApiResult<()> {
         TournamentService::require_tournament_organizer(db, tournament_id, user).await?;
+        ensure_jury_management_allowed(db, tournament_id).await?;
         let rows = JuryRepository::remove_jury_role(db, tournament_id, target_user_id).await?;
         if rows == 0 {
             return Err(ApiError::NotFound(
@@ -146,12 +154,11 @@ impl JuryService {
             .await?
             .ok_or_else(|| ApiError::NotFound("Round not found".to_string()))?;
         TournamentService::require_tournament_organizer(db, round.tournament_id, user).await?;
+        let tournament = TournamentRepository::find_by_id(db, round.tournament_id)
+            .await?
+            .ok_or_else(|| ApiError::NotFound("Tournament not found".to_string()))?;
 
-        if round.status != "submission_closed" {
-            return Err(ApiError::Validation(
-                "Assignments can be generated only after submissions are closed".to_string(),
-            ));
-        }
+        ensure_assignment_generation_allowed(&tournament.status, &round.status)?;
 
         let existing_assignments =
             JuryRepository::count_assignments_for_round(db, round.id).await?;
@@ -302,6 +309,51 @@ pub(crate) fn plan_assignments(
     Ok(planned)
 }
 
+async fn ensure_jury_management_allowed(db: &PgPool, tournament_id: Uuid) -> ApiResult<()> {
+    let tournament = TournamentRepository::find_by_id(db, tournament_id)
+        .await?
+        .ok_or_else(|| ApiError::NotFound("Tournament not found".to_string()))?;
+
+    validate_jury_management_status(&tournament.status)
+}
+
+fn validate_jury_management_status(status: &str) -> ApiResult<()> {
+    let status = TournamentStatus::from_str(status)
+        .map_err(|_| ApiError::Validation("Tournament has invalid status".to_string()))?;
+
+    if status == TournamentStatus::Registration {
+        return Ok(());
+    }
+
+    Err(ApiError::Validation(
+        "Jury members can be changed only while tournament registration is open".to_string(),
+    ))
+}
+
+fn ensure_assignment_generation_allowed(
+    tournament_status: &str,
+    round_status: &str,
+) -> ApiResult<()> {
+    let tournament_status = TournamentStatus::from_str(tournament_status)
+        .map_err(|_| ApiError::Validation("Tournament has invalid status".to_string()))?;
+    let round_status = RoundStatus::from_str(round_status)
+        .map_err(|_| ApiError::Validation("Round has invalid status".to_string()))?;
+
+    if tournament_status != TournamentStatus::Running {
+        return Err(ApiError::Validation(
+            "Assignments can be generated only while tournament is running".to_string(),
+        ));
+    }
+
+    if round_status != RoundStatus::SubmissionClosed {
+        return Err(ApiError::Validation(
+            "Assignments can be generated only after submissions are closed".to_string(),
+        ));
+    }
+
+    Ok(())
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -364,5 +416,20 @@ mod tests {
         let result = plan_assignments(&[candidate(Uuid::new_v4(), &jury)], &jury, 1, 2);
 
         assert!(result.is_err());
+    }
+
+    #[test]
+    fn jury_management_is_allowed_only_during_registration() {
+        assert!(validate_jury_management_status("registration").is_ok());
+        assert!(validate_jury_management_status("draft").is_err());
+        assert!(validate_jury_management_status("running").is_err());
+        assert!(validate_jury_management_status("finished").is_err());
+    }
+
+    #[test]
+    fn assignments_require_running_tournament_and_closed_round() {
+        assert!(ensure_assignment_generation_allowed("running", "submission_closed").is_ok());
+        assert!(ensure_assignment_generation_allowed("registration", "submission_closed").is_err());
+        assert!(ensure_assignment_generation_allowed("running", "active").is_err());
     }
 }

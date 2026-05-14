@@ -6,6 +6,7 @@ use uuid::Uuid;
 pub struct LeaderboardTournament {
     pub id: Uuid,
     pub title: String,
+    pub status: String,
 }
 
 #[derive(Debug, Clone, sqlx::FromRow)]

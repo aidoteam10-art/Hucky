@@ -11,7 +11,7 @@ impl LeaderboardRepository {
         tournament_id: Uuid,
     ) -> Result<Option<LeaderboardTournament>, sqlx::Error> {
         sqlx::query_as::<_, LeaderboardTournament>(
-            "SELECT id, title
+            "SELECT id, title, status
             FROM tournaments
             WHERE id = $1",
         )

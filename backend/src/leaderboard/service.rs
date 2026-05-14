@@ -1,10 +1,11 @@
-use std::{cmp::Ordering, collections::HashMap};
+use std::{cmp::Ordering, collections::HashMap, str::FromStr};
 
 use sqlx::PgPool;
 use uuid::Uuid;
 
 use crate::{
     error::{ApiError, ApiResult},
+    tournaments::model::TournamentStatus,
     users::auth::AuthenticatedUser,
 };
 
@@ -33,13 +34,7 @@ impl LeaderboardService {
             None => false,
         };
 
-        let has_unpublished =
-            LeaderboardRepository::has_unpublished_submitted_rounds(db, tournament_id).await?;
-        if has_unpublished && !is_organizer {
-            return Err(ApiError::Forbidden(
-                "Leaderboard is available after evaluation is complete".to_string(),
-            ));
-        }
+        ensure_leaderboard_visible(&tournament.status, is_organizer)?;
 
         let rows = LeaderboardRepository::score_rows(db, tournament_id).await?;
         let teams = build_team_scores(rows);
@@ -127,6 +122,19 @@ fn round2(value: f64) -> f64 {
     (value * 100.0).round() / 100.0
 }
 
+fn ensure_leaderboard_visible(tournament_status: &str, is_organizer: bool) -> ApiResult<()> {
+    let status = TournamentStatus::from_str(tournament_status)
+        .map_err(|_| ApiError::Validation("Tournament has invalid status".to_string()))?;
+
+    if is_organizer || status == TournamentStatus::Finished {
+        return Ok(());
+    }
+
+    Err(ApiError::Forbidden(
+        "Leaderboard is available after tournament is finished".to_string(),
+    ))
+}
+
 #[cfg(test)]
 mod tests {
     use chrono::{TimeZone, Utc};
@@ -178,5 +186,12 @@ mod tests {
         ]);
 
         assert_eq!(items[0].team_name, "Early");
+    }
+
+    #[test]
+    fn public_leaderboard_is_visible_only_after_finish() {
+        assert!(ensure_leaderboard_visible("finished", false).is_ok());
+        assert!(ensure_leaderboard_visible("running", false).is_err());
+        assert!(ensure_leaderboard_visible("registration", true).is_ok());
     }
 }

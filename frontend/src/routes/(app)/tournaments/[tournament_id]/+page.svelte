@@ -14,6 +14,9 @@
 	$: rounds = data.rounds || [];
 	$: registeredTeams = tournament.registered_teams || [];
 	$: userTeam = data.userTeam;
+	$: canSetupRounds = data.canManage && ['draft', 'registration'].includes(tournament.status);
+	$: canManageJury = data.canManage && tournament.status === 'registration';
+	$: canOperateRounds = data.canManage && tournament.status === 'running';
 
 	function formatDate(value) {
 		if (!value) return 'Не вказано';
@@ -37,8 +40,10 @@
 		return [];
 	}
 
-	function roundActions(round) {
-		if (round.status === 'draft') return [{ status: 'active', label: 'Опублікувати задачу' }];
+	function roundActions(round, tournamentStatus) {
+		if (tournamentStatus === 'running' && round.status === 'draft') {
+			return [{ status: 'active', label: 'Опублікувати задачу' }];
+		}
 		return [];
 	}
 
@@ -101,12 +106,14 @@
 			>
 				До списку турнірів
 			</a>
-			<a
-				href={`/tournaments/results?tournament_id=${tournament.id}`}
-				class="w-full rounded-2xl border border-[#191F00] px-8 py-3 text-center text-sm font-bold text-[#191F00] transition hover:bg-[#191F00] hover:text-white lg:w-auto"
-			>
-				Таблиця лідерів
-			</a>
+			{#if tournament.status === 'finished'}
+				<a
+					href={`/tournaments/results?tournament_id=${tournament.id}`}
+					class="w-full rounded-2xl border border-[#191F00] px-8 py-3 text-center text-sm font-bold text-[#191F00] transition hover:bg-[#191F00] hover:text-white lg:w-auto"
+				>
+					Таблиця лідерів
+				</a>
+			{/if}
 		</div>
 	</section>
 
@@ -163,7 +170,7 @@
 										Відкрити
 									</a>
 									{#if data.canManage}
-										{#each roundActions(round) as action (action.status)}
+										{#each roundActions(round, tournament.status) as action (action.status)}
 											<form method="POST" action="?/changeRoundStatus">
 												<input type="hidden" name="round_id" value={round.id} />
 												<input type="hidden" name="status" value={action.status} />
@@ -175,7 +182,7 @@
 												</button>
 											</form>
 										{/each}
-										{#if round.status === 'active'}
+										{#if canOperateRounds && round.status === 'active'}
 											<form method="POST" action="?/lockSubmissions">
 												<input type="hidden" name="round_id" value={round.id} />
 												<button
@@ -186,7 +193,7 @@
 												</button>
 											</form>
 										{/if}
-										{#if round.status === 'submission_closed'}
+										{#if canOperateRounds && round.status === 'submission_closed'}
 											<form method="POST" action="?/generateAssignments" class="grid gap-2 rounded-lg border border-[#E5E7EB] bg-white p-3">
 												<input type="hidden" name="round_id" value={round.id} />
 												<label class="text-xs font-bold text-[#696969]">
@@ -292,14 +299,16 @@
 			</div>
 
 			{#if data.canManage}
-				<div class="rounded-2xl border border-[#E5E7EB] bg-white p-6 shadow-sm">
-					<a href={`/choose_jury?tournament_id=${tournament.id}`} class="flex w-full items-center justify-center gap-4 rounded-2xl border border-[#191F00] px-5 py-3 hover:ring-1">
-						<div class="flex h-9 w-9 items-center justify-center rounded-full">
-							<img src="/icons/hummer.svg" alt="" class="h-9 w-9" />
-						</div>
-						<span class="text-lg font-semibold">Обрати журі</span>
-					</a>
-				</div>
+				{#if canManageJury}
+					<div class="rounded-2xl border border-[#E5E7EB] bg-white p-6 shadow-sm">
+						<a href={`/choose_jury?tournament_id=${tournament.id}`} class="flex w-full items-center justify-center gap-4 rounded-2xl border border-[#191F00] px-5 py-3 hover:ring-1">
+							<div class="flex h-9 w-9 items-center justify-center rounded-full">
+								<img src="/icons/hummer.svg" alt="" class="h-9 w-9" />
+							</div>
+							<span class="text-lg font-semibold">Обрати журі</span>
+						</a>
+					</div>
+				{/if}
 
 				<div class="rounded-2xl border border-[#E5E7EB] bg-white p-6 shadow-sm">
 					<h2 class="mb-4 text-xl font-bold">Organizer controls</h2>
@@ -322,63 +331,65 @@
 					</div>
 				</div>
 
-				<form method="POST" action="?/createRound" class="rounded-2xl border border-[#E5E7EB] bg-white p-6 shadow-sm">
-					<h2 class="mb-4 text-xl font-bold">Додати раунд</h2>
-					<div class="space-y-4">
-						<InputField name="title" required header="Назва*" placeholder="Round 2: Final" />
-						<TextArea
-							name="task_description"
-							required
-							header="Опис завдання*"
-							placeholder="Опишіть задачу раунду"
-							rows={4}
-						/>
-						<TextArea
-							name="technology_requirements"
-							header="Технології"
-							placeholder="Будь-які вимоги до стеку"
-							rows={2}
-						/>
-						<div class="grid grid-cols-1 gap-4">
-							<DateField name="starts_at" required header="Початок*" />
-							<DateField name="deadline_at" required header="Дедлайн*" />
-							<InputField name="position" type="number" header="Позиція" placeholder="Автоматично" />
-						</div>
-						<div class="space-y-3">
-							<div class="flex items-center justify-between">
-								<p class="text-sm font-bold text-[#32221B]">Must-have</p>
-								<button type="button" on:click={addRoundRequirement} class="text-sm font-bold hover:underline">
-									Додати
-								</button>
+				{#if canSetupRounds}
+					<form method="POST" action="?/createRound" class="rounded-2xl border border-[#E5E7EB] bg-white p-6 shadow-sm">
+						<h2 class="mb-4 text-xl font-bold">Додати раунд</h2>
+						<div class="space-y-4">
+							<InputField name="title" required header="Назва*" placeholder="Round 2: Final" />
+							<TextArea
+								name="task_description"
+								required
+								header="Опис завдання*"
+								placeholder="Опишіть задачу раунду"
+								rows={4}
+							/>
+							<TextArea
+								name="technology_requirements"
+								header="Технології"
+								placeholder="Будь-які вимоги до стеку"
+								rows={2}
+							/>
+							<div class="grid grid-cols-1 gap-4">
+								<DateField name="starts_at" required header="Початок*" />
+								<DateField name="deadline_at" required header="Дедлайн*" />
+								<InputField name="position" type="number" header="Позиція" placeholder="Автоматично" />
 							</div>
-							{#each newRoundRequirements as requirement, index (index)}
-								<div class="flex items-end gap-2" data-filled={Boolean(requirement)}>
-									<InputField
-										bind:value={newRoundRequirements[index]}
-										name="must_have"
-										header=""
-										placeholder="Вимога {index + 1}"
-										class="w-full"
-									/>
-									<button
-										type="button"
-										on:click={() => removeRoundRequirement(index)}
-										class="mb-2 rounded-lg border border-[#B4B4B4] px-3 py-2 text-sm font-bold hover:bg-[#F4F4F5]"
-										aria-label="Видалити вимогу"
-									>
-										×
+							<div class="space-y-3">
+								<div class="flex items-center justify-between">
+									<p class="text-sm font-bold text-[#32221B]">Must-have</p>
+									<button type="button" on:click={addRoundRequirement} class="text-sm font-bold hover:underline">
+										Додати
 									</button>
 								</div>
-							{/each}
+								{#each newRoundRequirements as requirement, index (index)}
+									<div class="flex items-end gap-2" data-filled={Boolean(requirement)}>
+										<InputField
+											bind:value={newRoundRequirements[index]}
+											name="must_have"
+											header=""
+											placeholder="Вимога {index + 1}"
+											class="w-full"
+										/>
+										<button
+											type="button"
+											on:click={() => removeRoundRequirement(index)}
+											class="mb-2 rounded-lg border border-[#B4B4B4] px-3 py-2 text-sm font-bold hover:bg-[#F4F4F5]"
+											aria-label="Видалити вимогу"
+										>
+											×
+										</button>
+									</div>
+								{/each}
+							</div>
+							<button
+								type="submit"
+								class="w-full rounded-xl bg-[#191F00] px-5 py-3 text-sm font-bold text-white hover:bg-[#2b3500]"
+							>
+								Створити раунд
+							</button>
 						</div>
-						<button
-							type="submit"
-							class="w-full rounded-xl bg-[#191F00] px-5 py-3 text-sm font-bold text-white hover:bg-[#2b3500]"
-						>
-							Створити раунд
-						</button>
-					</div>
-				</form>
+					</form>
+				{/if}
 			{/if}
 		</aside>
 	</section>

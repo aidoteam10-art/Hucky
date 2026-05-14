@@ -7,7 +7,9 @@ use uuid::Uuid;
 use crate::{
     error::{ApiError, ApiResult},
     tournaments::{
-        dto::CreateFirstRoundRequest, model::TournamentStatus, repository::TournamentRepository,
+        dto::CreateFirstRoundRequest,
+        model::{Tournament, TournamentStatus},
+        repository::TournamentRepository,
         service::TournamentService,
     },
     users::auth::AuthenticatedUser,
@@ -57,6 +59,8 @@ impl RoundService {
         payload: CreateRoundRequest,
     ) -> ApiResult<RoundDetailResponse> {
         TournamentService::require_tournament_organizer(db, tournament_id, user).await?;
+        let tournament = find_tournament(db, tournament_id).await?;
+        ensure_round_setup_allowed(&tournament)?;
 
         let position = match payload.position {
             Some(position) => position,
@@ -128,6 +132,9 @@ impl RoundService {
     ) -> ApiResult<RoundDetailResponse> {
         let existing = find_round(db, round_id).await?;
         TournamentService::require_tournament_organizer(db, existing.tournament_id, user).await?;
+        ensure_round_editable(&existing)?;
+        let tournament = find_tournament(db, existing.tournament_id).await?;
+        ensure_round_setup_allowed(&tournament)?;
 
         let title = payload.title.unwrap_or(existing.title);
         let task_description = payload
@@ -205,6 +212,14 @@ impl RoundService {
             ));
         }
 
+        let pending_assignments = RoundRepository::pending_assignments_count(db, round_id).await?;
+        if pending_assignments > 0 {
+            return Err(ApiError::Validation(
+                "Round cannot be marked as evaluated while jury assignments are pending"
+                    .to_string(),
+            ));
+        }
+
         let updated = RoundRepository::update_status(db, round_id, RoundStatus::Evaluated).await?;
         build_round_detail(db, updated).await
     }
@@ -214,6 +229,12 @@ async fn find_round(db: &PgPool, round_id: Uuid) -> ApiResult<Round> {
     RoundRepository::find_by_id(db, round_id)
         .await?
         .ok_or_else(|| ApiError::NotFound("Round not found".to_string()))
+}
+
+async fn find_tournament(db: &PgPool, tournament_id: Uuid) -> ApiResult<Tournament> {
+    TournamentRepository::find_by_id(db, tournament_id)
+        .await?
+        .ok_or_else(|| ApiError::NotFound("Tournament not found".to_string()))
 }
 
 async fn build_round_detail(db: &PgPool, round: Round) -> ApiResult<RoundDetailResponse> {
@@ -281,6 +302,33 @@ async fn validate_round_can_be_activated(db: &PgPool, round: &Round) -> ApiResul
 fn parse_round_status(value: &str) -> ApiResult<RoundStatus> {
     RoundStatus::from_str(value)
         .map_err(|_| ApiError::Validation("Round has invalid status".to_string()))
+}
+
+fn ensure_round_setup_allowed(tournament: &Tournament) -> ApiResult<()> {
+    let status = TournamentStatus::from_str(&tournament.status)
+        .map_err(|_| ApiError::Validation("Tournament has invalid status".to_string()))?;
+
+    if matches!(
+        status,
+        TournamentStatus::Draft | TournamentStatus::Registration
+    ) {
+        return Ok(());
+    }
+
+    Err(ApiError::Validation(
+        "Rounds can be created or edited only before tournament starts".to_string(),
+    ))
+}
+
+fn ensure_round_editable(round: &Round) -> ApiResult<()> {
+    let status = parse_round_status(&round.status)?;
+    if status == RoundStatus::Draft {
+        return Ok(());
+    }
+
+    Err(ApiError::Validation(
+        "Only draft rounds can be edited".to_string(),
+    ))
 }
 
 fn normalize_round_input(
@@ -420,5 +468,61 @@ mod tests {
         let result = validate_round_status_transition(RoundStatus::Active, RoundStatus::Evaluated);
 
         assert!(result.is_err());
+    }
+
+    #[test]
+    fn allows_round_setup_before_tournament_runs() {
+        let draft = tournament_with_status(TournamentStatus::Draft);
+        let registration = tournament_with_status(TournamentStatus::Registration);
+
+        assert!(ensure_round_setup_allowed(&draft).is_ok());
+        assert!(ensure_round_setup_allowed(&registration).is_ok());
+    }
+
+    #[test]
+    fn rejects_round_setup_when_tournament_is_running_or_finished() {
+        let running = tournament_with_status(TournamentStatus::Running);
+        let finished = tournament_with_status(TournamentStatus::Finished);
+
+        assert!(ensure_round_setup_allowed(&running).is_err());
+        assert!(ensure_round_setup_allowed(&finished).is_err());
+    }
+
+    #[test]
+    fn rejects_non_draft_round_edits() {
+        assert!(ensure_round_editable(&round_with_status(RoundStatus::Draft)).is_ok());
+        assert!(ensure_round_editable(&round_with_status(RoundStatus::Active)).is_err());
+        assert!(ensure_round_editable(&round_with_status(RoundStatus::SubmissionClosed)).is_err());
+        assert!(ensure_round_editable(&round_with_status(RoundStatus::Evaluated)).is_err());
+    }
+
+    fn round_with_status(status: RoundStatus) -> Round {
+        Round {
+            id: Uuid::new_v4(),
+            tournament_id: Uuid::new_v4(),
+            title: "MVP".to_string(),
+            task_description: "Build a working MVP with documented decisions".to_string(),
+            technology_requirements: None,
+            status: status.as_str().to_string(),
+            starts_at: date(10),
+            deadline_at: date(12),
+            position: 1,
+        }
+    }
+
+    fn tournament_with_status(status: TournamentStatus) -> Tournament {
+        Tournament {
+            id: Uuid::new_v4(),
+            organizer_id: Uuid::new_v4(),
+            title: "Spring Hackathon".to_string(),
+            description: "Detailed tournament description".to_string(),
+            rules: "Tournament rules are clear".to_string(),
+            status: status.as_str().to_string(),
+            registration_starts_at: date(1),
+            registration_ends_at: date(5),
+            starts_at: date(6),
+            ends_at: None,
+            max_teams: Some(20),
+        }
     }
 }

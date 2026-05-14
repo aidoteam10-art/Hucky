@@ -161,6 +161,20 @@ impl RoundRepository {
         .await
     }
 
+    pub async fn pending_assignments_count(
+        db: &PgPool,
+        round_id: Uuid,
+    ) -> Result<i64, sqlx::Error> {
+        sqlx::query_scalar::<_, i64>(
+            "SELECT COUNT(*)::bigint
+            FROM jury_assignments
+            WHERE round_id = $1 AND status = 'pending'",
+        )
+        .bind(round_id)
+        .fetch_one(db)
+        .await
+    }
+
     pub async fn next_position(db: &PgPool, tournament_id: Uuid) -> Result<i32, sqlx::Error> {
         let position = sqlx::query_scalar::<_, i32>(
             "SELECT COALESCE(MAX(position), 0) + 1 FROM rounds WHERE tournament_id = $1",

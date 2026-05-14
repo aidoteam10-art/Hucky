@@ -155,6 +155,7 @@ impl TournamentService {
     ) -> ApiResult<TournamentDetailResponse> {
         Self::require_tournament_organizer(db, tournament_id, user).await?;
         let existing = find_tournament(db, tournament_id).await?;
+        ensure_tournament_editable(&existing)?;
 
         let title = payload.title.unwrap_or(existing.title);
         let description = payload.description.unwrap_or(existing.description);
@@ -178,6 +179,9 @@ impl TournamentService {
             starts_at,
             max_teams,
         )?;
+        let registered_teams =
+            TournamentRepository::count_registered_teams(db, tournament_id).await?;
+        validate_max_teams_capacity(max_teams, registered_teams)?;
 
         let updated = TournamentRepository::update(
             db,
@@ -218,6 +222,10 @@ impl TournamentService {
                     "Tournament needs at least one round before it can start".to_string(),
                 ));
             }
+        }
+
+        if current == TournamentStatus::Running && payload.status == TournamentStatus::Finished {
+            ensure_tournament_can_finish(db, tournament_id).await?;
         }
 
         let updated =
@@ -309,6 +317,58 @@ async fn build_detail_response(
 fn parse_tournament_status(value: &str) -> ApiResult<TournamentStatus> {
     TournamentStatus::from_str(value)
         .map_err(|_| ApiError::Validation("Tournament has invalid status".to_string()))
+}
+
+fn ensure_tournament_editable(tournament: &Tournament) -> ApiResult<()> {
+    let status = parse_tournament_status(&tournament.status)?;
+    if matches!(
+        status,
+        TournamentStatus::Draft | TournamentStatus::Registration
+    ) {
+        return Ok(());
+    }
+
+    Err(ApiError::Validation(
+        "Tournament can be edited only before it starts".to_string(),
+    ))
+}
+
+async fn ensure_tournament_can_finish(db: &PgPool, tournament_id: Uuid) -> ApiResult<()> {
+    let rounds_count = TournamentRepository::count_rounds(db, tournament_id).await?;
+    let not_evaluated_count =
+        TournamentRepository::count_rounds_not_evaluated(db, tournament_id).await?;
+    validate_tournament_finish_preconditions(rounds_count, not_evaluated_count)
+}
+
+fn validate_tournament_finish_preconditions(
+    rounds_count: i64,
+    not_evaluated_count: i64,
+) -> ApiResult<()> {
+    if rounds_count == 0 {
+        return Err(ApiError::Validation(
+            "Tournament needs at least one evaluated round before it can finish".to_string(),
+        ));
+    }
+
+    if not_evaluated_count > 0 {
+        return Err(ApiError::Validation(
+            "Tournament can be finished only after all rounds are evaluated".to_string(),
+        ));
+    }
+
+    Ok(())
+}
+
+fn validate_max_teams_capacity(max_teams: Option<i32>, registered_teams: i64) -> ApiResult<()> {
+    if let Some(max_teams) = max_teams {
+        if registered_teams > i64::from(max_teams) {
+            return Err(ApiError::Validation(
+                "Max teams cannot be lower than currently registered teams".to_string(),
+            ));
+        }
+    }
+
+    Ok(())
 }
 
 pub(crate) fn validate_tournament_fields(
@@ -439,6 +499,38 @@ mod tests {
         );
 
         assert!(result.is_err());
+    }
+
+    #[test]
+    fn rejects_tournament_edit_after_it_starts() {
+        let running = tournament_with_owner(Uuid::new_v4(), TournamentStatus::Running);
+        let finished = tournament_with_owner(Uuid::new_v4(), TournamentStatus::Finished);
+
+        assert!(ensure_tournament_editable(&running).is_err());
+        assert!(ensure_tournament_editable(&finished).is_err());
+    }
+
+    #[test]
+    fn allows_tournament_edit_before_it_starts() {
+        let draft = tournament_with_owner(Uuid::new_v4(), TournamentStatus::Draft);
+        let registration = tournament_with_owner(Uuid::new_v4(), TournamentStatus::Registration);
+
+        assert!(ensure_tournament_editable(&draft).is_ok());
+        assert!(ensure_tournament_editable(&registration).is_ok());
+    }
+
+    #[test]
+    fn rejects_finish_until_all_rounds_are_evaluated() {
+        assert!(validate_tournament_finish_preconditions(0, 0).is_err());
+        assert!(validate_tournament_finish_preconditions(3, 1).is_err());
+        assert!(validate_tournament_finish_preconditions(3, 0).is_ok());
+    }
+
+    #[test]
+    fn rejects_max_teams_below_registered_count() {
+        assert!(validate_max_teams_capacity(Some(2), 3).is_err());
+        assert!(validate_max_teams_capacity(Some(3), 3).is_ok());
+        assert!(validate_max_teams_capacity(None, 30).is_ok());
     }
 
     #[test]
