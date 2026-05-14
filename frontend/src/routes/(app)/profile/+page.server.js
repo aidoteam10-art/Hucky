@@ -25,7 +25,7 @@ export const load = async ({ cookies, fetch }) => {
 			isOrganiser
 				? apiRequest(fetch, '/api/me/tournaments', { token })
 				: Promise.resolve({ items: [] }),
-			apiRequest(fetch, '/api/me/certificates', { token })
+			loadCertificates(fetch, token)
 		]);
 
 		return {
@@ -48,6 +48,18 @@ export const load = async ({ cookies, fetch }) => {
 		throw kitError(500, 'Backend недоступний');
 	}
 };
+
+async function loadCertificates(fetch, token) {
+	try {
+		return await apiRequest(fetch, '/api/me/certificates', { token });
+	} catch (error) {
+		if (error instanceof ApiError && error.status === 401) {
+			throw error;
+		}
+
+		return { items: [] };
+	}
+}
 
 export const actions = {
 	acceptInvitation: async ({ request, cookies, fetch }) => {
