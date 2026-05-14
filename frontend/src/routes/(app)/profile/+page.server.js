@@ -12,7 +12,7 @@ export const load = async ({ cookies, fetch }) => {
 		const isParticipant = profile.role === 'participant';
 		const isOrganiser = profile.role === 'organiser';
 		const isJury = profile.role === 'jury';
-		const [teams, invitations, juryAssignments, createdTournaments] = await Promise.all([
+		const [teams, invitations, juryAssignments, createdTournaments, certificates] = await Promise.all([
 			isParticipant
 				? apiRequest(fetch, '/api/me/teams', { token })
 				: Promise.resolve({ items: [] }),
@@ -24,7 +24,8 @@ export const load = async ({ cookies, fetch }) => {
 				: Promise.resolve({ items: [] }),
 			isOrganiser
 				? apiRequest(fetch, '/api/me/tournaments', { token })
-				: Promise.resolve({ items: [] })
+				: Promise.resolve({ items: [] }),
+			apiRequest(fetch, '/api/me/certificates', { token })
 		]);
 
 		return {
@@ -32,7 +33,8 @@ export const load = async ({ cookies, fetch }) => {
 			teams: teams.items || [],
 			invitations: invitations.items || [],
 			juryAssignments: juryAssignments.items || [],
-			createdTournaments: createdTournaments.items || []
+			createdTournaments: createdTournaments.items || [],
+			certificates: certificates.items || []
 		};
 	} catch (error) {
 		if (error instanceof ApiError && error.status === 401) {

@@ -3,6 +3,7 @@
 	import TournamentCard from '../../../components/TournamentCard.svelte';
 	import { tick } from 'svelte';
 	import { avatarSrc, DEFAULT_AVATAR, isDefaultAvatar, setAvatar } from '$lib/avatar';
+	import { downloadCertificatePdf } from '$lib/certificatePdf';
 
 	export let data;
 	export let form;
@@ -23,9 +24,11 @@
 	$: isJury = role === 'jury';
 	$: isAdmin = role === 'admin';
 	$: createdTournaments = data.createdTournaments || [];
+	$: certificates = data.certificates || [];
 	$: hasTeams = data.teams.length > 0;
 	$: hasInvitations = data.invitations.length > 0;
 	$: hasJuryAssignments = data.juryAssignments.length > 0;
+	$: hasCertificates = certificates.length > 0;
 
 	function formatDate(value) {
 		if (!value) return 'Не вказано';
@@ -71,6 +74,10 @@
 			avatarError = 'Не вдалося прочитати зображення.';
 		};
 		reader.readAsDataURL(file);
+	}
+
+	function downloadCertificate(certificate) {
+		downloadCertificatePdf(certificate);
 	}
 </script>
 
@@ -188,6 +195,37 @@
 		<div class="mb-8 rounded-xl border border-red-200 bg-red-50 px-5 py-4 text-sm font-semibold text-red-700">
 			<span class="text-anywhere block">{form.message}</span>
 		</div>
+	{/if}
+
+	{#if hasCertificates}
+		<section class="mb-12 rounded-2xl border border-[#E5E7EB] bg-white p-6 shadow-sm lg:p-8">
+			<div class="mb-6 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+				<h2 class="text-2xl font-bold">Сертифікати</h2>
+				<span class="text-sm font-semibold text-gray-500">{certificates.length} у списку</span>
+			</div>
+
+			<div class="grid gap-4 md:grid-cols-2">
+				{#each certificates as certificate (certificate.id)}
+					<article class="rounded-xl border border-[#E5E7EB] bg-[#FAFAFA] p-5">
+						<div class="mb-5 min-w-0">
+							<h3 class="text-anywhere text-xl font-bold">{certificate.tournamentName}</h3>
+							<p class="text-anywhere mt-1 text-sm text-[#696969]">{certificate.teamName}</p>
+						</div>
+						<div class="mb-5 grid grid-cols-1 gap-3 text-sm text-[#696969] sm:grid-cols-2">
+							<p><span class="font-semibold text-[#191F00]">Місце:</span> {certificate.overallPlace ?? 'Не подано'}</p>
+							<p><span class="font-semibold text-[#191F00]">Дата:</span> {certificate.issuedAt}</p>
+						</div>
+						<button
+							type="button"
+							on:click={() => downloadCertificate(certificate)}
+							class="w-full rounded-xl bg-[#CCFF00] px-5 py-3 text-sm font-bold text-[#191F00] transition hover:bg-[#A9D207]"
+						>
+							Завантажити сертифікат
+						</button>
+					</article>
+				{/each}
+			</div>
+		</section>
 	{/if}
 
 	{#if isParticipant}
