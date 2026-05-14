@@ -4,6 +4,7 @@ use sqlx::PgPool;
 use uuid::Uuid;
 
 use crate::{
+    certificates::service::CertificateService,
     error::{ApiError, ApiResult},
     rounds::{model::NewRound, repository::RoundRepository, service::RoundService},
     users::{
@@ -230,6 +231,10 @@ impl TournamentService {
 
         let updated =
             TournamentRepository::update_status(db, tournament_id, payload.status).await?;
+
+        if current == TournamentStatus::Running && payload.status == TournamentStatus::Finished {
+            CertificateService::generate_for_tournament(db, tournament_id).await?;
+        }
 
         Ok(CreateTournamentResponse {
             id: updated.id,
