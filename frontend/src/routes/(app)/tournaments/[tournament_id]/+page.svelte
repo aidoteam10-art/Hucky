@@ -106,12 +106,14 @@
 			>
 				До списку турнірів
 			</a>
-			<a
-				href={`/tournaments/results?tournament_id=${tournament.id}`}
-				class="w-full rounded-2xl border border-[#191F00] px-8 py-3 text-center text-sm font-bold text-[#191F00] transition hover:bg-[#191F00] hover:text-white lg:w-auto"
-			>
-				Таблиця лідерів
-			</a>
+			{#if tournament.status === 'finished'}
+				<a
+					href={`/tournaments/results?tournament_id=${tournament.id}`}
+					class="w-full rounded-2xl border border-[#191F00] px-8 py-3 text-center text-sm font-bold text-[#191F00] transition hover:bg-[#191F00] hover:text-white lg:w-auto"
+				>
+					Таблиця лідерів
+				</a>
+			{/if}
 		</div>
 	</section>
 
