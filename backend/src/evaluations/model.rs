@@ -7,6 +7,8 @@ pub struct AssignmentForEvaluation {
     pub jury_user_id: Uuid,
     pub round_id: Uuid,
     pub tournament_id: Uuid,
+    pub round_status: String,
+    pub tournament_status: String,
 }
 
 #[derive(Debug, Clone, sqlx::FromRow)]

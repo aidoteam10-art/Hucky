@@ -113,10 +113,7 @@ pub async fn run_due_status_transitions(
                 SELECT 1
                 FROM rounds r
                 WHERE r.tournament_id = t.id
-                    AND (
-                        r.status IN ('draft', 'active')
-                        OR r.deadline_at > NOW()
-                    )
+                    AND r.status <> 'evaluated'
             )",
     )
     .execute(db)

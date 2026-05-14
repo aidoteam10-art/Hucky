@@ -1,10 +1,15 @@
-use std::collections::{HashMap, HashSet};
+use std::{
+    collections::{HashMap, HashSet},
+    str::FromStr,
+};
 
 use sqlx::PgPool;
 use uuid::Uuid;
 
 use crate::{
     error::{ApiError, ApiResult},
+    rounds::model::RoundStatus,
+    tournaments::model::TournamentStatus,
     users::auth::AuthenticatedUser,
 };
 
@@ -44,6 +49,7 @@ impl EvaluationService {
                 "Only pending assignments can be evaluated".to_string(),
             ));
         }
+        ensure_evaluation_window(&assignment.round_status, &assignment.tournament_status)?;
 
         let criteria =
             EvaluationRepository::criteria_for_tournament(db, assignment.tournament_id).await?;
@@ -134,6 +140,27 @@ pub(crate) fn validate_scores(
     Ok(())
 }
 
+fn ensure_evaluation_window(round_status: &str, tournament_status: &str) -> ApiResult<()> {
+    let round_status = RoundStatus::from_str(round_status)
+        .map_err(|_| ApiError::Validation("Round has invalid status".to_string()))?;
+    let tournament_status = TournamentStatus::from_str(tournament_status)
+        .map_err(|_| ApiError::Validation("Tournament has invalid status".to_string()))?;
+
+    if round_status != RoundStatus::SubmissionClosed {
+        return Err(ApiError::Validation(
+            "Evaluations can be submitted only after submissions are closed".to_string(),
+        ));
+    }
+
+    if tournament_status != TournamentStatus::Running {
+        return Err(ApiError::Validation(
+            "Evaluations can be submitted only while tournament is running".to_string(),
+        ));
+    }
+
+    Ok(())
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -195,5 +222,12 @@ mod tests {
         }];
 
         assert!(validate_scores(&scores, &[criterion]).is_err());
+    }
+
+    #[test]
+    fn evaluations_require_closed_round_and_running_tournament() {
+        assert!(ensure_evaluation_window("submission_closed", "running").is_ok());
+        assert!(ensure_evaluation_window("active", "running").is_err());
+        assert!(ensure_evaluation_window("submission_closed", "finished").is_err());
     }
 }

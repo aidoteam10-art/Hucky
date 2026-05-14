@@ -16,9 +16,12 @@ impl EvaluationRepository {
                 ja.status,
                 ja.jury_user_id,
                 ja.round_id,
-                r.tournament_id
+                r.tournament_id,
+                r.status AS round_status,
+                t.status AS tournament_status
             FROM jury_assignments ja
             JOIN rounds r ON r.id = ja.round_id
+            JOIN tournaments t ON t.id = r.tournament_id
             WHERE ja.id = $1",
         )
         .bind(assignment_id)

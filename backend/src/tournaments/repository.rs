@@ -251,6 +251,34 @@ impl TournamentRepository {
             .await
     }
 
+    pub async fn count_rounds_not_evaluated(
+        db: &PgPool,
+        tournament_id: Uuid,
+    ) -> Result<i64, sqlx::Error> {
+        sqlx::query_scalar::<_, i64>(
+            "SELECT COUNT(*)::bigint
+            FROM rounds
+            WHERE tournament_id = $1 AND status <> 'evaluated'",
+        )
+        .bind(tournament_id)
+        .fetch_one(db)
+        .await
+    }
+
+    pub async fn count_registered_teams(
+        db: &PgPool,
+        tournament_id: Uuid,
+    ) -> Result<i64, sqlx::Error> {
+        sqlx::query_scalar::<_, i64>(
+            "SELECT COUNT(*)::bigint
+            FROM teams
+            WHERE tournament_id = $1",
+        )
+        .bind(tournament_id)
+        .fetch_one(db)
+        .await
+    }
+
     pub async fn active_round(
         db: &PgPool,
         tournament_id: Uuid,
