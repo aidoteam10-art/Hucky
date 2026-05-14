@@ -16,6 +16,7 @@
 	$: currentStatus = data.filters.status;
 	$: searchQuery = data.filters.search;
 	$: canCreateTournament = data.profile?.role === 'organiser';
+	$: visibleFilterOptions = filterOptions.filter((option) => option.id !== 'draft' || canCreateTournament);
 	$: pageNumbers = Array.from({ length: tournaments.total_pages }, (_, index) => index + 1);
 
 	function queryFor(params) {
@@ -46,7 +47,7 @@
 				</div>
 
 				<div class="flex flex-wrap gap-2 md:gap-4">
-					{#each filterOptions as option (option.id)}
+					{#each visibleFilterOptions as option (option.id)}
 						<a
 							href={resolve('/tournaments' + queryFor({ status: option.id, page: 1 }))}
 							class="rounded-lg px-4 py-3 text-sm font-bold leading-none transition md:px-9 md:py-5 md:text-lg {currentStatus ===

@@ -79,8 +79,8 @@
 </svelte:head>
 
 <main class="w-full px-6 py-10 font-sans text-[#191F00] md:px-16 lg:px-28 lg:py-20">
-	<section class="mb-12 flex flex-col items-center gap-8 text-center md:flex-row md:items-start md:text-left">
-		<div class="flex flex-col items-center gap-3 md:items-start">
+	<section class="mb-12 flex flex-col items-center gap-8 text-center md:flex-row md:flex-wrap md:items-start md:gap-12 md:text-left lg:gap-14 xl:flex-nowrap">
+		<div class="flex shrink-0 flex-col items-center gap-3 md:items-start">
 			<button
 				type="button"
 				class="group relative h-24 w-24 overflow-hidden rounded-full border border-[#B4B4B4] bg-white transition hover:ring-2 hover:ring-[#CCFF00] focus:outline-none focus:ring-2 focus:ring-[#191F00] lg:h-35 lg:w-35"
@@ -112,39 +112,45 @@
 				<p class="max-w-36 text-center text-xs font-semibold text-red-600 md:text-left">{avatarError}</p>
 			{/if}
 		</div>
-		<div class="w-full pt-0 md:pt-4">
-			<div class="mb-6 flex flex-col items-center gap-4 md:flex-row lg:gap-10">
-				<h1 class="text-3xl leading-tight font-bold lg:text-[3rem]">{data.profile.full_name}</h1>
+		<div class="min-w-0 w-full pt-0 md:min-w-64 md:flex-1 md:pt-4">
+			<div class="mb-6 flex flex-col items-center gap-4 md:flex-row md:flex-wrap md:items-center lg:gap-10">
+				<h1 class="text-anywhere text-3xl leading-tight font-bold lg:text-[3rem]">{data.profile.full_name}</h1>
 				<StateTag variant={role} />
 			</div>
-			<div class="flex flex-col items-center gap-2 md:flex-row md:gap-6">
-				<span class="text-lg font-semibold lg:text-[1.4rem]">Пошта:</span>
-				<span class="text-lg lg:text-[1.4rem]">{data.profile.email}</span>
+			<div class="flex flex-col items-center gap-2 md:flex-row md:items-start md:gap-4 lg:gap-6">
+				<span class="shrink-0 whitespace-nowrap text-lg font-semibold lg:text-[1.4rem]">Пошта:</span>
+				<span class="text-anywhere min-w-0 text-lg leading-tight lg:text-[1.4rem]">{data.profile.email}</span>
 			</div>
 		</div>
 		{#if isOrganiser || isAdmin}
-			<div class="flex w-full flex-col gap-4 md:w-auto">
+			<div class="grid w-full grid-cols-1 gap-3 sm:max-w-md sm:grid-cols-2 md:basis-full md:max-w-2xl xl:w-80 xl:basis-auto xl:grid-cols-1 xl:max-w-80 xl:min-w-72">
 				{#if isOrganiser}
-					<a href="/tournaments/new" class="flex w-full items-center justify-center gap-4 rounded-2xl border border-[#191F00] px-5 py-3 hover:ring-1 md:w-auto lg:gap-6 lg:px-7.5 lg:py-4">
-						<div class="flex h-8 w-8 items-center justify-center rounded-full bg-[#CCFF00] text-xl font-semibold leading-none lg:h-10 lg:w-10 lg:text-[1.65rem]">
+					<a href="/tournaments/new" class="flex min-w-0 items-center justify-center gap-3 rounded-2xl border border-[#191F00] px-4 py-3 hover:ring-1 md:justify-start lg:gap-4 lg:px-5 lg:py-4">
+						<div class="flex aspect-square h-8 shrink-0 items-center justify-center rounded-full bg-[#CCFF00] text-xl font-semibold leading-none lg:h-10 lg:text-[1.65rem]">
 							+
 						</div>
-						<span class="text-lg font-semibold lg:text-[1.5rem]">Створити новий турнір</span>
+						<span class="min-w-0 text-left text-base font-semibold leading-tight sm:text-lg lg:text-[1.25rem] xl:text-[1.5rem]">
+							Створити новий турнір
+						</span>
 					</a>
 
-					<a href="/choose_jury" class="flex w-full items-center justify-center gap-4 rounded-2xl border border-[#191F00] px-5 py-3 hover:ring-1 md:w-auto lg:gap-6 lg:px-7.5 lg:py-4">
-						<div class="flex h-9 w-9 items-center justify-center rounded-full lg:h-10 lg:w-10">
-							<img src="/icons/hummer.svg" alt="" class="h-9 w-9 lg:h-9 lg:w-9" />
+					<a href="/choose_jury" class="flex min-w-0 items-center justify-center gap-3 rounded-2xl border border-[#191F00] px-4 py-3 hover:ring-1 md:justify-start lg:gap-4 lg:px-5 lg:py-4">
+						<div class="flex aspect-square h-9 shrink-0 items-center justify-center rounded-full lg:h-10">
+							<img src="/icons/hummer.svg" alt="" class="h-9 w-9 shrink-0 lg:h-9 lg:w-9" />
 						</div>
-						<span class="text-lg font-semibold lg:text-[1.5rem]">Обрати журі</span>
+						<span class="min-w-0 text-left text-base font-semibold leading-tight sm:text-lg lg:text-[1.25rem] xl:text-[1.5rem]">
+							Обрати журі
+						</span>
 					</a>
 				{/if}
 				{#if isAdmin}
-					<a href="/admin_panel" class="flex w-full items-center justify-center gap-4 rounded-2xl border border-[#191F00] px-5 py-3 hover:ring-1 md:w-auto lg:gap-6 lg:px-7.5 lg:py-4">
-						<div class="flex h-9 w-9 items-center justify-center rounded-full lg:h-10 lg:w-10">
-							<img src="/icons/top-admin.svg" alt="" class="h-8 w-8 lg:h-9 lg:w-9" />
+					<a href="/admin_panel" class="flex min-w-0 items-center justify-center gap-3 rounded-2xl border border-[#191F00] px-4 py-3 hover:ring-1 md:justify-start lg:gap-4 lg:px-5 lg:py-4">
+						<div class="flex aspect-square h-9 shrink-0 items-center justify-center rounded-full lg:h-10">
+							<img src="/icons/top-admin.svg" alt="" class="h-8 w-8 shrink-0 lg:h-9 lg:w-9" />
 						</div>
-						<span class="text-lg font-semibold lg:text-[1.5rem]">Панель адміністратора</span>
+						<span class="min-w-0 text-left text-base font-semibold leading-tight sm:text-lg lg:text-[1.25rem] xl:text-[1.5rem]">
+							Панель адміністратора
+						</span>
 					</a>
 				{/if}
 			</div>
@@ -180,7 +186,7 @@
 
 	{#if form?.message}
 		<div class="mb-8 rounded-xl border border-red-200 bg-red-50 px-5 py-4 text-sm font-semibold text-red-700">
-			{form.message}
+			<span class="text-anywhere block">{form.message}</span>
 		</div>
 	{/if}
 
@@ -201,9 +207,9 @@
 								class="block rounded-xl border border-[#E5E7EB] bg-[#FAFAFA] p-5 transition hover:border-[#CCFF00] hover:bg-[#FBFFE9]"
 							>
 								<div class="mb-4 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-									<div>
-										<h3 class="text-xl font-bold">{item.team_name}</h3>
-										<p class="mt-1 text-sm text-[#696969]">{item.tournament.title}</p>
+									<div class="min-w-0">
+										<h3 class="text-anywhere text-xl font-bold">{item.team_name}</h3>
+										<p class="text-anywhere mt-1 text-sm text-[#696969]">{item.tournament.title}</p>
 									</div>
 									<div class="flex flex-wrap gap-2">
 										<span class="rounded-full bg-[#191F00] px-4 py-1.5 text-xs font-semibold text-[#CCFF00]">
@@ -248,9 +254,9 @@
 					<div class="space-y-4">
 						{#each data.invitations as invitation (invitation.id)}
 							<div class="rounded-xl border border-[#E5E7EB] bg-[#FAFAFA] p-4">
-								<h3 class="font-bold">{invitation.team_name}</h3>
-								<p class="mt-1 text-sm text-[#696969]">{invitation.tournament_title}</p>
-								<p class="mt-3 text-xs font-semibold text-[#696969]">
+								<h3 class="text-anywhere font-bold">{invitation.team_name}</h3>
+								<p class="text-anywhere mt-1 text-sm text-[#696969]">{invitation.tournament_title}</p>
+								<p class="text-anywhere mt-3 text-xs font-semibold text-[#696969]">
 									Від: {invitation.invited_by.full_name}
 								</p>
 								<p class="mt-1 text-xs font-semibold text-[#696969]">
@@ -306,10 +312,10 @@
 								: 'bg-[#FAFAFA] hover:border-[#B4B4B4]'}"
 						>
 							<div class="mb-4 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-								<div>
-									<h3 class="text-xl font-bold">{assignment.team_name}</h3>
-									<p class="mt-1 text-sm text-[#696969]">{assignment.tournament_title}</p>
-									<p class="mt-1 text-sm text-[#696969]">{assignment.round_title}</p>
+								<div class="min-w-0">
+									<h3 class="text-anywhere text-xl font-bold">{assignment.team_name}</h3>
+									<p class="text-anywhere mt-1 text-sm text-[#696969]">{assignment.tournament_title}</p>
+									<p class="text-anywhere mt-1 text-sm text-[#696969]">{assignment.round_title}</p>
 								</div>
 								<span class="rounded-full bg-[#191F00] px-4 py-1.5 text-xs font-semibold text-[#CCFF00]">
 									{assignment.status === 'pending' ? 'Очікує' : 'Оцінено'}

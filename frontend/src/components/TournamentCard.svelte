@@ -114,15 +114,15 @@
 			<div class="flex items-center">
 				<StateTag variant={current_state} class="text-[3cqw] xl:text-[2.5cqw]"></StateTag>
 			</div>
-			<span class="text-[3.5cqw] font-medium select-none xl:text-[3cqw]">{formattedRounds}</span>
+			<span class="text-anywhere text-[3.5cqw] font-medium select-none xl:text-[3cqw]">{formattedRounds}</span>
 		</div>
 
 		<h3
-			class="mt-[2cqw] mb-[3cqw] line-clamp-1 max-w-[25ch] truncate text-[6cqw] font-black select-none xl:text-[5cqw]"
+			class="text-anywhere mt-[2cqw] mb-[3cqw] line-clamp-1 max-w-[25ch] overflow-hidden text-[6cqw] font-black select-none xl:text-[5cqw]"
 		>
 			{title}
 		</h3>
-		<p class="mb-[3cqw] line-clamp-2 text-[4cqw] leading-snug select-none xl:text-[3.5cqw]">
+		<p class="text-anywhere mb-[3cqw] line-clamp-2 overflow-hidden text-[4cqw] leading-snug select-none xl:text-[3.5cqw]">
 			{description}
 		</p>
 
@@ -134,7 +134,7 @@
 						alt="Calendar icon"
 						class="h-auto w-[4cqw] select-none xl:w-[3.5cqw]"
 					/>
-					<span class="text-[3.5cqw] font-medium select-none xl:text-[3cqw]"
+					<span class="text-anywhere text-[3.5cqw] font-medium select-none xl:text-[3cqw]"
 						>{formattedStartDate}</span
 					>
 				</div>
@@ -145,7 +145,7 @@
 						alt="Teams icon"
 						class="h-auto w-[3.5cqw] select-none xl:w-[3cqw]"
 					/>
-					<span class="text-[3.5cqw] font-medium select-none xl:text-[3cqw]"
+					<span class="text-anywhere text-[3.5cqw] font-medium select-none xl:text-[3cqw]"
 						>{registered_teams}/{max_teams} команд</span
 					>
 				</div>

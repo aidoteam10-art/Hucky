@@ -345,7 +345,8 @@ impl TeamService {
         let invitation = find_invitation(db, invitation_id).await?;
 
         ensure_invitation_belongs_to_user(&invitation, user.user_id, &current_user.email)?;
-        ensure_pending_and_unexpired(&invitation)?;
+        let tournament = find_tournament(db, invitation.tournament_id).await?;
+        ensure_invitation_can_be_accepted(&invitation, &tournament)?;
 
         if TeamRepository::accepted_membership_in_tournament(
             db,
@@ -563,8 +564,13 @@ fn ensure_team_registration_is_open(tournament: &Tournament) -> ApiResult<()> {
         .map_err(|_| ApiError::Validation("Tournament has invalid status".to_string()))?;
     if status != TournamentStatus::Registration {
         return Err(ApiError::Validation(
-            "Team registration is available only while tournament status is registration"
-                .to_string(),
+            "Team registration is available only while tournament registration is open".to_string(),
+        ));
+    }
+
+    if Utc::now() >= tournament.registration_ends_at {
+        return Err(ApiError::Validation(
+            "Team registration is closed for this tournament".to_string(),
         ));
     }
 
@@ -619,6 +625,18 @@ fn ensure_pending_and_unexpired(invitation: &super::model::TeamInvitation) -> Ap
     }
 
     Ok(())
+}
+
+fn ensure_invitation_can_be_accepted(
+    invitation: &super::model::TeamInvitation,
+    tournament: &Tournament,
+) -> ApiResult<()> {
+    ensure_pending_and_unexpired(invitation)?;
+    ensure_team_registration_is_open(tournament).map_err(|_| {
+        ApiError::Validation(
+            "Invitation can be accepted only while tournament registration is open".to_string(),
+        )
+    })
 }
 
 fn build_team_detail(
@@ -799,14 +817,14 @@ mod tests {
     }
 
     #[test]
-    fn allows_team_registration_when_status_is_registration_after_date_window() {
+    fn rejects_team_registration_after_registration_end() {
         let tournament = tournament_with_status(
             TournamentStatus::Registration,
             Utc::now() - Duration::days(2),
             Utc::now() - Duration::days(1),
         );
 
-        assert!(ensure_team_registration_is_open(&tournament).is_ok());
+        assert!(ensure_team_registration_is_open(&tournament).is_err());
     }
 
     #[test]
@@ -838,6 +856,57 @@ mod tests {
         assert!(ensure_pending_and_unexpired(&invitation).is_err());
     }
 
+    #[test]
+    fn rejects_invitation_when_registration_ended() {
+        let invitation = pending_invitation();
+        let tournament = tournament_with_status(
+            TournamentStatus::Registration,
+            Utc::now() - Duration::days(2),
+            Utc::now() - Duration::minutes(1),
+        );
+
+        assert!(ensure_invitation_can_be_accepted(&invitation, &tournament).is_err());
+    }
+
+    #[test]
+    fn rejects_invitation_when_tournament_is_running() {
+        let invitation = pending_invitation();
+        let tournament = tournament_with_status(
+            TournamentStatus::Running,
+            Utc::now() - Duration::days(2),
+            Utc::now() + Duration::days(1),
+        );
+
+        assert!(ensure_invitation_can_be_accepted(&invitation, &tournament).is_err());
+    }
+
+    #[test]
+    fn accepts_invitation_while_registration_is_open() {
+        let invitation = pending_invitation();
+        let tournament = tournament_with_status(
+            TournamentStatus::Registration,
+            Utc::now() - Duration::days(1),
+            Utc::now() + Duration::days(1),
+        );
+
+        assert!(ensure_invitation_can_be_accepted(&invitation, &tournament).is_ok());
+    }
+
+    fn pending_invitation() -> super::super::model::TeamInvitation {
+        super::super::model::TeamInvitation {
+            id: Uuid::new_v4(),
+            team_id: Uuid::new_v4(),
+            tournament_id: Uuid::new_v4(),
+            email: "user@example.com".to_string(),
+            invited_user_id: None,
+            invited_by: Uuid::new_v4(),
+            status: InvitationStatus::Pending.as_str().to_string(),
+            expires_at: Utc::now() + Duration::days(1),
+            created_at: Utc::now(),
+            updated_at: Utc::now(),
+        }
+    }
+
     fn tournament_with_status(
         status: TournamentStatus,
         registration_starts_at: chrono::DateTime<Utc>,
@@ -845,6 +914,7 @@ mod tests {
     ) -> Tournament {
         Tournament {
             id: Uuid::new_v4(),
+            organizer_id: Uuid::new_v4(),
             title: "Test tournament".to_string(),
             description: "Description".to_string(),
             rules: "Rules".to_string(),

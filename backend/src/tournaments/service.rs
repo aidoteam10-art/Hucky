@@ -6,7 +6,11 @@ use uuid::Uuid;
 use crate::{
     error::{ApiError, ApiResult},
     rounds::{model::NewRound, repository::RoundRepository, service::RoundService},
-    users::{auth::AuthenticatedUser, model::AccountRole, repository::UserRepository},
+    users::{
+        auth::{AuthenticatedUser, OptionalAuthenticatedUser},
+        model::AccountRole,
+        repository::UserRepository,
+    },
 };
 
 use super::{
@@ -84,6 +88,7 @@ impl TournamentService {
 
     pub async fn list_tournaments(
         db: &PgPool,
+        user: OptionalAuthenticatedUser,
         query: TournamentListQuery,
     ) -> ApiResult<TournamentListResponse> {
         let page = query.page.unwrap_or(1).max(1);
@@ -92,6 +97,7 @@ impl TournamentService {
         let filter = TournamentListFilter {
             status: query.status,
             search: query.search,
+            viewer_id: user.0.map(|user| user.user_id),
             page,
             per_page,
         };
@@ -133,9 +139,11 @@ impl TournamentService {
 
     pub async fn get_tournament(
         db: &PgPool,
+        user: OptionalAuthenticatedUser,
         tournament_id: Uuid,
     ) -> ApiResult<TournamentDetailResponse> {
         let tournament = find_tournament(db, tournament_id).await?;
+        ensure_can_view_tournament(&tournament, user.0)?;
         build_detail_response(db, tournament).await
     }
 
@@ -256,6 +264,21 @@ async fn find_tournament(db: &PgPool, tournament_id: Uuid) -> ApiResult<Tourname
     TournamentRepository::find_by_id(db, tournament_id)
         .await?
         .ok_or_else(|| ApiError::NotFound("Tournament not found".to_string()))
+}
+
+fn ensure_can_view_tournament(
+    tournament: &Tournament,
+    user: Option<AuthenticatedUser>,
+) -> ApiResult<()> {
+    if tournament.status != TournamentStatus::Draft.as_str() {
+        return Ok(());
+    }
+
+    if user.is_some_and(|user| user.user_id == tournament.organizer_id) {
+        return Ok(());
+    }
+
+    Err(ApiError::NotFound("Tournament not found".to_string()))
 }
 
 async fn build_detail_response(
@@ -416,5 +439,48 @@ mod tests {
         );
 
         assert!(result.is_err());
+    }
+
+    #[test]
+    fn hides_draft_tournament_from_non_owner() {
+        let tournament = tournament_with_owner(Uuid::new_v4(), TournamentStatus::Draft);
+        let user = AuthenticatedUser {
+            user_id: Uuid::new_v4(),
+        };
+
+        assert!(ensure_can_view_tournament(&tournament, Some(user)).is_err());
+        assert!(ensure_can_view_tournament(&tournament, None).is_err());
+    }
+
+    #[test]
+    fn allows_draft_tournament_owner() {
+        let owner_id = Uuid::new_v4();
+        let tournament = tournament_with_owner(owner_id, TournamentStatus::Draft);
+        let user = AuthenticatedUser { user_id: owner_id };
+
+        assert!(ensure_can_view_tournament(&tournament, Some(user)).is_ok());
+    }
+
+    #[test]
+    fn allows_published_tournament_without_user() {
+        let tournament = tournament_with_owner(Uuid::new_v4(), TournamentStatus::Registration);
+
+        assert!(ensure_can_view_tournament(&tournament, None).is_ok());
+    }
+
+    fn tournament_with_owner(owner_id: Uuid, status: TournamentStatus) -> Tournament {
+        Tournament {
+            id: Uuid::new_v4(),
+            organizer_id: owner_id,
+            title: "Spring Hackathon".to_string(),
+            description: "Detailed tournament description".to_string(),
+            rules: "Tournament rules are clear".to_string(),
+            status: status.as_str().to_string(),
+            registration_starts_at: date(1),
+            registration_ends_at: date(5),
+            starts_at: date(6),
+            ends_at: None,
+            max_teams: Some(20),
+        }
     }
 }

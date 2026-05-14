@@ -6,6 +6,7 @@ use axum::{
 use serde::Serialize;
 use tower_http::cors::CorsLayer;
 
+pub mod automation;
 pub mod config;
 pub mod error;
 pub mod evaluations;

@@ -3,10 +3,22 @@ import { apiRequest, getAuthToken } from '$lib/server/api';
 const allowedStatuses = new Set(['draft', 'registration', 'running', 'finished']);
 
 export const load = async ({ url, cookies, fetch }) => {
-	const status = url.searchParams.get('status') || 'all';
+	let status = url.searchParams.get('status') || 'all';
 	const search = url.searchParams.get('search') || '';
 	const page = Math.max(Number(url.searchParams.get('page') || 1), 1);
 	const perPage = 6;
+	const token = getAuthToken(cookies);
+	let profile = null;
+
+	try {
+		profile = token ? await apiRequest(fetch, '/api/users/me', { token }) : null;
+	} catch {
+		profile = null;
+	}
+
+	if (status === 'draft' && profile?.role !== 'organiser') {
+		status = 'all';
+	}
 
 	const params = new URLSearchParams({
 		page: String(page),
@@ -15,13 +27,9 @@ export const load = async ({ url, cookies, fetch }) => {
 
 	if (allowedStatuses.has(status)) params.set('status', status);
 	if (search.trim()) params.set('search', search.trim());
-	const token = getAuthToken(cookies);
 
 	try {
-		const [tournaments, profile] = await Promise.all([
-			apiRequest(fetch, `/api/tournaments?${params.toString()}`),
-			token ? apiRequest(fetch, '/api/users/me', { token }) : Promise.resolve(null)
-		]);
+		const tournaments = await apiRequest(fetch, `/api/tournaments?${params.toString()}`, { token });
 
 		return {
 			tournaments,
