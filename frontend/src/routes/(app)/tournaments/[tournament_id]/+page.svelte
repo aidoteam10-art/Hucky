@@ -15,7 +15,7 @@
 	$: registeredTeams = tournament.registered_teams || [];
 	$: userTeam = data.userTeam;
 	$: canSetupRounds = data.canManage && ['draft', 'registration'].includes(tournament.status);
-	$: canManageJury = data.canManage && tournament.status === 'registration';
+	$: canManageJury = data.canManage && tournament.status !== 'finished';
 	$: canOperateRounds = data.canManage && tournament.status === 'running';
 
 	function formatDate(value) {

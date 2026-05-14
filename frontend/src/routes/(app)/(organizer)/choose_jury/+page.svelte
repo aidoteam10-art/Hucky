@@ -5,12 +5,12 @@
 	let selectedJuryId = '';
 	let selectedTournamentId = data.selectedTournamentId || '';
 
-	$: registrationTournaments = data.tournaments || [];
+	$: manageableTournaments = data.tournaments || [];
 	$: juries = data.juries || [];
-	$: if (!selectedTournamentId && registrationTournaments.length > 0) {
-		selectedTournamentId = registrationTournaments[0].id;
+	$: if (!selectedTournamentId && manageableTournaments.length > 0) {
+		selectedTournamentId = manageableTournaments[0].id;
 	}
-	$: selectedTournament = registrationTournaments.find(
+	$: selectedTournament = manageableTournaments.find(
 		(tournament) => tournament.id === selectedTournamentId
 	);
 	$: assignedJuries = selectedTournament
@@ -21,7 +21,7 @@
 		: [];
 	$: assignedElsewhere = juries
 		.map((jury) => {
-			const assignedTournaments = registrationTournaments.filter(
+			const assignedTournaments = manageableTournaments.filter(
 				(item) => item.id !== selectedTournament?.id && item.jury_ids.includes(jury.id)
 			);
 
@@ -32,6 +32,7 @@
 		.filter(Boolean);
 
 	const statusLabel = {
+		draft: 'Чернетка',
 		registration: 'Реєстрація',
 		running: 'Активний',
 		finished: 'Завершений'
@@ -55,7 +56,7 @@
 				</h1>
 			</div>
 			<p class="max-w-5xl text-[1.0625rem] leading-8 text-[#696969] sm:text-[1.25rem]">
-				Призначайте користувачів з роллю журі на турніри, де ще відкрита реєстрація.
+				Призначайте користувачів з роллю журі на турніри, які ще не завершені.
 				Якщо журі вже є в іншому вашому турнірі, це буде показано окремо.
 			</p>
 		</div>
@@ -69,11 +70,11 @@
 		<div class="grid gap-7 lg:grid-cols-[18rem_minmax(0,1fr)] xl:grid-cols-[20rem_minmax(0,1fr)]">
 			<aside>
 				<h2 class="mb-4 text-[1rem] font-medium uppercase text-[#696969]">
-					МОЇ ТУРНІРИ ({registrationTournaments.length})
+					МОЇ ТУРНІРИ ({manageableTournaments.length})
 				</h2>
 
 				<div class="grid gap-3">
-					{#each registrationTournaments as tournament}
+					{#each manageableTournaments as tournament}
 						<button
 							type="button"
 							on:click={() => selectTournament(tournament.id)}
@@ -109,7 +110,7 @@
 						</button>
 					{:else}
 						<p class="rounded-lg border border-[#B4B4B4] p-4 text-[0.9375rem] text-[#696969]">
-							У вас немає турнірів з відкритою реєстрацією.
+							У вас немає незавершених турнірів.
 						</p>
 					{/each}
 				</div>
@@ -223,7 +224,7 @@
 								</article>
 							{:else}
 								<p class="rounded-lg bg-[#F4F4F4] px-4 py-3 text-[0.9375rem] text-[#696969]">
-									Немає журі, призначених на інші турніри з відкритою реєстрацією.
+									Немає журі, призначених на інші незавершені турніри.
 								</p>
 							{/each}
 						</div>
@@ -232,7 +233,7 @@
 			{:else}
 				<section class="rounded-xl border border-[#B4B4B4] bg-white p-6 text-[#696969]">
 					<h2 class="mb-2 text-[1.25rem] font-semibold text-[#191F00]">Немає доступних турнірів</h2>
-					<p>Відкрийте реєстрацію для турніру, щоб призначити на нього журі.</p>
+					<p>Журі можна призначати тільки на турніри, які ще не завершені.</p>
 				</section>
 			{/if}
 		</div>
