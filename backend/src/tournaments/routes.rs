@@ -3,6 +3,7 @@ use axum::{
     extract::{Path, Query, State},
     routing::{get, patch, post},
 };
+use serde_json::{Value, json};
 use uuid::Uuid;
 
 use crate::{
@@ -28,7 +29,9 @@ pub fn routes() -> Router<AppState> {
         )
         .route(
             "/api/tournaments/:id",
-            get(get_tournament_handler).patch(update_tournament_handler),
+            get(get_tournament_handler)
+                .patch(update_tournament_handler)
+                .delete(delete_tournament_handler),
         )
         .route(
             "/api/tournaments/:id/status",
@@ -72,6 +75,15 @@ async fn update_tournament_handler(
 ) -> ApiResult<Json<TournamentDetailResponse>> {
     let response = TournamentService::update_tournament(&state.db, user, id, payload).await?;
     Ok(Json(response))
+}
+
+async fn delete_tournament_handler(
+    State(state): State<AppState>,
+    user: AuthenticatedUser,
+    Path(id): Path<Uuid>,
+) -> ApiResult<Json<Value>> {
+    TournamentService::delete_tournament(&state.db, user, id).await?;
+    Ok(Json(json!({ "status": "deleted" })))
 }
 
 async fn change_tournament_status_handler(
